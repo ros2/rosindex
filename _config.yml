@@ -89,15 +89,10 @@ index_old_doc_paths: false
 # drop-down list in the distro selector.
 #
 distros:
-  - 'kinetic'
-  - 'jade'
-  - 'indigo'
-  - 'hydro'
+  - 'bionic'
+  - 'ardent'
 old_distros:
-  - 'groovy'
-  - 'fuerte'
-  - 'electric'
-  - 'diamondback'
+  - 'r2b3'
 
 # rosdep / xylem platforms
 #

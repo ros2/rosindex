@@ -1,6 +1,6 @@
 [submodule "_rosdistro"]
 	path = _rosdistro
-	url = https://github.com/ros/rosdistro.git
+	url = https://github.com/ros2/rosdistro.git
 [submodule "_deploy"]
 	path = _deploy
 	url = git@github.com:rosindex/rosindex.github.io.git
