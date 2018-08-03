@@ -1179,7 +1179,11 @@ class Indexer < Jekyll::Generator
     puts "Generating update report...".blue
 
     # read the old report
-    old_report = YAML.load(IO.read(site.config['report_filename']))
+    old_report = {}
+    old_report_filename = site.config['report_filename']
+    if File.exists?(old_report_filename)
+      old_report = YAML.load(IO.read(old_report_filename))
+    end
 
     # write out the report and the diff
     new_report = @db.get_report
