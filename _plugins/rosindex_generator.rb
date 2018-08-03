@@ -1070,8 +1070,11 @@ class Indexer < Jekyll::Generator
 
       # add attic repos
       attic_filename = site.config['attic_file']
+      attic_data = {}
       # read in the repo data
-      attic_data = YAML.load_file(attic_filename)
+      if File.exists?(attic_filename)
+        attic_data = YAML.load_file(attic_filename)
+      end
 
       attic_data.each do |repo_name, instances|
         puts " - Adding repositories for " << repo_name
