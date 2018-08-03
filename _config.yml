@@ -89,7 +89,7 @@ index_old_doc_paths: false
 # drop-down list in the distro selector.
 #
 distros:
-  - 'bionic'
+  - 'bouncy'
   - 'ardent'
 old_distros:
   - 'r2b3'
