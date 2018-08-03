@@ -1141,7 +1141,10 @@ class Indexer < Jekyll::Generator
     end
 
     # Load wiki title index
-    @wiki_data = parse_wiki_title_index(site.config['wiki_title_index_filename'])
+    @wiki_data = {}
+    if File.exists?(site.config['wiki_title_index_filename'])
+      @wiki_data = parse_wiki_title_index(site.config['wiki_title_index_filename'])
+    end
 
     # scrape all the repos
     unless @skip_scrape
