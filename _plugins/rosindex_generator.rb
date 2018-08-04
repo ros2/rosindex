@@ -208,6 +208,12 @@ class Indexer < Jekyll::Generator
         package_name = REXML::XPath.first(manifest_doc, "/package/name/text()").to_s.strip
         version = REXML::XPath.first(manifest_doc, "/package/version/text()").to_s.strip
 
+        # if a build type (e.g. ament_python for ROS 2) has been declared explicitly, use that as the package type
+        build_type = REXML::XPath.first(manifest_doc, "/package/export/build_type/text()").to_s.strip
+        unless build_type.length == 0
+          pkg_type = build_type
+        end
+
         # get dependencies
         deps = REXML::XPath.each(manifest_doc, "/package/build_depend/text() | /package/run_depend/text() | package/depend/text()").map { |a| a.to_s.strip }.uniq
 
