@@ -90,9 +90,8 @@ index_old_doc_paths: false
 #
 distros:
   - 'bouncy'
-  - 'ardent'
 old_distros:
-  - 'r2b3'
+  - 'ardent'
 
 # rosdep / xylem platforms
 #
