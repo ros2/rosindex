@@ -1204,12 +1204,14 @@ class Indexer < Jekyll::Generator
     site.static_files << ReportFile.new(site, site.dest, "/", report_filename)
     File.open(site.config['report_filename'],'w') {|f| f.write(report_yaml) }
 
-    report_diff = @db.diff_report(old_report, new_report)
-    report_yaml = report_diff.to_yaml
-    report_filename = 'index_report_diff.yaml'
-    File.open(File.join(site.dest, report_filename),'w') {|f| f.write(report_yaml) }
-    site.static_files << ReportFile.new(site, site.dest, "/", report_filename)
-    File.open(site.config['report_diff_filename'],'w') {|f| f.write(report_yaml) }
+    if not old_report.empty?
+      report_diff = @db.diff_report(old_report, new_report)
+      report_yaml = report_diff.to_yaml
+      report_filename = 'index_report_diff.yaml'
+      File.open(File.join(site.dest, report_filename),'w') {|f| f.write(report_yaml) }
+      site.static_files << ReportFile.new(site, site.dest, "/", report_filename)
+      File.open(site.config['report_diff_filename'],'w') {|f| f.write(report_yaml) }
+    end
 
     # compute post-scrape details
     # TODO: check for missing deps or just leave them as nil?
