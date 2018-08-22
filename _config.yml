@@ -78,10 +78,10 @@ exclude:
   - Gemfile.lock
   - README.md
 
-rosdep_path: _rosdep
-rosdistro_path: _rosdistro
-repos_path: _rosforks/repos
-attic_file: _rosforks/attic.yaml
+rosdep_path: ../rosdep
+rosdistro_path: ../rosdistro
+repos_path: ../rosforks/repos
+attic_file: ../rosforks/attic.yaml
 index_old_doc_paths: false
 
 # ROS distros to look for
