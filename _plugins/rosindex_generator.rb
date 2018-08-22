@@ -769,8 +769,10 @@ class Indexer < Jekyll::Generator
 
     # load rosdep data
     # TODO: check deps against this when generating pages
+    rosdep_path = site.config.key?('rosdep_path') ? site.config['rosdep_path']: site.config['rosdistro_path']
+
     raw_rosdeps = load_rosdeps(
-      site.config['rosdistro_path'],
+      rosdep_path,
       site.config['platforms'],
       site.config['package_manager_names'].keys)
 
