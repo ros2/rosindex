@@ -1,0 +1,13 @@
+repositories:
+  rosdistro:
+    type: git
+    url: git@github.com:ros/rosdistro.git
+    version: master
+  rosdep:
+    type: git
+    url: git@github.com:ros/rosdistro.git
+    version: master
+  rosforks:
+    type: git
+    url: git@github.com:rosindex/rosforks.git
+    version: master

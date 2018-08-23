@@ -7,7 +7,7 @@ baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://rosindex.github.io" # the base hostname & protocol for your site
 #twitter_username: jekyllrb
 github_username:  rosindex
-destination: _deploy
+destination: ../deploy
 
 # Build settings
 markdown: redcarpet
@@ -32,11 +32,11 @@ redcarpet:
 
 # If true, this begins with an existing db
 use_db_cache: false
-db_cache_filename: _caches/_deploy_cache.db
-report_filename: _caches/_deploy_index_report.yaml
-report_diff_filename: _caches/_deploy_index_report_diff.yaml
-debbuild_release_path: _caches/debbuild_releases
-wiki_title_index_filename: _caches/ros_org_wiki_title_index.txt
+db_cache_filename: ../cache/_deploy_cache.db
+report_filename: ../cache/_deploy_index_report.yaml
+report_diff_filename: ../cache/_deploy_index_report_diff.yaml
+debbuild_release_path: ../cache/debbuild_releases
+wiki_title_index_filename: ../cache/ros_org_wiki_title_index.txt
 
 # If true, this skips finding repos based on the repo sources
 skip_discover: false
@@ -63,15 +63,8 @@ domain_blacklist:
 
 exclude:
   - _scripts
-  - _deploy
   - _devel
-  - _caches
-  - _rosdistro
-  - _rosforks
-  - _deploy_cache.db
-  - _devel_cace.db
   - _ruby_libs
-  - _checkout
   - node_modules
   - Rakefile
   - Gemfile

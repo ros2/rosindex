@@ -59,6 +59,21 @@ cd rosindex.github.io
 bundle install
 ```
 
+### Get resources
+
+Needed resources are the rosdistro to index and the rosdep keys as well as known forks.
+TODO document vcs
+```
+vcs import --input resources.repos ..
+```
+
+### Create necessary temporary files
+
+```
+mkdir -p ../cache/checkout
+mkdir ../deploy
+```
+
 ### Build the Devel (Tiny) Version
 
 ```
