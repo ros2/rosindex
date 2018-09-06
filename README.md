@@ -18,11 +18,13 @@ and uses client-side javascript for quick searching and visualization.
 
 ### Pre-Requisites
 
-#### Basic Ubuntu 12.04 Deps
+#### Basic Ubuntu 16.04 Deps
 
 ```
+echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
+apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update
-sudo apt-get install curl git git-svn mercurial nodejs pandoc
+sudo apt-get install curl git git-svn mercurial nodejs pandoc python3-vcs
 ```
 
 #### Ruby 2.2 via RVM
@@ -54,39 +56,30 @@ gem install bundler
 #### Clone Source and Install Gems
 
 ```
-git clone git@github.com:rosindex/rosindex --recursive
+git clone git@github.com:ros2/rosindex.git --recursive
 cd rosindex.github.io
 bundle install
 ```
 
-### Get resources
-
-Needed resources are the rosdistro to index and the rosdep keys as well as known forks.
-TODO document vcs
-```
-vcs import --input resources.repos ..
-```
-
-### Create necessary temporary files
+### Clone repos that are part of rosdistro and build the index
 
 ```
-mkdir -p ../cache/checkout
-mkdir ../deploy
+make build
 ```
 
-### Build the Devel (Tiny) Version
+### Serve the devel (tiny) version locally
 
 ```
-rake build:devel
+make serve-devel
 ```
 
-### Build the Deploy (Full) Version
+### Serve the full version locally
 
 **Note:** This requires a minimum of 30GB of
-free space for the `_checkout` directory.
+free space for the `checkout` directory.
 
 ```
-rake build:devel
+make serve
 ```
 
 ### Skipping Parts of the Build
@@ -116,12 +109,8 @@ skip_search_index: false
 
 ## Deployment
 
-Deployment is done by simply pushing the generated site to GitHub:
+Deployment is done by calling the following make command:
 
 ```
-cd _deploy
-git add .
-git commit -a --amend
-git push -f origin master
+make deploy
 ```
-
