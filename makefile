@@ -11,14 +11,18 @@ html: build deploy
 # Clone a bunch of other repos part of the rosdistro and build the index.
 build:
 	mkdir -p $(deploy_dir)/cache
+	mkdir -p $(workdir)/cache/checkout
+	vcs import --input resources.repos $(workdir)
 	bundle exec jekyll build --verbose --trace --config=$(config_file)
 
 # deploy assumes download-previous and build were run already
 deploy:
-	cd $(deploy_dir) && git add --all
-	cd $(deploy_dir) && git status
-	cd $(deploy_dir) && git commit -m "make deploy by `whoami` on `date`"
-	cd $(deploy_dir) && git push --verbose
+	# TODO(apojomovsky): re-enable deployment once the deploy URL is updated in
+	# https://github.com/ros2/rosindex/blob/clear_submodules/resources.repos#L16
+	#cd $(deploy_dir) && git add --all
+	#cd $(deploy_dir) && git status
+	#cd $(deploy_dir) && git commit -m "make deploy by `whoami` on `date`"
+	#cd $(deploy_dir) && git push --verbose
 
 serve:
 	bundle exec jekyll serve --host 0.0.0.0 --trace -d $(deploy_dir) --config=$(config_file) --skip-initial-build
