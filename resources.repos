@@ -1,0 +1,17 @@
+repositories:
+  rosdistro:
+    type: git
+    url: git@github.com:ros2/rosdistro.git
+    version: ros2
+  rosdep:
+    type: git
+    url: git@github.com:ros/rosdistro.git
+    version: master
+  rosforks:
+    type: git
+    url: git@github.com:rosindex/rosforks.git
+    version: master
+  deploy:
+    type: git
+    url: git@github.com:ros-infrastructure/index.ros.org.git
+    version: gh-pages

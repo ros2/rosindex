@@ -1,15 +1,3 @@
-[submodule "_rosdistro"]
-	path = _rosdistro
-	url = https://github.com/ros2/rosdistro.git
-[submodule "_deploy"]
-	path = _deploy
-	url = git@github.com:rosindex/rosindex.github.io.git
 [submodule "js/venn.js"]
 	path = js/venn.js
 	url = https://github.com/benfred/venn.js
-[submodule "_caches"]
-	path = _caches
-	url = git@github.com:rosindex/caches.git
-[submodule "_rosforks"]
-	path = _rosforks
-	url = git@github.com:rosindex/rosforks.git

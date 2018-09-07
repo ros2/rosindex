@@ -6,8 +6,8 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        <li><a href="/repos">Repos</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
+        <li><a href="{{site.baseurl}}/repos">Repos</a></li>
         <li class="active">{{page.repo.name}}</li>
         <!--<li class="active">{{page.instance.name}}</li>-->
       </ol>
@@ -51,7 +51,7 @@ layout: default
                 <tbody>
                 {% for p in page.repo.snapshots[distro].packages %}
                   <tr>
-                    <td><a href="/p/{{p[1].name}}/{{page.repo.id}}">{{ p[1].name }}</a></td>
+                    <td><a href="{{site.baseurl}}/p/{{p[1].name}}/{{page.repo.id}}">{{ p[1].name }}</a></td>
                     <td>{{ p[1].data.version }}</td>
                   </tr>
                 {% endfor %}
@@ -94,4 +94,3 @@ layout: default
   </div>
 {% endfor %}
 
-<script src="/js/distro_switch.js"></script>

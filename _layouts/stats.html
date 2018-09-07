@@ -5,7 +5,7 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
         <li class="active">Statistics</li>
       </ol>
     </div>
@@ -19,7 +19,7 @@ layout: default
           <ul>
             <li><strong>Repositories:</strong> {{page.n_repos}}</li>
             <li><strong>Packages:</strong> {{page.n_packages}}</li>
-            <li><strong>Errors:</strong> <a href="/stats/errors">{{page.n_errors}}</a></li>
+            <li><strong>Errors:</strong> <a href="{{site.baseurl}}/stats/errors">{{page.n_errors}}</a></li>
           </ul>
         </div>
       </div>
@@ -78,9 +78,9 @@ layout: default
 </style>
 
 <script src="http://d3js.org/d3.v2.min.js"></script>
-<script src="/js/venn.js/venn.js"></script>
-<script src="/js/mds.js"></script>
-<script src="/js/numeric-1.2.6.js"></script>
+<script src="{{site.baseurl}}/js/venn.js/venn.js"></script>
+<script src="{{site.baseurl}}/js/mds.js"></script>
+<script src="{{site.baseurl}}/js/numeric-1.2.6.js"></script>
 <script>
 // define sets and set set intersections
 var sets = [

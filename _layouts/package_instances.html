@@ -6,15 +6,15 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        <li><a href="/packages">Packages</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
+        <li><a href="{{site.baseurl}}/packages">Packages</a></li>
         <li class="active">{{ page.package_instances.name }}</li>
       </ol>
     </div>
     <div class="row">
       <div class="well well-sm">
         <div class="top-buffer">
-          <h3><img style="width: 50px; margin-right: 5px;" src="/assets/package.png">{{page.package_name}} <small>package instances</small></h3>
+          <h3><img style="width: 50px; margin-right: 5px;" src={{ "/assets/package.png" | prepend: site.baseurl }}>{{page.package_name}} <small>package instances</small></h3>
         </div>
         <div class="top-buffer">
           {% for tag in page.repo.tags %}<span class="label label-default">{{ tag }}</span> {% endfor %}
@@ -43,7 +43,7 @@ layout: default
             <tbody>
             {% for repo in page.package_instances.instances %}
               <tr>
-                <td><a href="/p/{{page.package_instances.name}}/{{repo[0]}}">{{repo[0] }}</a></td>
+                <td><a href="{{site.baseurl}}/p/{{page.package_instances.name}}/{{repo[0]}}">{{repo[0] }}</a></td>
                 <td class="filterable-cell"><a href="{{repo[1].uri}}" class="label label-primary pull-right">{{ repo[1].uri }}</a></td>
               </tr>
             {% endfor %}

@@ -3,11 +3,11 @@ title: ROS Index
 #email: your-email@domain.com
 description: > # this means to ignore newlines until "baseurl:"
   a community-maintained index of robotics software
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://rosindex.github.io" # the base hostname & protocol for your site
+baseurl: "/index.ros.org" # the subpath of your site, e.g. /blog/
+url: "https://ros-infrastructure.github.io/index.ros.org/" # the base hostname & protocol for your site
 #twitter_username: jekyllrb
 github_username:  rosindex
-destination: _deploy
+destination: ../deploy
 
 # Build settings
 markdown: redcarpet
@@ -32,11 +32,11 @@ redcarpet:
 
 # If true, this begins with an existing db
 use_db_cache: false
-db_cache_filename: _caches/_deploy_cache.db
-report_filename: _caches/_deploy_index_report.yaml
-report_diff_filename: _caches/_deploy_index_report_diff.yaml
-debbuild_release_path: _caches/debbuild_releases
-wiki_title_index_filename: _caches/ros_org_wiki_title_index.txt
+db_cache_filename: ../deploy_cache/_deploy_cache.db
+report_filename: ../deploy_cache/_deploy_index_report.yaml
+report_diff_filename: ../deploy_cache/_deploy_index_report_diff.yaml
+debbuild_release_path: ../deploy_cache/debbuild_releases
+wiki_title_index_filename: ../deploy_cache/ros_org_wiki_title_index.txt
 
 # If true, this skips finding repos based on the repo sources
 skip_discover: false
@@ -63,24 +63,18 @@ domain_blacklist:
 
 exclude:
   - _scripts
-  - _deploy
   - _devel
-  - _caches
-  - _rosdistro
-  - _rosforks
-  - _deploy_cache.db
-  - _devel_cace.db
   - _ruby_libs
-  - _checkout
   - node_modules
   - Rakefile
   - Gemfile
   - Gemfile.lock
   - README.md
 
-rosdistro_path: _rosdistro
-repos_path: _rosforks/repos
-attic_file: _rosforks/attic.yaml
+rosdep_path: ../rosdep
+rosdistro_path: ../rosdistro
+repos_path: ../rosforks/repos
+attic_file: ../rosforks/attic.yaml
 index_old_doc_paths: false
 
 # ROS distros to look for

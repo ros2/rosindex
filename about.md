@@ -6,7 +6,7 @@ permalink: /about/
 
 # About
 
-<img style="margin-left: 40px; margin-right:40px; margin-bottom: 15px;" align="right" src="/assets/rosindex_logo.png" width="256">
+<img style="margin-left: 40px; margin-right:40px; margin-bottom: 15px;" align="right" src={{ "/assets/rosindex_logo.png" | prepend: site.baseurl }} width="256">
 
 ROS Index aims to be the *definitive index* of all ROS software. It aims to do this
 not only by indexing all known ROS packages listed in

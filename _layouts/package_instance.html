@@ -6,9 +6,9 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
-        <li><a href="/repos">Repos</a></li>
-        <li><a href="/r/{{page.instance.name}}/{{ page.instance.id }}">{{page.instance.name}}</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
+        <li><a href="{{site.baseurl}}/repos">Repos</a></li>
+        <li><a href="{{site.baseurl}}/r/{{page.instance.name}}/{{ page.instance.id }}">{{page.instance.name}}</a></li>
         <li class="active">{{page.package_name}}
         </li>
         <!--<li class="active">{{page.instance.name}}</li>-->
@@ -54,4 +54,3 @@ layout: default
   </div>
 {% endfor %}
 
-<script src="/js/distro_switch.js"></script>

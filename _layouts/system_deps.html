@@ -6,7 +6,7 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
         <li class="active">System Dependencies</li>
       </ol>
     </div>
@@ -28,7 +28,7 @@ layout: default
                     {% if page.sort_id == 'name' %}
                       <span class="selected-sort-label">Name</span>
                     {% else %}
-                      <a class="unselected-sort-label" href="/deps/page/1/name">Name</a>
+                      <a class="unselected-sort-label" href="{{site.baseurl}}/deps/page/1/name">Name</a>
                     {% endif %}
                   </th>
                   {% for platform in site.platforms %}
@@ -45,7 +45,7 @@ layout: default
                   {% assign dep_details = dep[1] %}
                   <tr>
                     <td>
-                      <a href="/d/{{dep_name}}">{{ dep_name }}</a>
+                      <a href="{{site.baseurl}}/d/{{dep_name}}">{{ dep_name }}</a>
                     </td>
                     {% comment %}<td>{% endcomment %}
                       {% comment %}{{dep_details}}{% endcomment %}
@@ -109,4 +109,3 @@ layout: default
   </div>
 </div>
 
-<script src="/js/distro_switch.js"></script>

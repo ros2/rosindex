@@ -6,7 +6,7 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
         <li class="active">Packages</li>
       </ol>
     </div>
@@ -29,21 +29,21 @@ layout: default
                     {% if page.sort_id == 'released' %}
                       <span class="glyphicon glyphicon-flash selected-sort-label"></span>
                     {% else %}
-                      <a href="/packages/page/1/released" class="unselected-sort-label glyphicon glyphicon-flash"></a>
+                      <a href="{{site.baseurl}}/packages/page/1/released" class="unselected-sort-label glyphicon glyphicon-flash"></a>
                     {% endif %}
                   </th>
                   <th style="text-align: center;">
                     {% if page.sort_id == 'doc' %}
                       <span class="glyphicon glyphicon-file selected-sort-label"></span>
                     {% else %}
-                      <a href="/packages/page/1/doc" class="unselected-sort-label glyphicon glyphicon-file"></a>
+                      <a href="{{site.baseurl}}/packages/page/1/doc" class="unselected-sort-label glyphicon glyphicon-file"></a>
                     {% endif %}
                   </th>
                   <th style="text-align: center;">
                     {% if page.sort_id == 'time' %}
                       <span class="glyphicon glyphicon-time selected-sort-label"></span>
                     {% else %}
-                      <a href="/packages/page/1/time" class="unselected-sort-label glyphicon glyphicon-time"></a>
+                      <a href="{{site.baseurl}}/packages/page/1/time" class="unselected-sort-label glyphicon glyphicon-time"></a>
                     {% endif %}
                   </th>
                   <th style="text-align: left;">
@@ -63,7 +63,7 @@ layout: default
                   {% assign n_instances = package[1].instances | size %}
                   <tr>
                     <td title="View Package Instances" data-toggle="tooltip" data-placement="left" align="center">
-                      <a href="/packages/{{package[0]}}" class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
+                      <a href="{{site.baseurl}}/packages/{{package[0]}}" class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
                           {{n_instances}}
                       </a>
                     </td>
@@ -91,7 +91,7 @@ layout: default
                         <span class="label label-default">{{ r.data.last_commit_time }}</span>
                       </td>
                       <td>
-                        <a href="/p/{{package[0]}}">{{ package[0] }}</a>
+                        <a href="{{site.baseurl}}/p/{{package[0]}}">{{ package[0] }}</a>
                       </td>
                       <td>
                         <div class="truncate">
@@ -105,7 +105,7 @@ layout: default
                       <td></td>
                       <td></td>
                       <td>
-                        <a class="inactive" href="/p/{{package[0]}}">{{ package[0] }}</a>
+                        <a class="inactive" href="{{site.baseurl}}/p/{{package[0]}}">{{ package[0] }}</a>
                       </td>
                       <td></td>
                     {% endif %}
@@ -123,4 +123,3 @@ layout: default
   </div>
 </div>
 
-<script src="/js/distro_switch.js"></script>

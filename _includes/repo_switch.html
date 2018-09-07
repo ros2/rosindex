@@ -13,7 +13,7 @@
       <ul class="dropdown-menu" role="menu">
         {% for variant in page.repo_variants %}
           <li role="presentation"><a id="{{variant[0]}}" role="menuitem" tabindex="-1" href="#" data="{{variant[0]}}">
-            {{variant[1].uri}}
+            {{site.baseurl}}/{{variant[1].uri}}
             <!--<span class="pull-right">-->
               <!--<span class="label label-default">released</span>-->
             <!--</span>-->
