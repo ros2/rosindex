@@ -13,5 +13,5 @@ repositories:
     version: master
   deploy:
     type: git
-    url: git@github.com:rosindex/rosindex.github.io.git
+    url: git@github.com:ros-infrastructure/index.ros.org.git
     version: master
