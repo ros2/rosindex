@@ -14,4 +14,4 @@ repositories:
   deploy:
     type: git
     url: git@github.com:ros-infrastructure/index.ros.org.git
-    version: master
+    version: gh-pages
