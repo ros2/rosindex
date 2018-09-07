@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 gem 'jekyll'
 gem 'colorator'
-gem 'rake'
 #gem 'git'
 gem 'rugged'
 gem 'typhoeus'
