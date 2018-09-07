@@ -6,8 +6,8 @@ layout: default
 <div class="container-fluid" style="margin:20px">
   <div class="row">
     <ol class="breadcrumb">
-      <li><a href="/">Home</a></li>
-      <li><a href="/repos">Repos</a></li>
+      <li><a href="{{site.baseurl}}/">Home</a></li>
+      <li><a href="{{site.baseurl}}/repos">Repos</a></li>
       <li class="active">{{ page.repo.name }}</li>
     </ol>
   </div>
@@ -82,8 +82,7 @@ layout: default
   </div>
 </div>
 
-<script src="/js/distro_switch.js"></script>
-<script src="/js/repo_switch.js"></script>
+<script src={{ "/js/repo_switch.js" | prepend: site.baseurl }}></script>
 
 <script>
 $(document).ready(function(){

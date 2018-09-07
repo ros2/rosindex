@@ -275,7 +275,7 @@ Assumes distro and package are defined
                   {% for d in package.data.system_deps %}
                     {% if d[1] %}
                       <tr>
-                        <td><a href="/d/{{d[0]}}">{{d[0]}}</a></td>
+                        <td><a href="{{site.baseurl}}/d/{{d[0]}}">{{d[0]}}</a></td>
                       </tr>
                     {% else %}
                       <tr class="danger">
@@ -418,4 +418,4 @@ Assumes distro and package are defined
   </div>
 </div>
 
-<script src="/js/package_body_tabs.js"></script>
+<script src={{ "/js/package_body_tabs.js" | prepend: site.baseurl }}></script>

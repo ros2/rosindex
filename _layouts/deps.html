@@ -6,7 +6,7 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
         <li class="active">Packages</li>
       </ol>
     </div>
@@ -27,28 +27,28 @@ layout: default
                 {% if page.sort_id == 'released' %}
                   <span class="glyphicon glyphicon-flash selected-sort-label"></span>
                 {% else %}
-                  <a href="/packages/page/1/released" class="unselected-sort-label glyphicon glyphicon-flash"></a>
+                  <a href="{{site.baseurl}}/packages/page/1/released" class="unselected-sort-label glyphicon glyphicon-flash"></a>
                 {% endif %}
               </th>
               <th style="text-align: center;">
                 {% if page.sort_id == 'doc' %}
                   <span class="glyphicon glyphicon-file selected-sort-label"></span>
                 {% else %}
-                  <a href="/packages/page/1/doc" class="unselected-sort-label glyphicon glyphicon-file"></a>
+                  <a href="{{site.baseurl}}/packages/page/1/doc" class="unselected-sort-label glyphicon glyphicon-file"></a>
                 {% endif %}
               </th>
               <th style="text-align: center;">
                 {% if page.sort_id == 'time' %}
                   <span class="glyphicon glyphicon-time selected-sort-label"></span>
                 {% else %}
-                  <a href="/packages/page/1/time" class="unselected-sort-label glyphicon glyphicon-time"></a>
+                  <a href="{{site.baseurl}}/packages/page/1/time" class="unselected-sort-label glyphicon glyphicon-time"></a>
                 {% endif %}
               </th>
               <th style="text-align: left;">
                 {% if page.sort_id == '' %}
                   <span class="selected-sort-label">Name</span>
                 {% else %}
-                  <a class="unselected-sort-label" href="/packages/page/1">Name</a>
+                  <a class="unselected-sort-label" href="{{site.baseurl}}/packages/page/1">Name</a>
                 {% endif %}
               </th>
               <th width="100%">Description</th>
@@ -61,7 +61,7 @@ layout: default
               {% assign n_instances = package[1].instances | size %}
               <tr>
                 <td title="View Package Instances" data-toggle="tooltip" data-placement="left" align="center">
-                  <a href="/packages/{{package[0]}}" class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
+                  <a href="{{site.baseurl}}/packages/{{package[0]}}" class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
                       {{n_instances}}
                   </a>
                 </td>

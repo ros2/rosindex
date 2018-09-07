@@ -6,9 +6,9 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="/">Home</a></li>
+        <li><a href="{{site.baseurl}}/">Home</a></li>
         {% for bc in page.breadcrumbs %}
-          <li><a href="/{{bc}}">{{bc}}</a></li>
+          <li><a href="{{site.baseurl}}/{{bc}}">{{bc}}</a></li>
         {% endfor %}
         <li class="active">{{ page.title }}</li>
       </ol>
