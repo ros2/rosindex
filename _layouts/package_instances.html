@@ -43,7 +43,7 @@ layout: default
             <tbody>
             {% for repo in page.package_instances.instances %}
               <tr>
-                <td><a href="/p/{{page.package_instances.name}}/{{repo[0]}}">{{repo[0] }}</a></td>
+                <td><a href="{{site.baseurl}}/p/{{page.package_instances.name}}/{{repo[0]}}">{{repo[0] }}</a></td>
                 <td class="filterable-cell"><a href="{{repo[1].uri}}" class="label label-primary pull-right">{{ repo[1].uri }}</a></td>
               </tr>
             {% endfor %}
