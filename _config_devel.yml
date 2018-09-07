@@ -5,12 +5,8 @@ repos_per_page: 3
 # set the following to a non-zero value for testing (limit the number of indexed repos)
 max_repos: 2
 
-destination: _devel
-
 # If true, this begins with an existing db
 use_db_cache: true
-db_cache_filename: _caches/_devel_cache.db
-
 # If true, this skips finding repos based on the repo sources
 skip_discover: true
 # If true, this skips updating the known repos
@@ -21,7 +17,6 @@ skip_scrape: true
 skip_search_index: true
 
 checkout_threads: 1
-checkout_path: "../checkout"
 
 # if non-empty, only scrape these packages (useful for debugging / partial db updates)
 scrape_whitelist: []
