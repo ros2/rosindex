@@ -289,6 +289,9 @@ class Indexer < Jekyll::Generator
         end
       }
 
+      # extract the paths to the readme files that were explicitly declared in the package
+      readmes_relpath = REXML::XPath.each(manifest_doc, "/package/export/rosindex/readme/text()").map(&:to_s)
+
       # compute the relative path from the root of the repo to this directory
       relpath = Pathname.new(File.join(*path)).relative_path_from(Pathname.new(checkout_path))
       local_package_path = Pathname.new(path)
@@ -297,8 +300,18 @@ class Indexer < Jekyll::Generator
       raw_uri = File.join(data['raw_uri'], relpath)
       browse_uri = File.join(data['browse_uri'], relpath)
 
+      # generate an array of pairs composed of the rendered and the not-rendered version
+      # of a readme file.
+      readmes_uncurated = readmes_relpath.map do |readme_relpath|
+        get_md_rst_txt(site, path, readme_relpath, raw_uri)
+      end.push(get_readme(site, path, raw_uri))
+
+      # curate the list by removing the nil elements
+      readmes_rendered, readmes = readmes_uncurated.reject do |x|
+        x[0].nil? || x[1].nil?
+      end.transpose
+      
       # check for readme in same directory as package.xml
-      readme_rendered, readme = get_readme(site, path, raw_uri)
       changelog_rendered, changelog = get_changelog(site, path, raw_uri)
 
       # TODO: don't do this for cmake-based packages
@@ -353,8 +366,8 @@ class Indexer < Jekyll::Generator
         'tags' => tags,
         'nodes' => nodes,
         # readme
-        'readme' => readme,
-        'readme_rendered' => readme_rendered,
+        'readmes' => readmes,
+        'readmes_rendered' => readmes_rendered,
         # changelog
         'changelog' => changelog,
         'changelog_rendered' => changelog_rendered,
