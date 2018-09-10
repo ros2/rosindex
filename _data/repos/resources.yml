@@ -1,3 +1,4 @@
+# VCS repos file listing rosindex generation resources.
 repositories:
   rosdistro:
     type: git

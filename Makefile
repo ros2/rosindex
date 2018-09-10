@@ -5,6 +5,9 @@ workdir=..
 deploy_dir=$(workdir)/deploy
 checkout_dir=$(workdir)/checkout
 
+data_dir=_data
+docs_dir=doc
+
 # This target is invoked by a doc_independent job on the ROS buildfarm.
 html: build deploy
 
@@ -12,7 +15,10 @@ html: build deploy
 build:
 	mkdir -p $(checkout_dir)
 	mkdir -p $(deploy_dir)
-	vcs import --input resources.repos --force $(workdir)
+	mkdir -p $(cache_dir)
+	vcs import --input $(data_dir)/repos/resources.yml --force $(workdir)
+	mkdir -p $(docs_dir)
+	vcs import --input $(data_dir)/repos/docs.yml $(docs_dir)
 	bundle exec jekyll build --verbose --trace --config=$(config_file)
 
 # deploy assumes download-previous and build were run already
