@@ -936,7 +936,7 @@ class Indexer < Jekyll::Generator
               if @all_repos.key?(repo.id)
                 repo = @all_repos[repo.id]
               else
-                puts " -- Adding repo " << repo.name << " instance: " << repo.id << " from uri: " << repo.uri.to_s << " with version: " <<source_version
+                puts " -- Adding repo " << repo.name << " instance: " << repo.id << " from uri: " << repo.uri.to_s << " with version: " << source_version
                 # store this repo in the unique index
                 @all_repos[repo.id] = repo
               end
@@ -1175,14 +1175,14 @@ class Indexer < Jekyll::Generator
       end
     end
 
-
     if site.config['use_db_cache']
       # backup the current db if it exists
       if File.exist?(@db_cache_filename) then FileUtils.mv(@db_cache_filename, @db_cache_filename+'.bak') end
       # save scraped data into the cache db
+      db_cache_dirname = File.dirname(@db_cache_filename)
+      Dir.mkdir(db_cache_dirname) unless File.directory?(db_cache_dirname)
       File.open(@db_cache_filename, 'w') {|f| f.write(Marshal.dump(@db)) }
     end
-
 
     puts "Generating update report...".blue
 
@@ -1204,6 +1204,8 @@ class Indexer < Jekyll::Generator
 
     File.open(File.join(site.dest, report_filename),'w+') {|f| f.write(report_yaml) }
     site.static_files << ReportFile.new(site, site.dest, "/", report_filename)
+    report_dirname = File.dirname(site.config['report_filename'])
+    Dir.mkdir(report_dirname) unless File.directory?(report_dirname)
     File.open(site.config['report_filename'],'w') {|f| f.write(report_yaml) }
 
     if not old_report.empty?
@@ -1212,6 +1214,8 @@ class Indexer < Jekyll::Generator
       report_filename = 'index_report_diff.yaml'
       File.open(File.join(site.dest, report_filename),'w') {|f| f.write(report_yaml) }
       site.static_files << ReportFile.new(site, site.dest, "/", report_filename)
+      report_diff_dirname = File.dirname(site.config['report_diff_filename'])
+      Dir.mkdir(report_diff_dirname) unless File.directory?(report_diff_dirname)
       File.open(site.config['report_diff_filename'],'w') {|f| f.write(report_yaml) }
     end
 
