@@ -15,13 +15,13 @@ of known ROS packages, and encourage people to get their packages added to the
 index *no matter how volatile or buggy they are*.
 
 ROS Index also aims to better summarize the pulse of the ROS development
-community with [statistics](/stats/) and the ability to list the [most recently
-updated ROS repositories](/packages/page/1/time/).
+community with [statistics]({{ "/stats/" | prepend: site.baseurl }}) and the ability to list the [most recently
+updated ROS repositories]({{ "/packages/page/1/time/" | prepend: site.baseurl }}).
 
 For more information see:
 
-* [Design](/about/design)
-* [Development](/about/development)
+* [Design]({{ "/about/design" | prepend: site.baseurl }})
+* [Development]({{ "/about/development" | prepend: site.baseurl }})
 
 See [rosindex on GitHub](https://github.com/rosindex/rosindex.github.io) for
 active development.

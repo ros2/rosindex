@@ -156,7 +156,7 @@ information is collected.
 The information collected is then written to disk as a Ruby marshalled data
 structure which can be re-loaded to rapidly experiment with data presentation.
 For details on controlling which parts of the build process are run, see
-[Development](/about/development/).
+[Development]({{ "/about/development/" | prepend: site.baseurl }}).
 
 ## Information Collected by ROS Index
 
@@ -181,4 +181,4 @@ For details on controlling which parts of the build process are run, see
 
 ### ROS Index Metadata
 
-See [ROS Index Metadata](/contribute/metadata) for more details.
+See [ROS Index Metadata]({{ "/contribute/metadata" | prepend: site.baseurl }}) for more details.
