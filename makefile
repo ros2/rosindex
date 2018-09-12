@@ -3,7 +3,6 @@ devel_config_file=_config_devel.yml
 
 workdir=..
 deploy_dir=$(workdir)/deploy
-cache_dir=$(workdir)/deploy_cache
 checkout_dir=$(workdir)/checkout
 
 # This target is invoked by a doc_independent job on the ROS buildfarm.
@@ -13,8 +12,7 @@ html: build deploy
 build:
 	mkdir -p $(checkout_dir)
 	mkdir -p $(deploy_dir)
-	mkdir -p $(cache_dir)
-	vcs import --input resources.repos $(workdir)
+	vcs import --input resources.repos --force $(workdir)
 	bundle exec jekyll build --verbose --trace --config=$(config_file)
 
 # deploy assumes download-previous and build were run already
@@ -28,9 +26,8 @@ serve:
 	bundle exec jekyll serve --host 0.0.0.0 --trace -d $(deploy_dir) --config=$(config_file) --skip-initial-build
 
 serve-devel:
-	bundle exec jekyll serve --host 0.0.0.0 --no-watch -d $(deploy_dir) --trace --config=$(config_file),$(devel_config_file) --skip-initial-build
+	bundle exec jekyll serve --host 0.0.0.0 --watch -d $(deploy_dir) --trace --config=$(config_file),$(devel_config_file) --skip-initial-build
 
 clean:
-	rm -rf $(checkout_dir)
 	rm -rf $(deploy_dir)
-	rm -rf $(cache_dir)
+	rm -rf $(checkout_dir)
