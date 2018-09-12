@@ -26,14 +26,14 @@ responsibility if you add your repository to `rosdistro`.
 If you would like you get your code indexed for documentation, click the
 button below.
 
-<a type="button" href="/contribute/add_repo" class="btn btn-success">Add a Repository to the Index</a>
+<a type="button" href={{ "/contribute/add_repo" | prepend: site.baseurl }} class="btn btn-success">Add a Repository to the Index</a>
 
 ### Adding a Fork of an Existing Repository
 
 If you would like you get your fork of an existing repository indexed for
 documentation, click the button below.
 
-<a type="button" href="/contribute/add_fork" class="btn btn-success disabled">Add a Repository Fork to the Index</a>
+<a type="button" href={{ "/contribute/add_fork" | prepend: site.baseurl }} class="btn btn-success disabled">Add a Repository Fork to the Index</a>
 
 ### Releasing Binary Packages
 
@@ -49,7 +49,7 @@ In addition to standard `README` formats, ROS Index also inspects ROS package
 manifest XML files for ROS Index-specific `<export>` tags in order to read
 additional metadata.
 
-See [ROS Index Metadata](/contribute/metadata) for documentation on these tags.
+See [ROS Index Metadata]({{ "/contribute/metadata" | prepend: site.baseurl }}) for documentation on these tags.
 
 ## Contributing Content to Packages Maintained by Others
 
@@ -67,7 +67,7 @@ packages which are no longer maintained, feel free to fork those packages on
 GitHub, add documentation, and get them indexed as forks (see above for
 contributing a fork).
 
-See [Resurrecting Packages](/contribute/resurrect) for documentation on how to
+See [Resurrecting Packages]({{ "/contribute/resurrect" | prepend: site.baseurl }}) for documentation on how to
 bring a package back from the dead.
 ## Opting out of Indexing
 
@@ -98,7 +98,7 @@ requests, and especially pull requests are welcome.
 
 <a href="https://github.com/rosindex/rosindex.github.io/issues/new" target="_blank" class="btn btn-success">Post an Issue</a>
 
-For more details on developing ROS Index, see [development](/about/development).
+For more details on developing ROS Index, see [development]({{ "/about/development" | prepend: site.baseurl }}).
 
 ## Fund ROS Index Development
 
