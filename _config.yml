@@ -67,7 +67,6 @@ exclude:
   - _devel
   - _ruby_libs
   - node_modules
-  - Rakefile
   - Gemfile
   - Gemfile.lock
   - README.md
