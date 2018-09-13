@@ -1,0 +1,17 @@
+# VCS repos file listing all non-package specific
+# documentation repositories. Its file format, however,
+# has been extended to include, on a per repository basis,
+# the following extra fields:
+#
+# - 'short_description': A description to be used to refer
+#                        to the content of the repository
+#                        as a whole, e.g. ROS Install
+#                        Instructions.
+#
+# These extra fields will be ignored by VCS upon repo importation.
+repositories:
+  ros2_overview:  # TODO(hidmic): Replace dummy repo with real ones.
+    type: git
+    url: git@github.com:hidmic/ros2_documentation.git
+    short_description: "ROS2 Overview"
+    version: master

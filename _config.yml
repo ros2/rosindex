@@ -28,6 +28,13 @@ redcarpet:
     - html_toc
     - tables
 
+defaults:
+  -
+    scope:
+      path: "doc"
+    values:
+      layout: page
+
 # OLD from jekyll 2.x
 #highlighter: pygments
 
@@ -70,6 +77,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - Makefile
 
 rosdep_path: ../rosdep
 rosdistro_path: ../rosdistro
@@ -191,5 +199,12 @@ repos_per_page: 50
 # uncomment the following line for testing (limit the number of indexed repos)
 max_repos: 00
 
+readme_index:
+  remove_originals: true
+
 plugins:
   - jekyll-sitemap
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+  - jekyll-readme-index
+  - jekyll-relative-links

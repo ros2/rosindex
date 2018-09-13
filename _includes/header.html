@@ -43,10 +43,18 @@
                     Doc <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    <li class="disabled"><a href="{{site.baseurl}}/categories/">Categories</a></li>
-                    <li class="disabled"><a href="{{site.baseurl}}/tutorials">Tutorials</a></li>
-                    <li class="disabled"><a href="{{site.baseurl}}/readmes">Readmes</a></li>
-                    <li class="disabled"><a href="{{site.baseurl}}/apis">APIs</a></li>
+                    {% for repo in site.data.repos.docs.repositories %}
+                    <li>
+                      <a href="{{site.baseurl}}/doc/{{ repo[0] }}">
+                        {{ repo[1].short_description }}
+                      </a>
+                    </li>
+                    {% endfor %}
+                    <li class="divider"></li>
+
+                    <li class="disabled"><a href="{{site.baseurl}}/doc/tutorials">Tutorials</a></li>
+                    <li class="disabled"><a href="{{site.baseurl}}/doc/readmes">Readmes</a></li>
+                    <li class="disabled"><a href="{{site.baseurl}}/doc/apis">APIs</a></li>
                   </ul>
                 </li>
 
