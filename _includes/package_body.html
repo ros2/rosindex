@@ -29,6 +29,9 @@ Assumes distro and package are defined
     {% assign n_tutorials = package.data.wiki.tutorials | size %}
     <a href="#{{distro}}-tutorials" data-toggle="tab"><span class="label label-{%if n_tutorials == 0%}default{%else%}primary{%endif%}">{{n_tutorials}}</span> Tutorials</a>
   </li>
+  <li class="better-tabs">
+    <a href="#{{distro}}-answers" data-toggle="tab"><span class="label label-primary"><div id='answers_count'></div></span> Q & A</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -217,6 +220,17 @@ Assumes distro and package are defined
       </div>
       <div class="panel-body">
         <em>Not currently indexed.</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="{{distro}}-answers">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Answers.ros.org Recent Questions Tagged: <kbd>{{package.name}}</kbd></h3>
+      </div>
+      <div class="panel-body">
+        <div id='answers_result' class="question"></div>
       </div>
     </div>
   </div>
@@ -429,3 +443,75 @@ Assumes distro and package are defined
 </div>
 
 <script src={{ "/js/package_body_tabs.js" | prepend: site.baseurl }}></script>
+
+
+<script type="text/javascript" src={{"/js/jquery-min.js" | prepend: site.baseurl }}></script>
+<script type="text/javascript" src={{"/js/jquery.jfeed.pack.js" | prepend: site.baseurl }}></script>
+
+<script type="text/javascript">
+jQuery.browser = {};
+(function () {
+    jQuery.browser.msie = false;
+    jQuery.browser.version = 0;
+    if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+        jQuery.browser.msie = true;
+        jQuery.browser.version = RegExp.$1;
+    }
+})();
+jQuery(function() {
+    jQuery.getFeed({
+        url: 'https://answers.ros.org/feeds/rss/?tags={{package.name}}',
+        success: function(feed) {
+            var html = '';
+
+            if (feed.items.length == 0) {
+              html = 'No questions yet, you can ask one <a href="https://answers.ros.org/questions/ask/?tags={{package.name}},{{distro}}">here</a>.'
+              jQuery('#answers_result').replaceWith(html);
+              jQuery('#answers_count').replaceWith(feed.items.length)
+              return
+            }
+            html += '<p>Browse '
+            + '<a href="https://answers.ros.org/questions/scope:all/sort:activity-desc/tags:{{package.name}}/page:1/">recent questions</a>'
+            + ' or see the '
+            + '<a href="https://answers.ros.org/questions/scope:all/sort:votes-desc/tags:{{package.name}}/page:1/">higest voted</a>'
+            + '</p>'
+
+            html += '<div class="question_list">'
+            + '<h4>Recent questions preview:</h4>'
+            + '<ul>'
+            for(var i = 0; i < feed.items.length && i < 50; i++) {
+
+                var item = feed.items[i];
+
+                html += '<li>'
+                + '<a href="'
+                + item.link
+                + '">'
+                + '<div class="answer">'
+                + '<h3>Question: '
+                + item.title
+                + '</h3>';
+
+                html += '<div class="updated">'
+                + 'Asked on: '+ item.updated
+                + '</div>';
+
+                html += '<div>'
+                + item.description
+                + '</div>'
+                + '</div>';
+                + '</a>'
+                + '</li>'
+            }
+            html += ' </ul>'
+            + '</div>'
+
+            // jQuery('#answers_result').append(html);
+            // jQuery('#answers_count').append(feed.items.length)
+            // TODO(tfoote): switch back to append above. This seems to be being invoked twice
+            jQuery('#answers_result').replaceWith(html);
+            jQuery('#answers_count').replaceWith(feed.items.length)
+        }
+    });
+});
+</script>

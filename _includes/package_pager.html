@@ -1,7 +1,7 @@
 
 {% if page.page_index %}
 <div class="row text-center">
-y    <ul class="pagination pagination-sm">
+    <ul class="pagination pagination-sm">
       <li class="{% if page.page_index == 1 %}disabled{% endif %}">
     <a href="{% if page.page_index == 1 %}#{% else %}{{site.baseurl}}/{{page.pager.base}}/page/{{ page.prev_page }}{{page.pager.post_ns}}{% endif %}">&laquo;</a>
       </li>
