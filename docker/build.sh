@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-BASE_DIR=`dirname $( readlink -m $( type -p $0 ))`
+SCRIPT_DIR=`dirname $( readlink -m $( type -p $0 ))`
 
-docker build -f $BASE_DIR/Dockerfile -t rosindex/rosindex $BASE_DIR/..
+docker build -f $SCRIPT_DIR/Dockerfile -t rosindex/rosindex $SCRIPT_DIR/..
