@@ -10,8 +10,8 @@
 #
 # These extra fields will be ignored by VCS upon repo importation.
 repositories:
-  ros2_overview:  # TODO(hidmic): Replace dummy repo with real ones.
+  ros2_docs:
     type: git
     url: git@github.com:hidmic/ros2_documentation.git
-    short_description: "ROS2 Overview"
+    short_description: "ROS2 Docs"
     version: master
