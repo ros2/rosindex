@@ -10,8 +10,8 @@
 #
 # These extra fields will be ignored by VCS upon repo importation.
 repositories:
-  ros2_docs:
+  ros2_overview:
     type: git
-    url: git@github.com:hidmic/ros2_documentation.git
-    short_description: "ROS2 Docs"
+    url: git@github.com:ros2/ros2_documentation.git
+    short_description: "ROS2 Overview"
     version: master
