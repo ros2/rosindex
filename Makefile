@@ -15,7 +15,6 @@ html: build deploy
 build:
 	mkdir -p $(checkout_dir)
 	mkdir -p $(deploy_dir)
-	mkdir -p $(cache_dir)
 	vcs import --input $(data_dir)/repos/resources.yml --force $(workdir)
 	mkdir -p $(docs_dir)
 	vcs import --input $(data_dir)/repos/docs.yml $(docs_dir)
