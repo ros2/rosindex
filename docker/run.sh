@@ -18,7 +18,7 @@ fi
 docker run\
   --env SSH_AUTH_SOCK=/ssh-agent\
   -v $SSH_AUTH_SOCK:/ssh-agent\
-  -v "$SCRIPT_DIR/workdir:/workdir:rw"\
+  -v "$SCRIPT_DIR/../../workdir:/workdir:rw"\
   -v "$SCRIPT_DIR/..:/workdir/rosindex:rw"\
   --net=host\
   -p 4000:4000\
