@@ -63,7 +63,7 @@ class RstAsMarkdown < Jekyll::Generator
       next unless markdown_converter.matches(doc.extname)
       content = File.read(doc.path, :encoding => 'UTF-8')
       modified_content = content.gsub(RST_LINK_REGEX) do |link|
-        next if absolute_link? link
+        next if absolute_link? $1
         link.sub($1, $1.sub(/\.rst$/, '.md'))
       end
       File.write(doc.path, modified_content)

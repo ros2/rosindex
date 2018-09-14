@@ -78,6 +78,7 @@ exclude:
   - Gemfile.lock
   - README.md
   - Makefile
+  - docker
 
 rosdep_path: ../rosdep
 rosdistro_path: ../rosdistro
