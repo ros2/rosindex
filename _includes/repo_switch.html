@@ -12,7 +12,7 @@
       </button>
       <ul class="dropdown-menu" role="menu">
         {% for variant in page.repo_variants %}
-          <li role="presentation"><a id="{{variant[0]}}" role="menuitem" tabindex="-1" href="#" data="{{variant[0]}}">
+          <li role="presentation"><a id="{{variant[0]}}" role="menuitem" tabindex="-1" href="#" data="{{site.baseurl}}/{{variant[0]}}">
             {{site.baseurl}}/{{variant[1].uri}}
             <!--<span class="pull-right">-->
               <!--<span class="label label-default">released</span>-->
