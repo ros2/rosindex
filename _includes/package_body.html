@@ -30,7 +30,7 @@ Assumes distro and package are defined
     <a href="#{{distro}}-tutorials" data-toggle="tab"><span class="label label-{%if n_tutorials == 0%}default{%else%}primary{%endif%}">{{n_tutorials}}</span> Tutorials</a>
   </li>
   <li class="better-tabs">
-    <a href="#{{distro}}-answers" data-toggle="tab"><span class="label label-primary"><div id='answers_count'></div></span> Q & A</a>
+    <a href="#{{distro}}-answers" data-toggle="tab"><span class="label label-primary"><div id='{{distro}}-answers-count'></div></span> Q & A</a>
   </li>
 </ul>
 
@@ -230,7 +230,7 @@ Assumes distro and package are defined
         <h3 class="panel-title">Answers.ros.org Recent Questions Tagged: <kbd>{{package.name}}</kbd></h3>
       </div>
       <div class="panel-body">
-        <div id='answers_result' class="question"></div>
+        <div id='{{distro}}-answers-result' class="question"></div>
       </div>
     </div>
   </div>
@@ -466,8 +466,8 @@ jQuery(function() {
 
             if (feed.items.length == 0) {
               html = 'No questions yet, you can ask one <a href="https://answers.ros.org/questions/ask/?tags={{package.name}},{{distro}}">here</a>.'
-              jQuery('#answers_result').replaceWith(html);
-              jQuery('#answers_count').replaceWith(feed.items.length)
+              jQuery('#{{distro}}-answers-result').append(html);
+              jQuery('#{{distro}}-answers-count').replaceWith("0")
               return
             }
             html += '<p>Browse '
@@ -506,11 +506,8 @@ jQuery(function() {
             html += ' </ul>'
             + '</div>'
 
-            // jQuery('#answers_result').append(html);
-            // jQuery('#answers_count').append(feed.items.length)
-            // TODO(tfoote): switch back to append above. This seems to be being invoked twice
-            jQuery('#answers_result').replaceWith(html);
-            jQuery('#answers_count').replaceWith(feed.items.length)
+            jQuery('#{{distro}}-answers-result').append(html);
+            jQuery('#{{distro}}-answers-count').replaceWith(feed.items.length)
         }
     });
 });
