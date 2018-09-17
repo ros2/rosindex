@@ -20,7 +20,7 @@
             <ul class="dropdown-menu" role="menu">
               {% for instance in page.instances %}
                 <li role="presentation">
-                  <a id="{{instance[0]}}" role="menuitem" tabindex="-1" href="/{{page.instance_base_url}}/{{instance[0]}}" data="{{instance[0]}}">
+                  <a id="{{instance[0]}}" role="menuitem" tabindex="-1" href="{{site.baseurl}}/{{page.instance_base_url}}/{{instance[0]}}" data="{{instance[0]}}">
                     <span class="glyphicon glyphicon-{% if page.default_instance_id == instance[0] %}star{% else %}none{% endif %}"></span>
                     {{instance[1].id}}
                   </a>
