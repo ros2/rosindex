@@ -16,8 +16,9 @@ build:
 	mkdir -p $(checkout_dir)
 	mkdir -p $(deploy_dir)
 	vcs import --input $(data_dir)/repos/resources.yml --force $(workdir)
+	rm -rf $(docs_dir)
 	mkdir -p $(docs_dir)
-	vcs import --input $(data_dir)/repos/docs.yml $(docs_dir)
+	vcs import --input $(data_dir)/repos/docs.yml --force $(docs_dir)
 	bundle exec jekyll build --verbose --trace --config=$(config_file)
 
 # deploy assumes download-previous and build were run already
