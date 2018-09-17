@@ -51,7 +51,7 @@ def get_raw_uri(uri_s, type, branch)
     uri_split = File.split(uri.path)
     path_split = uri_split[1].rpartition('.')
     repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
-    return 'https://raw.githubusercontent.com/%s/%s/%s' % [uri_split[0], repo_name, branch]
+    return 'https://raw.githubusercontent.com/%s/%s/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
   when 'bitbucket.org'
     uri_split = File.split(uri.path)
     return 'https://bitbucket.org/%s/%s/raw/%s' % [uri_split[0], uri_split[1], branch]
@@ -72,7 +72,8 @@ def get_browse_uri(uri_s, type, branch)
     uri_split = File.split(uri.path)
     path_split = uri_split[1].rpartition('.')
     repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
-    return 'https://github.com/%s/%s/tree/%s' % [uri_split[0], repo_name, branch]
+    puts uri_split
+    return 'https://github.com/%s/%s/blob/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
   when 'bitbucket.org'
     uri_split = File.split(uri.path)
     return 'https://bitbucket.org/%s/%s/src/%s' % [uri_split[0], uri_split[1], branch]
@@ -300,18 +301,29 @@ class Indexer < Jekyll::Generator
       raw_uri = File.join(data['raw_uri'], relpath)
       browse_uri = File.join(data['browse_uri'], relpath)
 
-      # generate an array of pairs composed of the rendered and the not-rendered version
-      # of a readme file.
-      readmes_uncurated = readmes_relpath.map do |readme_relpath|
-        get_md_rst_txt(site, path, readme_relpath, raw_uri)
-      end.push(get_readme(site, path, raw_uri))
+      # load the package's readme for this branch if it exists
+      readme_file = Dir.glob(File.join(path, "README*"), File::FNM_CASEFOLD)
+      unless readme_file.empty? then
+        readmes_relpath.push(File.basename(readme_file.first))
+      end
 
-      # curate the list by removing the nil elements
-      readmes_rendered, readmes = readmes_uncurated.reject do |x|
-        x[0].nil? || x[1].nil?
-      end.transpose
-      
-      # check for readme in same directory as package.xml
+      # Iterate over each of the readme file paths that were explicitly declared in package
+      readmes = Array.new
+      readmes_relpath.each do |readme_relpath|
+        tmp_readme_rendered, tmp_readme  = get_md_rst_txt(site, path, readme_relpath, raw_uri)
+        readme = {
+          'browse_uri' => File.join(data['browse_uri'], package_name, readme_relpath),
+          'filename' => File.basename(readme_relpath),
+          'readme' => tmp_readme,
+          'readme_rendered' => tmp_readme_rendered
+        }
+        readmes.push(readme)
+      end
+      readmes.reject! do |x|
+        x['readme'].nil? || x['readme_rendered'].nil?
+      end
+
+      # check for changelog in same directory as package.xml
       changelog_rendered, changelog = get_changelog(site, path, raw_uri)
 
       # TODO: don't do this for cmake-based packages
@@ -367,7 +379,6 @@ class Indexer < Jekyll::Generator
         'nodes' => nodes,
         # readme
         'readmes' => readmes,
-        'readmes_rendered' => readmes_rendered,
         # changelog
         'changelog' => changelog,
         'changelog_rendered' => changelog_rendered,
