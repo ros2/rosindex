@@ -290,16 +290,17 @@ class Indexer < Jekyll::Generator
         end
       }
 
-      # extract the paths to the readme files that were explicitly declared in the package
-      readmes_relpath = REXML::XPath.each(manifest_doc, "/package/export/rosindex/readme/text()").map(&:to_s)
-
       # compute the relative path from the root of the repo to this directory
-      relpath = Pathname.new(File.join(*path)).relative_path_from(Pathname.new(checkout_path))
+      package_relpath = Pathname.new(File.join(*path)).relative_path_from(Pathname.new(checkout_path))
+
       local_package_path = Pathname.new(path)
 
       # extract package manifest info
-      raw_uri = File.join(data['raw_uri'], relpath)
-      browse_uri = File.join(data['browse_uri'], relpath)
+      raw_uri = File.join(data['raw_uri'], package_relpath)
+      browse_uri = File.join(data['browse_uri'], package_relpath)
+
+      # extract the paths to the readme files that were explicitly declared in the package
+      readmes_relpath = REXML::XPath.each(manifest_doc, "/package/export/rosindex/readme/text()").map(&:to_s)
 
       # load the package's readme for this branch if it exists
       readme_file = Dir.glob(File.join(path, "README*"), File::FNM_CASEFOLD)
@@ -312,11 +313,15 @@ class Indexer < Jekyll::Generator
       readmes_relpath.each do |readme_relpath|
         tmp_readme_rendered, tmp_readme  = get_md_rst_txt(site, path, readme_relpath, raw_uri)
         readme = {
-          'browse_uri' => File.join(data['browse_uri'], package_name, readme_relpath),
-          'filename' => File.basename(readme_relpath),
+          'browse_uri' => File.join(browse_uri, readme_relpath),
           'readme' => tmp_readme,
           'readme_rendered' => tmp_readme_rendered
         }
+        if package_relpath.to_s. == "." then
+          readme['relpath'] = readme_relpath
+        else
+          readme['relpath'] = File.join(package_relpath, readme_relpath)
+        end
         readmes.push(readme)
       end
       readmes.reject! do |x|
