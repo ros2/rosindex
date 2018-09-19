@@ -44,12 +44,8 @@
                     Doc <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    {% for repo in site.data.repos.docs.repositories %}
-                    <li>
-                      <a href="{{site.baseurl}}/doc/{{ repo[0] }}">
-                        {{ repo[1].short_description }}
-                      </a>
-                    </li>
+                    {% for repo in site.data.remotes.repositories %}
+                      <li><a href="{{site.baseurl}}/doc/{{ repo[0] }}">{{ repo[1].short_description }}</a></li>
                     {% endfor %}
                     <li class="hidden" class="divider"></li>
 

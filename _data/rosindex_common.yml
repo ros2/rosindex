@@ -1,0 +1,96 @@
+# rosdep / xylem platforms
+#
+# This is a list of platforms and versions found in the rosdep database if a
+# platform / version key isn't found here, then it will throw and error and
+# should either be added or fixed if it was erroneous.
+#
+# Each key under 'versions' is a map from version identifier to version
+# display name. If the display name is empty, then the capitalized version of
+# the identifier will be used.
+#
+platforms:
+  arch:
+    name: 'Arch Linux'
+    versions: {}
+  centos:
+    name: 'CentOS'
+    versions: {}
+  cygwin:
+    name: 'Cygwin'
+    versions: {}
+  debian:
+    name: 'Debian'
+    versions:
+      sarge: ""
+      etch: ""
+      lenny: ""
+      squeeze: ""
+      wheezy: ""
+      jessie: ""
+      sid: "Sid (Unstable)"
+  fedora:
+    name: 'Fedora'
+    versions:
+      beefy: "17 (Beefy Miracle)"
+      spherical: "18 (Spherical Cow)"
+      "schrödinger’s": "19 (Schrödinger's Cat)"
+      heisenbug: "20 (Heisenberg)"
+      '21': "Fedora 21"
+      '22': "Fedora 22"
+  freebsd:
+    name: 'FreeBSD'
+    versions: {}
+  gentoo:
+    name: 'Gentoo Linux'
+    versions: {}
+  mandrake:
+    name: 'Mandrake/Mandriva Linux'
+    versions: {}
+  opensuse:
+    name: 'openSUSE'
+    versions: {}
+  osx:
+    name: 'Mac OS X'
+    versions:
+      leopard: ""
+      snow: "Snow Leopard"
+      lion: ""
+      "mountain lion": ""
+      mavericks: ""
+      yosemite: ""
+  rhel:
+    name: 'Red Hat Enterprise Linux'
+    versions: {}
+  ubuntu:
+    name: 'Ubuntu'
+    versions:
+      karmic: ""
+      lucid: ""
+      maverick: ""
+      natty: ""
+      oneiric: ""
+      precise: ""
+      quantal: ""
+      raring: ""
+      saucy: ""
+      trusty: ""
+      trusty_python3: "Trusty (Python3)"
+      utopic: ""
+      utopic_python3: "Utopic (Python3)"
+      vivid: ""
+      vivid_python3: "Vivid (Python3)"
+      wily: ""
+      wily_python3: "Wily (Python3)"
+      xenial: ""
+      xenial_python3: "Xenial (Python3)"
+
+# These are the names of available package managers across all the
+# platforms
+package_manager_names:
+  apt: ['ubuntu','debian']
+  gem: []
+  homebrew: ['osx']
+  macports: ['osx']
+  pacman: ['arch']
+  pip: []
+  portage: ['gentoo']
