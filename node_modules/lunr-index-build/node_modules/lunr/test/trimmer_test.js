@@ -1,27 +1,29 @@
-module('lunr.trimmer')
+suite('lunr.trimmer', function () {
+  test('latin characters', function () {
+    var token = new lunr.Token ('hello')
+    assert.equal(lunr.trimmer(token).toString(), token.toString())
+  })
 
-test('latin characters', function () {
-  var token = 'hello'
-  equal(lunr.trimmer(token), token)
-})
+  suite('punctuation', function () {
+    var trimmerTest = function (description, str, expected) {
+      test(description, function () {
+        var token = new lunr.Token(str),
+            trimmed = lunr.trimmer(token).toString()
 
-test('removing leading and trailing punctuation', function () {
-  var fullStop = 'hello.',
-      innerApostrophe = "it's",
-      trailingApostrophe = "james'",
-      exclamationMark = 'stop!',
-      comma = 'first,',
-      brackets = '[tag]'
+        assert.equal(expected, trimmed)
+      })
+    }
 
-  deepEqual(lunr.trimmer(fullStop), 'hello')
-  deepEqual(lunr.trimmer(innerApostrophe), "it's")
-  deepEqual(lunr.trimmer(trailingApostrophe), "james")
-  deepEqual(lunr.trimmer(exclamationMark), 'stop')
-  deepEqual(lunr.trimmer(comma), 'first')
-  deepEqual(lunr.trimmer(brackets), 'tag')
-})
+    trimmerTest('full stop', 'hello.', 'hello')
+    trimmerTest('inner apostrophe', "it's", "it's")
+    trimmerTest('trailing apostrophe', "james'", 'james')
+    trimmerTest('exclamation mark', 'stop!', 'stop')
+    trimmerTest('comma', 'first,', 'first')
+    trimmerTest('brackets', '[tag]', 'tag')
+  })
 
-test('should be registered with lunr.Pipeline', function () {
-  equal(lunr.trimmer.label, 'trimmer')
-  deepEqual(lunr.Pipeline.registeredFunctions['trimmer'], lunr.trimmer)
+  test('is a registered pipeline function', function () {
+    assert.equal(lunr.trimmer.label, 'trimmer')
+    assert.equal(lunr.Pipeline.registeredFunctions['trimmer'], lunr.trimmer)
+  })
 })
