@@ -29,6 +29,8 @@ class RstAsMarkdown < Jekyll::Generator
       replace_rst_files!(site.static_files) do |file, base, dir, name|
         new_name = name.rpartition('.').first + '.md'
         new_file = Jekyll::StaticFile.new(site, base, dir, new_name)
+        next if File.exists?(new_file.path) &&
+                File.mtime(new_file.path) >= File.mtime(file.path)
         File.write(new_file.path, rst_to_md(File.read(file.path)))
         new_file
       end
@@ -37,6 +39,8 @@ class RstAsMarkdown < Jekyll::Generator
     replace_rst_files!(site.pages) do |page, base, dir, name|
       new_name = name.rpartition('.').first + '.md'
       new_page = Jekyll::Page.new(base, dir, new_name)
+      next if File.exists?(new_page.path) &&
+              File.mtime(new_page.path) >= File.mtime(page.path)
       File.write(new_page.path, rst_to_md(File.read(page.path)))
       new_page
     end
@@ -53,7 +57,7 @@ class RstAsMarkdown < Jekyll::Generator
       else
         doc
       end
-    end
+    end.compact!
   end
 
   def replace_rst_links!(site, documents)
@@ -63,9 +67,10 @@ class RstAsMarkdown < Jekyll::Generator
       next unless markdown_converter.matches(doc.extname)
       content = File.read(doc.path, :encoding => 'UTF-8')
       modified_content = content.gsub(RST_LINK_REGEX) do |link|
-        next if absolute_link? $1
-        link.sub($1, $1.sub(/\.rst$/, '.md'))
+        return link if absolute_link? $1
+        return link.sub($1, $1.sub(/\.rst$/, '.md'))
       end
+      next unless modified_content != content
       File.write(doc.path, modified_content)
     end
   end
