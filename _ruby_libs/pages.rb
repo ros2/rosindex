@@ -35,7 +35,8 @@ class DepPage < Jekyll::Page
     self.data['dep_name'] = dep_name
     self.data['dep_data'] = dep_data
 
-    self.data['full_dep_data'] = full_dep_data
+    self.data['dep_data_per_platform'] = full_dep_data['data_per_platform']
+    self.data['dependants_per_distro'] = full_dep_data['dependants_per_distro']
   end
 end
 
