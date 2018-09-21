@@ -1,50 +1,49 @@
 /**
- * Convenience function for instantiating a new lunr index and configuring it
- * with the default pipeline functions and the passed config function.
+ * A convenience function for configuring and constructing
+ * a new lunr Index.
  *
- * When using this convenience function a new index will be created with the
- * following functions already in the pipeline:
+ * A lunr.Builder instance is created and the pipeline setup
+ * with a trimmer, stop word filter and stemmer.
  *
- * lunr.StopWordFilter - filters out any stop words before they enter the
- * index
+ * This builder object is yielded to the configuration function
+ * that is passed as a parameter, allowing the list of fields
+ * and other builder parameters to be customised.
  *
- * lunr.stemmer - stems the tokens before entering the index.
+ * All documents _must_ be added within the passed config function.
  *
- * Example:
+ * @example
+ * var idx = lunr(function () {
+ *   this.field('title')
+ *   this.field('body')
+ *   this.ref('id')
  *
- *     var idx = lunr(function () {
- *       this.field('title', 10)
- *       this.field('tags', 100)
- *       this.field('body')
- *       
- *       this.ref('cid')
- *       
- *       this.pipeline.add(function () {
- *         // some custom pipeline function
- *       })
- *       
- *     })
+ *   documents.forEach(function (doc) {
+ *     this.add(doc)
+ *   }, this)
+ * })
  *
- * @param {Function} config A function that will be called with the new instance
- * of the lunr.Index as both its context and first parameter. It can be used to
- * customize the instance of new lunr.Index.
- * @namespace
- * @module
- * @returns {lunr.Index}
- *
+ * @see {@link lunr.Builder}
+ * @see {@link lunr.Pipeline}
+ * @see {@link lunr.trimmer}
+ * @see {@link lunr.stopWordFilter}
+ * @see {@link lunr.stemmer}
+ * @namespace {function} lunr
  */
 var lunr = function (config) {
-  var idx = new lunr.Index
+  var builder = new lunr.Builder
 
-  idx.pipeline.add(
+  builder.pipeline.add(
     lunr.trimmer,
     lunr.stopWordFilter,
     lunr.stemmer
   )
 
-  if (config) config.call(idx, idx)
+  builder.searchPipeline.add(
+    lunr.stemmer
+  )
 
-  return idx
+  config.call(builder, builder)
+  return builder.build()
 }
 
 lunr.version = "@VERSION"

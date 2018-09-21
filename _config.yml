@@ -53,7 +53,7 @@ skip_update: false
 # If true, this skips scraping the cloned repos
 skip_scrape: false
 # If true, this skips generating the search index
-skip_search_index: true
+skip_search_index: false
 
 checkout_threads: 4
 checkout_path: "../checkout"
