@@ -30,7 +30,7 @@ Assumes distro and package are defined
     <a href="#{{distro}}-tutorials" data-toggle="tab"><span class="label label-{%if n_tutorials == 0%}default{%else%}primary{%endif%}">{{n_tutorials}}</span> Tutorials</a>
   </li>
   <li class="better-tabs">
-    <a href="#{{distro}}-answers" data-toggle="tab"><span class="label label-primary"><div id='{{distro}}-answers-count'></div></span> Q & A</a>
+    <a href="#{{distro}}-questions" data-toggle="tab"><span class="label label-primary"><div id="{{distro}}-questions-count">0</div></span> Q & A</a>
   </li>
 </ul>
 
@@ -220,17 +220,6 @@ Assumes distro and package are defined
       </div>
       <div class="panel-body">
         <em>Not currently indexed.</em>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-pane" id="{{distro}}-answers">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Answers.ros.org Recent Questions Tagged: <kbd>{{package.name}}</kbd></h3>
-      </div>
-      <div class="panel-body">
-        <div id='{{distro}}-answers-result' class="question"></div>
       </div>
     </div>
   </div>
@@ -440,11 +429,47 @@ Assumes distro and package are defined
       </div>
     </div>
   </div>
+
+  <div class="tab-pane" id="{{distro}}-questions">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Answers.ros.org Recent Questions Tagged: <kbd>{{package.name}}</kbd></h3>
+      </div>
+      <div id="{{distro}}-question-list" class="panel-body" style="display: none;"></div>
+      <div id="{{distro}}-no-question-list" class="panel-body" style="display: none;">
+        <p>No questions yet, you can ask one <a href="https://answers.ros.org/questions/ask/?tags={{package.name}},{{distro}}">here</a>.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<script src={{ "/js/package_body_tabs.js" | prepend: site.baseurl }}></script>
+<script type="text/javascript" src={{ "/js/package_body_tabs.js" | prepend: site.baseurl }}></script>
 
-<script type="text/javascript" src={{"/js/jquery.jfeed.pack.js" | prepend: site.baseurl }}></script>
+<script id="{{distro}}-question-list-template" type="text/html">
+  {% raw %}
+  <div class="list-group">
+    {{#questions}}
+    <div class="list-group-item mb-1">
+      <a href="{{link}}">
+        <h4 class="w-75 float-left">{{title}}</h4>
+        <small class="w-25">{{updated}}</small>
+      </a>
+      <hr>
+      {{&description}}
+    </div>
+    {{/questions}}
+  </div>
+  {% endraw %}
+  <p>
+    Browse <a href="https://answers.ros.org/questions/scope:all/sort:activity-desc/tags:{{package.name}}/page:1/">recent questions</a>
+    or see the <a href="https://answers.ros.org/questions/scope:all/sort:votes-desc/tags:{{package.name}}/page:1/">higest voted ones</a>.
+  </p>
+</script>
+
+<script type="text/javascript" src={{ "/js/jquery.jfeed.pack.js" | prepend: site.baseurl }}></script>
+<script type="text/javascript" src={{ "/js/run_prettify.js" | prepend: site.baseurl }}></script>
+<script type="text/javascript" src={{ "/js/mustache.js" | prepend: site.baseurl }}></script>
+<script type="text/javascript" src={{ "/js/showdown.min.js" | prepend: site.baseurl }}></script>
 
 <script type="text/javascript">
 jQuery.browser = {};
@@ -458,54 +483,25 @@ jQuery.browser = {};
 })();
 jQuery(function() {
     jQuery.getFeed({
-        url: 'https://answers.ros.org/feeds/rss/?tags={{package.name}}',
+        url: "https://answers.ros.org/feeds/rss/?tags={{package.name}}",
         success: function(feed) {
-            var html = '';
-
-            if (feed.items.length == 0) {
-              html = 'No questions yet, you can ask one <a href="https://answers.ros.org/questions/ask/?tags={{package.name}},{{distro}}">here</a>.'
-              jQuery('#{{distro}}-answers-result').append(html);
-              jQuery('#{{distro}}-answers-count').replaceWith("0")
-              return
+            if (feed.items.length > 0) {
+              var converter = new showdown.Converter();
+              var questions = feed.items.slice(0, 10).map(function(question) {
+                  question.description = converter.makeHtml(question.description);
+                  return question;
+              });
+              var template = jQuery("#{{distro}}-question-list-template").text();
+              Mustache.parse(template);
+              var rendered = Mustache.render(template, {questions: questions});
+              jQuery("#{{distro}}-question-list").html(rendered);
+              jQuery("#{{distro}}-question-list pre").addClass("prettyprint");
+              PR.prettyPrint();
+              jQuery("#{{distro}}-question-list").show();
+            } else {
+              jQuery("#{{distro}}-no-question-list").show();
             }
-            html += '<p>Browse '
-            + '<a href="https://answers.ros.org/questions/scope:all/sort:activity-desc/tags:{{package.name}}/page:1/">recent questions</a>'
-            + ' or see the '
-            + '<a href="https://answers.ros.org/questions/scope:all/sort:votes-desc/tags:{{package.name}}/page:1/">higest voted</a>'
-            + '</p>'
-
-            html += '<div class="question_list">'
-            + '<h4>Recent questions preview:</h4>'
-            + '<ul>'
-            for(var i = 0; i < feed.items.length && i < 50; i++) {
-
-                var item = feed.items[i];
-
-                html += '<li>'
-                + '<a href="'
-                + item.link
-                + '">'
-                + '<div class="answer">'
-                + '<h3>Question: '
-                + item.title
-                + '</h3>';
-
-                html += '<div class="updated">'
-                + 'Asked on: '+ item.updated
-                + '</div>';
-
-                html += '<div>'
-                + item.description
-                + '</div>'
-                + '</div>';
-                + '</a>'
-                + '</li>'
-            }
-            html += ' </ul>'
-            + '</div>'
-
-            jQuery('#{{distro}}-answers-result').append(html);
-            jQuery('#{{distro}}-answers-count').replaceWith(feed.items.length)
+            jQuery("#{{distro}}-questions-count").replaceWith(feed.items.length);
         }
     });
 });
