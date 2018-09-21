@@ -148,7 +148,7 @@ Assumes distro and package are defined
         </div>
       </div>
     </div>
-    {% if package.data.readmes %}
+    {% unless package.data.readmes == empty %}
       {% for readme in package.data.readmes %}
         <div class="row">
           <div class="col-xs-12">
@@ -176,7 +176,7 @@ Assumes distro and package are defined
           </div>
         </div>
       </div>
-    {% endif %}
+    {% endunless %}
     <div class="row">
       <div class="col-xs-12">
         <div class="panel panel-default">
