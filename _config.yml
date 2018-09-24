@@ -44,7 +44,7 @@ skip_scrape: false
 skip_search_index: false
 
 checkout_threads: 4
-checkout_path: "_plugin_data/checkout"
+checkout_path: "_plugins_data/checkout"
 
 # if non-empty, only scrape these packages (useful for debugging / partial db updates)
 repo_name_whitelist: []
@@ -60,7 +60,7 @@ domain_blacklist:
 exclude:
   - _scripts
   - _devel
-  - _plugin_data
+  - _plugins_data
   - _remotes
   - _ruby_libs
   - node_modules

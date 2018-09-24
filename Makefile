@@ -7,6 +7,7 @@ docs_dir=doc
 remotes_dir=_remotes
 remotes_file=$(data_dir)/remotes.yml
 deploy_dir=$(remotes_dir)/deploy
+cache_dir=$(deploy_dir)/cache
 
 config_file=_config.yml
 index_file=index.yml
