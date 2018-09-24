@@ -148,14 +148,14 @@ Assumes distro and package are defined
         </div>
       </div>
     </div>
-    {% if package.data.readmes_rendered %}
-      {% for readme_rendered in package.data.readmes_rendered %}
+    {% unless package.data.readmes == empty %}
+      {% for readme in package.data.readmes %}
         <div class="row">
           <div class="col-xs-12">
             <div class="panel panel-default">
-              <div class="panel-heading"><span class="glyphicon glyphicon-file"></span> README </div>
+              <div class="panel-heading"><span class="glyphicon glyphicon-file"></span><a href="{{readme.browse_uri}}">{{ readme.relpath }}</a></div>
               <div class="panel-body">
-                    {{ readme_rendered }}
+                    {{ readme.readme_rendered }}
               </div>
             </div>
           </div>
@@ -176,7 +176,7 @@ Assumes distro and package are defined
           </div>
         </div>
       </div>
-    {% endif %}
+    {% endunless %}
     <div class="row">
       <div class="col-xs-12">
         <div class="panel panel-default">
