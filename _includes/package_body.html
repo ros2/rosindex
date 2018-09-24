@@ -30,7 +30,7 @@ Assumes distro and package are defined
     <a href="#{{distro}}-tutorials" data-toggle="tab"><span class="label label-{%if n_tutorials == 0%}default{%else%}primary{%endif%}">{{n_tutorials}}</span> Tutorials</a>
   </li>
   <li class="better-tabs">
-    <a href="#{{distro}}-questions" data-toggle="tab"><span class="label label-primary"><div id="{{distro}}-questions-count">0</div></span> Q & A</a>
+    <a href="#{{distro}}-questions" data-toggle="tab"><span id="{{distro}}-questions-count" class="label label-primary">0</span> Q & A</a>
   </li>
 </ul>
 
@@ -507,7 +507,7 @@ jQuery(function() {
             } else {
               jQuery("#{{distro}}-no-question-list").show();
             }
-            jQuery("#{{distro}}-questions-count").replaceWith(feed.items.length);
+            jQuery("#{{distro}}-questions-count").text(feed.items.length);
         }
     });
 });
