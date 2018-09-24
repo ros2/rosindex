@@ -41,7 +41,7 @@ layout: default
           {% assign platform_versions = platform_details.versions %}
           {% assign platform_name = platform_details.name %}
 
-          {% assign dep_platform_data = page.full_dep_data[platform_key] %}
+          {% assign dep_platform_data = page.dep_data_per_platform[platform_key] %}
           <div class="row">
             <div class="col-sm-4">
               <div class="vcenter"><strong>{{platform_name}}</strong></div>
@@ -109,8 +109,26 @@ layout: default
 
   <div class="panel panel-default">
     <div class="panel-heading"><h3 class="panel-title">Used in Packages</h3></div>
-    <div class="panel-body">
-      <em>Package usage not currently computed.</em>
+    <div class="panel-body table-responsive">
+      <table class="table">
+        <tbody>
+          {% for distro_dependants in page.dependants_per_distro %}
+          {% assign distro = distro_dependants[0] %}
+          {% assign dependants = distro_dependants[1] %}
+          <tr>
+            <th scope="row">{{distro}}</th>
+            <td>
+              {% for dependant in dependants %}
+              <a href="{{site.baseurl}}/p/{{dependant.package.name}}#{{distro}}" class="label label-primary pkg-label">
+                {{dependant.package.name}}
+              </a>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
     </div>
   </div>
 </div>

@@ -809,19 +809,19 @@ class Indexer < Jekyll::Generator
       platforms = site.config['platforms']
       manager_set = Set.new(site.config['package_manager_names'])
 
-      full_dep_data = {}
+      platform_data = {}
       platforms.each do |platform_key, platform_details|
         if platform_details['versions'].size > 0
-          full_dep_data[platform_key] = {}
+          platform_data[platform_key] = {}
           platform_details['versions'].each do |version_key, version_name|
-            full_dep_data[platform_key][version_key] = resolve_dep(platforms, manager_set, platform_key, version_key, dep_data)
+            platform_data[platform_key][version_key] = resolve_dep(platforms, manager_set, platform_key, version_key, dep_data)
           end
         else
-          full_dep_data[platform_key] = resolve_dep(platforms, manager_set, platform_key, 'any_version', dep_data)
+          platform_data[platform_key] = resolve_dep(platforms, manager_set, platform_key, 'any_version', dep_data)
         end
       end
 
-      @rosdeps[dep_name] = full_dep_data
+      @rosdeps[dep_name] = {'data_per_platform' => platform_data, 'dependants_per_distro' => {}}
     end
 
     # get the repositories from the rosdistro files, rosdoc rosinstall files, and other sources
@@ -1282,6 +1282,15 @@ class Indexer < Jekyll::Generator
             package_snapshot.data['system_deps'].keys.each do |dep_name|
               if @rosdeps.key?(dep_name)
                 package_snapshot.data['system_deps'][dep_name] = @rosdeps[dep_name]
+                dep_dependants_per_distro = @rosdeps[dep_name]['dependants_per_distro']
+                unless dep_dependants_per_distro.key?(distro) then
+                  dep_dependants_per_distro[distro] = []
+                end
+                dep_dependants_per_distro[distro] << {
+                  'repo' => repo,
+                  'id' => instance_id,
+                  'package' => package_snapshot
+                }
               end
             end
           end
