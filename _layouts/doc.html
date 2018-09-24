@@ -1,0 +1,38 @@
+---
+layout: default
+---
+
+<div class="container-fluid" style="margin-top:20px">
+  <div class="container-fluid">
+    <div class="row">
+      <ol class="breadcrumb">
+        <li><a href="{{site.baseurl}}/">Home</a></li>
+        {% for bc in page.breadcrumbs %}
+        <li><a href="{{site.baseurl}}/{{bc}}">{{bc}}</a></li>
+        {% endfor %}
+        <li class="active">{{ page.title }}</li>
+      </ol>
+      {% if page.edit_url %}
+      <a type="button" href="{{ page.edit_url }}" class="btn btn-success pull-right">
+        Edit on Github
+      </a>
+      {% endif %}
+    </div>
+    <div class="row">
+      <div class="col-md-10">  
+        {{ content }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(
+    function() {
+      $('#toc').toc({
+        title: '',
+        listType: 'ul',
+        showSpeed: 0,
+        headers: 'h2, h3' });
+});
+</script>

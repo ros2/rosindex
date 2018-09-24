@@ -31,7 +31,12 @@ class RstAsMarkdown < Jekyll::Generator
         new_file = Jekyll::StaticFile.new(site, base, dir, new_name)
         next if File.exists?(new_file.path) &&
                 File.mtime(new_file.path) >= File.mtime(file.path)
-        File.write(new_file.path, rst_to_md(File.read(file.path)))
+        File.open(new_file.path, "w") do |f|
+          f.puts "---"
+          f.puts "origin_path: #{file.relative_path[1..-1]}"
+          f.puts "---"
+          f.write rst_to_md(File.read(file.path))
+        end
         new_file
       end
       replace_rst_links!(site, site.static_files)
@@ -39,6 +44,7 @@ class RstAsMarkdown < Jekyll::Generator
     replace_rst_files!(site.pages) do |page, base, dir, name|
       new_name = name.rpartition('.').first + '.md'
       new_page = Jekyll::Page.new(base, dir, new_name)
+      new_page.data["origin_path"] = page.path
       next if File.exists?(new_page.path) &&
               File.mtime(new_page.path) >= File.mtime(page.path)
       File.write(new_page.path, rst_to_md(File.read(page.path)))

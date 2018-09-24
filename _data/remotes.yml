@@ -29,5 +29,5 @@ repositories:
   ros2_overview:
     type: git
     url: git@github.com:ros2/ros2_documentation.git
-    short_description: "ROS2 Overview"
+    edit_url: https://github.com/ros2/ros2_documentation/edit/master
     version: master
