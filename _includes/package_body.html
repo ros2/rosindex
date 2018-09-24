@@ -446,6 +446,10 @@ Assumes distro and package are defined
 <script type="text/javascript" src={{ "/js/package_body_tabs.js" | prepend: site.baseurl }}></script>
 
 <script id="{{distro}}-question-list-template" type="text/html">
+  <p>
+    Browse <a href="https://answers.ros.org/questions/scope:all/sort:activity-desc/tags:{{package.name}}/page:1/">recent questions</a>
+    or see the <a href="https://answers.ros.org/questions/scope:all/sort:votes-desc/tags:{{package.name}}/page:1/">higest voted ones</a>.
+  </p>
   {% raw %}
   <div class="list-group">
     {{#questions}}
@@ -460,14 +464,11 @@ Assumes distro and package are defined
     {{/questions}}
   </div>
   {% endraw %}
-  <p>
-    Browse <a href="https://answers.ros.org/questions/scope:all/sort:activity-desc/tags:{{package.name}}/page:1/">recent questions</a>
-    or see the <a href="https://answers.ros.org/questions/scope:all/sort:votes-desc/tags:{{package.name}}/page:1/">higest voted ones</a>.
-  </p>
 </script>
 
 <script type="text/javascript" src={{ "/js/jquery.jfeed.pack.js" | prepend: site.baseurl }}></script>
-<script type="text/javascript" src={{ "/js/run_prettify.js" | prepend: site.baseurl }}></script>
+<link rel="stylesheet" type="text/css" href={{ "/css/prettify.css" | prepend: site.baseurl }}/>
+<script type="text/javascript" src={{ "/js/prettify.js" | prepend: site.baseurl }}></script>
 <script type="text/javascript" src={{ "/js/mustache.js" | prepend: site.baseurl }}></script>
 <script type="text/javascript" src={{ "/js/showdown.min.js" | prepend: site.baseurl }}></script>
 
@@ -496,8 +497,13 @@ jQuery(function() {
               var rendered = Mustache.render(template, {questions: questions});
               jQuery("#{{distro}}-question-list").html(rendered);
               jQuery("#{{distro}}-question-list pre").addClass("prettyprint");
-              PR.prettyPrint();
+              jQuery("#{{distro}}-question-list img").each(function() {
+                if (jQuery(this).attr("src").startsWith("/upfiles")) {
+                   jQuery(this).attr("src", "https://answers.ros.org" + jQuery(this).attr("src"));
+                }
+              });
               jQuery("#{{distro}}-question-list").show();
+              PR.prettyPrint();
             } else {
               jQuery("#{{distro}}-no-question-list").show();
             }
