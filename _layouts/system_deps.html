@@ -31,7 +31,7 @@ layout: default
                       <a class="unselected-sort-label" href="{{site.baseurl}}/deps/page/1/name">Name</a>
                     {% endif %}
                   </th>
-                  {% for platform in site.platforms %}
+                  {% for platform in site.data.platforms %}
                     <th>
                     {% comment %}class="rotate45" style="text-align:left;">{% endcomment %}
                       {{ platform[0] }}
@@ -50,7 +50,7 @@ layout: default
                     {% comment %}<td>{% endcomment %}
                       {% comment %}{{dep_details}}{% endcomment %}
                     {% comment %}</td>{% endcomment %}
-                    {% for p in site.platforms %}
+                    {% for p in site.data.platforms %}
                       {% assign platform = p[0] %}
                       {% assign platform_details = p[1] %}
                       {% assign versions = platform_details.versions %}

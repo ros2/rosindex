@@ -767,7 +767,7 @@ class Indexer < Jekyll::Generator
 
     @domain_blacklist = site.config['domain_blacklist']
 
-    @db_cache_filename = if site.config['db_cache_filename'] then File.join(site.source,site.config['db_cache_filename']) else 'rosindex.db' end
+    @db_cache_filename = if site.config['db_cache_filename'] then File.join(site.dest, site.config['db_cache_filename']) else 'rosindex.db' end
     @use_db_cache = (site.config['use_db_cache'] and File.exist?(@db_cache_filename))
 
     @skip_discover = site.config['skip_discover']
@@ -802,12 +802,12 @@ class Indexer < Jekyll::Generator
 
     raw_rosdeps = load_rosdeps(
       rosdep_path,
-      site.config['platforms'],
-      site.config['package_manager_names'].keys)
+      site.data['rosindex_common']['platforms'],
+      site.data['rosindex_common']['package_manager_names'].keys)
 
     raw_rosdeps.each do |dep_name, dep_data|
-      platforms = site.config['platforms']
-      manager_set = Set.new(site.config['package_manager_names'])
+      platforms = site.data['rosindex_common']['platforms']
+      manager_set = Set.new(site.data['rosindex_common']['package_manager_names'])
 
       platform_data = {}
       platforms.each do |platform_key, platform_details|
@@ -1179,8 +1179,9 @@ class Indexer < Jekyll::Generator
 
     # Load wiki title index
     @wiki_data = {}
-    if File.exists?(site.config['wiki_title_index_filename'])
-      @wiki_data = parse_wiki_title_index(site.config['wiki_title_index_filename'])
+    wiki_title_index_filename = File.join(site.dest, site.config['wiki_title_index_filename'])
+    if File.exists?(wiki_title_index_filename)
+      @wiki_data = parse_wiki_title_index(wiki_title_index_filename)
     end
 
     # scrape all the repos
@@ -1217,7 +1218,7 @@ class Indexer < Jekyll::Generator
 
     # read the old report
     old_report = {}
-    old_report_filename = site.config['report_filename']
+    old_report_filename = File.join(site.dest, site.config['report_filename'])
     if File.exists?(old_report_filename)
       old_report = YAML.load(IO.read(old_report_filename))
     end
@@ -1243,7 +1244,7 @@ class Indexer < Jekyll::Generator
       report_filename = 'index_report_diff.yaml'
       File.open(File.join(site.dest, report_filename),'w') {|f| f.write(report_yaml) }
       site.static_files << ReportFile.new(site, site.dest, "/", report_filename)
-      report_diff_dirname = File.dirname(site.config['report_diff_filename'])
+      report_diff_dirname = File.dirname(File.join(site.dest, site.config['report_diff_filename']))
       Dir.mkdir(report_diff_dirname) unless File.directory?(report_diff_dirname)
       File.open(site.config['report_diff_filename'],'w') {|f| f.write(report_yaml) }
     end
