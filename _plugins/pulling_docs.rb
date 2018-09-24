@@ -1,4 +1,6 @@
-# Copy the specified documentation repos into the jekyll-tracked "doc" directory.
+# Copy the specified documentation repos into the
+# jekyll-tracked "doc" directory.
+
 require 'fileutils'
 
 Jekyll::Hooks.register :site, :after_init do |site|
@@ -7,10 +9,12 @@ Jekyll::Hooks.register :site, :after_init do |site|
         dest = File.join(site.source, "doc") 
         to_delete = File.join(site.source, repo_dir) 
         if File.directory?(to_delete)
-        FileUtils.rm_r(to_delete)
+            FileUtils.rm_r(to_delete)
         end
         if File.directory?(origin)
             FileUtils.cp_r(origin, dest)
+        else
+            raise IOError.new("Unable to copy from #{origin}, the directory doesn't exist.")
         end
     end
 end

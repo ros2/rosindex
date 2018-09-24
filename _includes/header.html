@@ -44,8 +44,12 @@
                     Doc <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    {% for repo in site.data.remotes.repositories %}
-                      <li><a href="{{site.baseurl}}/doc/{{ repo[0] }}">{{ repo[1].short_description }}</a></li>
+                    {% for repo_name in site.documentation_repos%}
+                      {% for repo in site.data.remotes.repositories[{{ repo_name }}] %}
+                        {% unless repo == empty %}
+                          <li><a href="{{site.baseurl}}/doc/{{ repo[0] }}">{{ repo[1].short_description }}</a></li>
+                        {% endunless %}
+                      {% endfor %}
                     {% endfor %}
                     <li class="hidden" class="divider"></li>
 
