@@ -79,9 +79,16 @@ index_old_doc_paths: false
 #
 distros:
   - 'bouncy'
+  - 'melodic'
+  - 'lunar'
+  - 'kinetic'
+  - 'indigo'
+
 old_distros:
   - 'ardent'
-
+  - 'jade'
+  - 'hydro'
+  
 # package list page
 packages_per_page: 50
 repos_per_page: 50

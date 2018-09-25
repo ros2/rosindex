@@ -798,7 +798,7 @@ class Indexer < Jekyll::Generator
 
     # load rosdep data
     # TODO: check deps against this when generating pages
-    rosdep_path = site.config.key?('rosdep_path') ? site.config['rosdep_path']: site.config['rosdistro_path']
+    rosdep_path = site.config.key?('rosdep_path') ? site.config['rosdep_path']: site.config['rosdistro_paths'].first
 
     raw_rosdeps = load_rosdeps(
       rosdep_path,
@@ -831,225 +831,226 @@ class Indexer < Jekyll::Generator
       $all_distros.reverse_each do |distro|
 
         puts "processing rosdistro: "+distro
+        site.config['rosdistro_paths'].each do |rosdistro_path|
+          # read in the rosdistro distribution file
+          rosdistro_filename = File.join(rosdistro_path,distro,'distribution.yaml')
+          if File.exist?(rosdistro_filename)
+            distro_data = YAML.load_file(rosdistro_filename)
+            distro_data['repositories'].each do |repo_name, repo_data|
 
-        # read in the rosdistro distribution file
-        rosdistro_filename = File.join(site.config['rosdistro_path'],distro,'distribution.yaml')
-        if File.exist?(rosdistro_filename)
-          distro_data = YAML.load_file(rosdistro_filename)
-          distro_data['repositories'].each do |repo_name, repo_data|
+              unless (site.config['repo_name_whitelist'].length == 0 or site.config['repo_name_whitelist'].include?(repo_name)) then next end
 
-            unless (site.config['repo_name_whitelist'].length == 0 or site.config['repo_name_whitelist'].include?(repo_name)) then next end
+              begin
+                # limit repos if requested
+                if not @repo_names.has_key?(repo_name) and site.config['max_repos'] > 0 and @repo_names.length > site.config['max_repos'] then next end
 
-            begin
-              # limit repos if requested
-              if not @repo_names.has_key?(repo_name) and site.config['max_repos'] > 0 and @repo_names.length > site.config['max_repos'] then next end
+                dputs " - "+repo_name
 
-              dputs " - "+repo_name
+                source_uri = nil
+                source_version = nil
+                source_type = nil
+                release_manifest_xml = nil
+                release_version = nil
 
-              source_uri = nil
-              source_version = nil
-              source_type = nil
-              release_manifest_xml = nil
-              release_version = nil
+                # only index if it has a source repo
+                if repo_data.has_key?('source')
+                  source_uri = repo_data['source']['url'].to_s
+                  source_type = repo_data['source']['type'].to_s
+                  source_version = repo_data['source']['version'].to_s
+                  source_version = (if repo_data['source'].key?('version') and repo_data['source']['version'] != 'HEAD' then repo_data['source']['version'].to_s else 'REMOTE_HEAD' end)
+                elsif repo_data.has_key?('doc')
+                  source_uri = repo_data['doc']['url'].to_s
+                  source_type = repo_data['doc']['type'].to_s
+                  source_version = (if repo_data['doc'].key?('version') and repo_data['doc']['version'] != 'HEAD' then repo_data['doc']['version'].to_s else 'REMOTE_HEAD' end)
+                elsif repo_data.has_key?('release')
+                  # NOTE: also, sometimes people use the release repo as the "doc" repo
 
-              # only index if it has a source repo
-              if repo_data.has_key?('source')
-                source_uri = repo_data['source']['url'].to_s
-                source_type = repo_data['source']['type'].to_s
-                source_version = repo_data['source']['version'].to_s
-                source_version = (if repo_data['source'].key?('version') and repo_data['source']['version'] != 'HEAD' then repo_data['source']['version'].to_s else 'REMOTE_HEAD' end)
-              elsif repo_data.has_key?('doc')
-                source_uri = repo_data['doc']['url'].to_s
-                source_type = repo_data['doc']['type'].to_s
-                source_version = (if repo_data['doc'].key?('version') and repo_data['doc']['version'] != 'HEAD' then repo_data['doc']['version'].to_s else 'REMOTE_HEAD' end)
-              elsif repo_data.has_key?('release')
-                # NOTE: also, sometimes people use the release repo as the "doc" repo
+                  # get the release repo to get the upstream repo
+                  release_uri = cleanup_uri(repo_data['release']['url'].to_s)
+                  release_repo_path = File.join(@checkout_path,'_release_repos',repo_name,get_id(release_uri))
 
-                # get the release repo to get the upstream repo
-                release_uri = cleanup_uri(repo_data['release']['url'].to_s)
-                release_repo_path = File.join(@checkout_path,'_release_repos',repo_name,get_id(release_uri))
+                  tracks_file = nil
 
-                tracks_file = nil
-
-                (1..3).each do |attempt|
-                  begin
-                    # clone the release repo
-                    release_vcs = GIT.new(release_repo_path, release_uri)
-
+                  (1..3).each do |attempt|
                     begin
-                      release_vcs.fetch()
-                    rescue VCSException => e
-
-                    end
-
-                    # get the tracks file
-                    ['master','bloom'].each do |branch_name|
-                      branch, _ = release_vcs.get_version(branch_name)
-
-                      if branch.nil? then next end
-
-                      release_vcs.checkout(branch)
+                      # clone the release repo
+                      release_vcs = GIT.new(release_repo_path, release_uri)
 
                       begin
-                        # get the tracks file
-                        tracks_file = YAML.load_file(File.join(release_repo_path,'tracks.yaml'))
-                        # get package manifest files (if any)
-                        release_manifest_path = Dir[File.join(release_repo_path,distro,'package.xml')].first
-                        unless release_manifest_path.nil?
-                          release_manifest_xml = IO.read(release_manifest_path)
-                        end
+                        release_vcs.fetch()
+                      rescue VCSException => e
 
-                        unless tracks_file.nil? then break end
-                      rescue
-                        next
+                      end
+
+                      # get the tracks file
+                      ['master','bloom'].each do |branch_name|
+                        branch, _ = release_vcs.get_version(branch_name)
+
+                        if branch.nil? then next end
+
+                        release_vcs.checkout(branch)
+
+                        begin
+                          # get the tracks file
+                          tracks_file = YAML.load_file(File.join(release_repo_path,'tracks.yaml'))
+                          # get package manifest files (if any)
+                          release_manifest_path = Dir[File.join(release_repo_path,distro,'package.xml')].first
+                          unless release_manifest_path.nil?
+                            release_manifest_xml = IO.read(release_manifest_path)
+                          end
+
+                          unless tracks_file.nil? then break end
+                        rescue
+                          next
+                        end
+                      end
+
+                      # too many open files if we don't do this
+                      release_vcs.close()
+
+                      break
+                    rescue VCSException => e
+                      puts ("Failed to communicate with release repo after #{attempt} attempt(s)").yellow
+                      if attempt == 3
+                        raise IndexException.new("Could not fetch release repo for repo: "+repo_name+": "+e.msg)
                       end
                     end
+                  end
 
-                    # too many open files if we don't do this
-                    release_vcs.close()
+                  if tracks_file.nil?
+                    raise IndexException.new("Could not find tracks.yaml file in release repo: " + repo_name + " in rosidstro file: " + rosdistro_filename)
+                  end
 
-                    break
-                  rescue VCSException => e
-                    puts ("Failed to communicate with release repo after #{attempt} attempt(s)").yellow
-                    if attempt == 3
-                      raise IndexException.new("Could not fetch release repo for repo: "+repo_name+": "+e.msg)
+                  tracks_file['tracks'].each do |track_name, track|
+                    if track['ros_distro'] == distro
+                      source_uri = track['vcs_uri']
+                      source_type = track['vcs_type']
+                      # prefer devel branch if available
+                      if not track['devel_branch'].nil?
+                        source_version = track['devel_branch'].strip
+                      elsif not track['release_tag'].nil? and not track['last_version'].nil?
+                        source_version = track['release_tag'].to_s.strip
+                        # NOTE: when ruby loads yaml, it turns "foo: :{bar}" into {'foo'=>:"bar"} and "foo: v:{bar}" into {'foo'=>'v:{bar}'}
+                        source_version.gsub!(':{version}',track['last_version'].to_s)
+                        source_version.gsub!('{version}',track['last_version'].to_s)
+                      elsif not track['last_version'].nil?
+                        source_version = track['last_version'].to_s
+                      end
+                      release_version = track['last_version'].to_s.strip
+                      unless source_uri.nil? or source_type.nil? or source_version.nil?
+                        break
+                      end
                     end
                   end
-                end
 
-                if tracks_file.nil?
-                  raise IndexException.new("Could not find tracks.yaml file in release repo: " + repo_name + " in rosidstro file: " + rosdistro_filename)
-                end
-
-                tracks_file['tracks'].each do |track_name, track|
-                  if track['ros_distro'] == distro
-                    source_uri = track['vcs_uri']
-                    source_type = track['vcs_type']
-                    # prefer devel branch if available
-                    if not track['devel_branch'].nil?
-                      source_version = track['devel_branch'].strip
-                    elsif not track['release_tag'].nil? and not track['last_version'].nil?
-                      source_version = track['release_tag'].to_s.strip
-                      # NOTE: when ruby loads yaml, it turns "foo: :{bar}" into {'foo'=>:"bar"} and "foo: v:{bar}" into {'foo'=>'v:{bar}'}
-                      source_version.gsub!(':{version}',track['last_version'].to_s)
-                      source_version.gsub!('{version}',track['last_version'].to_s)
-                    elsif not track['last_version'].nil?
-                      source_version = track['last_version'].to_s
-                    end
-                    release_version = track['last_version'].to_s.strip
-                    unless source_uri.nil? or source_type.nil? or source_version.nil?
-                      break
-                    end
+                  if source_uri.nil? or source_type.nil? or source_version.nil?
+                    raise IndexException.new("Could not determine source repo from release repo: " + repo_name + " in rosidstro file: " + rosdistro_filename)
                   end
-                end
-
-                if source_uri.nil? or source_type.nil? or source_version.nil?
-                  raise IndexException.new("Could not determine source repo from release repo: " + repo_name + " in rosidstro file: " + rosdistro_filename)
-                end
-              else
-                raise IndexException.new("No source, doc, or release information for repo: " + repo_name+ " in rosidstro file: " + rosdistro_filename)
-              end
-
-              # create a new repo structure for this remote
-              begin
-                repo = Repo.new(
-                  repo_name,
-                  source_type,
-                  source_uri,
-                  'Via rosdistro: '+distro,
-                  @checkout_path)
-              rescue
-                raise IndexException.new("Failed to create repo from #{source_type} repo #{source_uri}: " + repo_name+ " in rosidstro file: " + rosdistro_filename)
-              end
-
-              if @all_repos.key?(repo.id)
-                repo = @all_repos[repo.id]
-              else
-                puts " -- Adding repo " << repo.name << " instance: " << repo.id << " from uri: " << repo.uri.to_s << " with version: " << source_version
-                # store this repo in the unique index
-                @all_repos[repo.id] = repo
-              end
-
-              # get maintainer status
-              if repo_data.key?('status')
-                repo.status = repo_data['status']
-              end
-
-              # add the specific version from this instance
-              repo.snapshots[distro] = RepoSnapshot.new(source_version, distro, repo_data.key?('release'), true)
-
-              # add the release manifest, if found
-              unless release_manifest_xml.nil?
-                release_manifest_xml.gsub!(':{version}',(release_version or '0.0.0'))
-              end
-              repo.release_manifests[distro] = release_manifest_xml
-
-              # store this repo in the name index
-              @repo_names[repo.name].instances[repo.id] = repo
-              @repo_names[repo.name].default = repo
-            rescue IndexException => e
-              @errors[repo_name] << e
-            end
-          end
-        end
-
-        # read in the old documentation index file (if it exists)
-        doc_path = File.join(site.config['rosdistro_path'],'doc',distro)
-
-        puts "Examining doc path: " << doc_path
-
-        Dir.glob(File.join(doc_path,'*.rosinstall').to_s) do |rosinstall_filename|
-
-          puts 'Indexing rosinstall repo data file: ' << rosinstall_filename
-
-          rosinstall_data = YAML.load_file(rosinstall_filename)
-          rosinstall_data.each do |rosinstall_entry|
-            rosinstall_entry.each do |repo_type, repo_data|
-
-              begin
-                if repo_data.nil? then next end
-                #puts repo_type.inspect
-                #puts repo_data.inspect
-
-                # extract the garbage
-                repo_name = repo_data['local-name'].to_s.split(File::SEPARATOR)[-1]
-                repo_uri = repo_data['uri'].to_s
-                repo_version = (if repo_data.key?('version') and repo_data['version'] != 'HEAD' then repo_data['version'].to_s else 'REMOTE_HEAD' end)
-
-                # limit number of repos indexed if in devel mode
-                if not @repo_names.has_key?(repo_name) and site.config['max_repos'] > 0 and @repo_names.length > site.config['max_repos'] then next end
-                unless (site.config['repo_name_whitelist'].length == 0 or site.config['repo_name_whitelist'].include?(repo_name)) then next end
-
-                puts " - #{repo_name}"
-
-                if repo_type == 'bzr'
-                  raise IndexException.new("ERROR: some fools trying to use bazaar: " + rosinstall_filename)
+                else
+                  raise IndexException.new("No source, doc, or release information for repo: " + repo_name+ " in rosidstro file: " + rosdistro_filename)
                 end
 
                 # create a new repo structure for this remote
-                repo = Repo.new(
-                  repo_name,
-                  repo_type,
-                  repo_uri,
-                  'Via rosdistro doc: '+distro,
-                  @checkout_path)
+                begin
+                  repo = Repo.new(
+                    repo_name,
+                    source_type,
+                    source_uri,
+                    'Via rosdistro: '+distro,
+                    @checkout_path)
+                rescue
+                  raise IndexException.new("Failed to create repo from #{source_type} repo #{source_uri}: " + repo_name+ " in rosidstro file: " + rosdistro_filename)
+                end
 
                 if @all_repos.key?(repo.id)
                   repo = @all_repos[repo.id]
                 else
-                  puts " -- Adding repo for " << repo.name << " instance: " << repo.id << " from uri: " << repo.uri.to_s
+                  puts " -- Adding repo " << repo.name << " instance: " << repo.id << " from uri: " << repo.uri.to_s << " with version: " << source_version
                   # store this repo in the unique index
                   @all_repos[repo.id] = repo
                 end
 
+                # get maintainer status
+                if repo_data.key?('status')
+                  repo.status = repo_data['status']
+                end
+
                 # add the specific version from this instance
-                repo.snapshots[distro] = RepoSnapshot.new(repo_version, distro, false, true)
+                repo.snapshots[distro] = RepoSnapshot.new(source_version, distro, repo_data.key?('release'), true)
+
+                # add the release manifest, if found
+                unless release_manifest_xml.nil?
+                  release_manifest_xml.gsub!(':{version}',(release_version or '0.0.0'))
+                end
+                repo.release_manifests[distro] = release_manifest_xml
 
                 # store this repo in the name index
                 @repo_names[repo.name].instances[repo.id] = repo
                 @repo_names[repo.name].default = repo
               rescue IndexException => e
                 @errors[repo_name] << e
+              end
+            end
+          end
+
+          # read in the old documentation index file (if it exists)
+          doc_path = File.join(rosdistro_path,'doc',distro)
+
+          puts "Examining doc path: " << doc_path
+
+          Dir.glob(File.join(doc_path,'*.rosinstall').to_s) do |rosinstall_filename|
+
+            puts 'Indexing rosinstall repo data file: ' << rosinstall_filename
+
+            rosinstall_data = YAML.load_file(rosinstall_filename)
+            rosinstall_data.each do |rosinstall_entry|
+              rosinstall_entry.each do |repo_type, repo_data|
+
+                begin
+                  if repo_data.nil? then next end
+                  #puts repo_type.inspect
+                  #puts repo_data.inspect
+
+                  # extract the garbage
+                  repo_name = repo_data['local-name'].to_s.split(File::SEPARATOR)[-1]
+                  repo_uri = repo_data['uri'].to_s
+                  repo_version = (if repo_data.key?('version') and repo_data['version'] != 'HEAD' then repo_data['version'].to_s else 'REMOTE_HEAD' end)
+
+                  # limit number of repos indexed if in devel mode
+                  if not @repo_names.has_key?(repo_name) and site.config['max_repos'] > 0 and @repo_names.length > site.config['max_repos'] then next end
+                  unless (site.config['repo_name_whitelist'].length == 0 or site.config['repo_name_whitelist'].include?(repo_name)) then next end
+
+                  puts " - #{repo_name}"
+
+                  if repo_type == 'bzr'
+                    raise IndexException.new("ERROR: some fools trying to use bazaar: " + rosinstall_filename)
+                  end
+
+                  # create a new repo structure for this remote
+                  repo = Repo.new(
+                    repo_name,
+                    repo_type,
+                    repo_uri,
+                    'Via rosdistro doc: '+distro,
+                    @checkout_path)
+
+                  if @all_repos.key?(repo.id)
+                    repo = @all_repos[repo.id]
+                  else
+                    puts " -- Adding repo for " << repo.name << " instance: " << repo.id << " from uri: " << repo.uri.to_s
+                    # store this repo in the unique index
+                    @all_repos[repo.id] = repo
+                  end
+
+                  # add the specific version from this instance
+                  repo.snapshots[distro] = RepoSnapshot.new(repo_version, distro, false, true)
+
+                  # store this repo in the name index
+                  @repo_names[repo.name].instances[repo.id] = repo
+                  @repo_names[repo.name].default = repo
+                rescue IndexException => e
+                  @errors[repo_name] << e
+                end
               end
             end
           end
@@ -1268,6 +1269,10 @@ class Indexer < Jekyll::Generator
               # reverse deps can point to the exact instance which depends on this package
               # these are keyed by package name => list of instances
               @package_names[dep_name].instances.each do |dep_instance_id, dep_repo|
+                if not dep_repo.snapshots[distro]
+                  dputs " - Skipping dep_repo.snapshots["+distro+"] TODO(tfoote) Not sure who"
+                  next
+                end
                 if dep_repo.snapshots[distro].packages.key?(dep_name)
                   dependants = dep_repo.snapshots[distro].packages[dep_name].data['dependants']
                   unless dependants.key?(package_name) then dependants[package_name] = [] end

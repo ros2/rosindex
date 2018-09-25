@@ -2,6 +2,10 @@
 repositories:
   rosdistro:
     type: git
+    url: git@github.com:ros/rosdistro.git
+    version: master
+  ros2_rosdistro:
+    type: git
     url: git@github.com:ros2/rosdistro.git
     version: ros2
   rosdep:
