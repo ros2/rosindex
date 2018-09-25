@@ -10,12 +10,46 @@ Jekyll::Hooks.register :site, :pre_render do |site, payload|
       page_path.start_with? (File.join("doc", name))
     end
     next if repo_name.nil? or repo_data.nil?
-    next unless repo_data.key?("edit_url")
+
+    # Generate edit url
     page_relative_url = page_path.sub(File.join("doc", repo_name), "")
-    # Path joins won't look past a potential trailing slash (i.e.
-    # won't care about one of the fragments being a partial URL).
-    page.data["edit_url"] = File.join(
-      repo_data["edit_url"], page_relative_url
-    )
+    page.data["edit_url"] = generate_edit_url(repo_data, page_relative_url)
+  end
+end
+
+def generate_edit_url(repo_data, page_relative_url)
+  https = repo_data['url'].include? "https"
+  github = repo_data['url'].include? "github.com"
+  bitbucket = repo_data['url'].include? "bitbucket.org"
+
+  unless github or bitbucket
+    raise ValueError("Cannot generate edition URL. Unknown organization for repository: #{repo_data['url']}")
+  end
+  
+  if https
+    uri = URI(repo_data['url'])
+    organization, repo = uri.path.split("/").reject { |c| c.empty? }
+    if repo.end_with? ".git" then repo.chomp!(".git") end
+    if github
+      edit_url = "https://#{uri.host}/#{organization}/#{repo}/edit/#{repo_data['version']}"
+      return File.join(edit_url, page_relative_url)
+    elsif bitbucket
+      edit_url = "https://#{uri.host}/#{organization}/#{repo}/src/#{repo_data['version']}"
+      return File.join(edit_url, page_relative_url) + "?mode=edit&spa=0&at=#{repo_data['version']}&fileviewer=file-view-default"
+    end
+  else # ssh
+    if github
+      host = repo_data['url'].split("@")[1].split(":")[0]
+      organization, repo = repo_data['url'].split("@")[1].split(":")[1].split("/")
+      if repo.end_with? ".git" then repo.chomp!(".git") end
+      edit_url = "https://#{host}/#{organization}/#{repo}/edit/#{repo_data['version']}"
+      return File.join(edit_url, page_relative_url)
+    elsif bitbucket
+      host = repo_data['url'].split("@")[1].split(":")[0]
+      organization, repo = repo_data['url'].split("@")[1].split(":")[1].split("/")
+      if repo.end_with? ".git" then repo.chomp!(".git") end
+      edit_url = "https://#{host}/#{organization}/#{repo}/src/#{repo_data['version']}"
+      return File.join(edit_url, page_relative_url) + "?mode=edit&spa=0&at=#{repo_data['version']}&fileviewer=file-view-default"
+    end
   end
 end

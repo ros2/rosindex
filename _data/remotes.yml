@@ -17,17 +17,7 @@ repositories:
     url: git@github.com:ros-infrastructure/index.ros.org.git
     version: gh-pages
 # List of all non-package specific documentation repositories.
-# The VCS file format has been extended to include, on a
-# per repository basis, the following extra fields:
-#
-# - 'short_description': A description to be used to refer
-#                        to the content of the repository
-#                        as a whole, e.g. ROS Install
-#                        Instructions.
-#
-# These extra fields will be ignored by VCS upon repo importation.
   ros2_overview:
     type: git
     url: git@github.com:ros2/ros2_documentation.git
-    edit_url: https://github.com/ros2/ros2_documentation/edit/master
     version: master
