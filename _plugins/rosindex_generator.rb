@@ -831,7 +831,6 @@ class Indexer < Jekyll::Generator
       $all_distros.reverse_each do |distro|
 
         puts "processing rosdistro: "+distro
-        # TODO(tfoote) For loop here
         site.config['rosdistro_paths'].each do |rosdistro_path|
           # read in the rosdistro distribution file
           rosdistro_filename = File.join(rosdistro_path,distro,'distribution.yaml')
