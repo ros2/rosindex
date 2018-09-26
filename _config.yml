@@ -28,11 +28,11 @@ defaults:
 
 # If true, this begins with an existing db
 use_db_cache: true
-db_cache_filename: cache/_deploy_cache.db
-report_filename: cache/_deploy_index_report.yaml
-report_diff_filename: cache/_deploy_index_report_diff.yaml
-debbuild_release_path: cache/debbuild_releases
-wiki_title_index_filename: cache/ros_org_wiki_title_index.txt
+db_cache_filename: _cache/_deploy_cache.db
+report_filename: _cache/_deploy_index_report.yaml
+report_diff_filename: _cache/_deploy_index_report_diff.yaml
+debbuild_release_path: _cache/debbuild_releases
+wiki_title_index_filename: _cache/ros_org_wiki_title_index.txt
 
 # If true, this skips finding repos based on the repo sources
 skip_discover: false
@@ -59,6 +59,7 @@ domain_blacklist:
 
 exclude:
   - _scripts
+  - _cache
   - _devel
   - _plugins_data
   - _remotes
