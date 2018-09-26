@@ -82,7 +82,7 @@ touch .rosindex_ignore
 If you do not want a single package in a repository indexed, you can create
 a `.rosindex_ignore` file at the root of that package. If this does not work or
 you want some other information removed from ROS Index, please [create an issue
-on GitHub](https://github.com/rosindex/rosindex.github.io/issues/new?title=%5BREMOVAL%20REQUEST%5D%20)
+on GitHub](https://github.com/ros-infrastructure/index.ros.org/issues/new?title=%5BREMOVAL%20REQUEST%5D%20)
 describing what you would like removed.
 
 ## Contribute to the ROS Index Website
@@ -96,7 +96,7 @@ to be generated offline, and then uploaded to GitHub's severs.
 Since the ROS Index website is completely open-source, issues, feature
 requests, and especially pull requests are welcome.
 
-<a href="https://github.com/rosindex/rosindex.github.io/issues/new" target="_blank" class="btn btn-success">Post an Issue</a>
+<a href="https://github.com/ros-infrastructure/index.ros.org/issues/new" target="_blank" class="btn btn-success">Post an Issue</a>
 
 For more details on developing ROS Index, see [development]({{ "/about/development" | prepend: site.baseurl }}).
 
