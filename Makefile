@@ -11,17 +11,33 @@ cache_dir=$(deploy_dir)/cache
 
 config_file=_config.yml
 index_file=index.yml
+discover_config=_config/discover.yml
+update_config=_config/update.yml
+scrape_config=_config/scrape.yml
+search_config=_config/search_index.yml
+
+build: download-previous discover update scrape search-index
 
 # This target is invoked by a doc_independent job on the ROS buildfarm.
 html: build deploy
 
-# Clone a bunch of other repos part of the rosdistro and build the index.
-build:
+download-previous:
 	mkdir -p $(deploy_dir)
 	mkdir -p $(docs_dir)
 	mkdir -p $(remotes_dir)
 	vcs import --input $(remotes_file) --force $(remotes_dir)
-	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file)
+
+discover:
+	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(discover_config)
+
+update:
+	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(update_config)
+
+scrape:
+	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(scrape_config)
+
+search-index:
+	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(search_config)
 
 # deploy assumes build has run already
 deploy:

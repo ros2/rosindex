@@ -60,6 +60,7 @@ domain_blacklist:
 exclude:
   - _scripts
   - _cache
+  - _config
   - _devel
   - _plugins_data
   - _remotes
