@@ -31,21 +31,26 @@
       this.ready = options.ready;
 
       this.baseUrl = options.baseUrl;
-      this.indexUrl = options.indexUrl;
-      this.indexDataUrl = options.indexDataUrl;
 
-      this.jxhr = [];
+      var promises = [];
 
-      this.jxhr.push($.getJSON(self.indexUrl, function(serialized_index) {
-        console.log("loading " + self.indexUrl);
-        self.index = lunr.Index.load(serialized_index);
-      }));
-      this.jxhr.push($.getJSON(self.indexDataUrl, function(index) {
-        console.log("loading " + self.indexDataUrl);
-        self.entries = index.entries;
-      }));
+      promises.push(
+        (options.deferredIndex || $.getJSON(options.indexUrl, function() {
+            console.log("loading " + options.indexUrl);
+        })).then(function(serialized_index) {
+          self.index = lunr.Index.load(serialized_index);
+        })
+      );
 
-      $.when.apply($, this.jxhr).done(function() {
+      promises.push(
+        (options.deferredIndexData || $.getJSON(options.indexDataUrl, function() {
+            console.log("loading " + options.indexDataUrl);
+        })).then(function(index_data) {
+          self.entries = index_data.entries;
+        })
+      );
+
+      $.when.apply($, promises).done(function() {
           self.populateSearchFromQuery();
           self.resetSearchResults();
           self.bindKeypress();

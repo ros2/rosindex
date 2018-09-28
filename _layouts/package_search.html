@@ -105,8 +105,12 @@ $(function() {
   console.log('ready');
   $('#search-query').lunrSearch({
     baseUrl: '{{site.baseurl}}',
-    indexDataUrl: '{{site.baseurl}}/search.json',             // URL of the `search.json` index data for your site
-    indexUrl: '{{site.baseurl}}/index.json',
+    deferredIndex: $.Deferred(function(d) {
+      $.sessionStorage.pull("search-index", d.resolve);
+    }).promise(),
+    deferredIndexData: $.Deferred(function(d) {
+      $.sessionStorage.pull("search-index-data", d.resolve);
+    }).promise(),
     results:  '#search-results',          // jQuery selector for the search results container
     pagination: '#search-pagination',
     template: '#search-results-template',  // jQuery selector for the Mustache.js template

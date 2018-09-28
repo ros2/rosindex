@@ -17,10 +17,20 @@
 
     <script type="text/javascript" src={{ "/js/ga.js" | prepend: site.baseurl }} async></script>
     <script type="text/javascript" src={{ "/js/toc.js" | prepend: site.baseurl }}></script>
-    
+
     <script src={{ "/js/distro_switch.js" | prepend: site.baseurl }}></script>
 
-    <!-- Pre-fetch search index files -->
-    {% comment %}<link rel="prefetch" href={{ "/index.json" | prepend: site.baseurl }}>{% endcomment %}
-    {% comment %}<link rel="prefetch" href={{ "/search.json" | prepend: site.baseurl }}>{% endcomment %}
+    <!-- Pre-fetch session specific content -->
+    <script type="text/javascript" src="{{ '/js/lz-string.min.js' | preprend: site.baseurl }}"></script>
+    <script type="text/javascript" src="{{ '/js/jquery.session.storage.js' | preprend: site.baseurl }}"></script>
+
+    <script type="text/javascript">
+      $.sessionStorage.prefetch("search-index", function() {
+          return $.ajax("{{ '/index.json' | prepend: site.baseurl }}");
+      });
+
+      $.sessionStorage.prefetch("search-index-data", function() {
+        return $.ajax("{{ '/search.json' | prepend: site.baseurl }}");
+      });
+    </script>
 </head>
