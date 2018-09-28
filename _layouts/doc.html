@@ -7,10 +7,21 @@ layout: default
     <div class="row">
       <ol class="breadcrumb">
         <li><a href="{{site.baseurl}}/">Home</a></li>
-        {% for bc in page.breadcrumbs %}
-        <li><a href="{{site.baseurl}}/{{bc}}">{{bc}}</a></li>
+        {% assign splitted_url = page.url | split:"/" %}
+        {% assign repo_name = splitted_url[2] %}
+        {% for repo in site.docs_repos %}
+          {% if repo.name == repo_name %}
+            {% assign description = repo.description %}
+          {% endif %}
         {% endfor %}
-        <li class="active">{{ page.title }}</li>
+        {% if splitted_url.size > 3 %}
+          {% for repo in site.docs_repos %}
+            {% if repo.name == repo_name %}
+              <li><a href="{{site.baseurl}}/doc/{{repo_name}}/">{{ repo.description }}</a></li>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        <li class="active">{{ description }}</li>
       </ol>
       {% if page.edit_url %}
       <a type="button" href="{{ page.edit_url }}" class="btn btn-success pull-right">
