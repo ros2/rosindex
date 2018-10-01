@@ -6,3 +6,5 @@ skip_update: true
 skip_scrape: true
 # If true, this skips generating the search index
 skip_search_index: false
+# Shard count for search index partitioning.
+search_index_shards: 10

@@ -20,7 +20,7 @@
   // define lunr.js search class
   var LunrSearch = (function() {
 
-  function LunrSearch(input, options) {
+    function LunrSearch(input, options) {
       var self = this;
 
       this.$input = input;
@@ -28,36 +28,55 @@
       this.$pagination = $(options.pagination);
 
       this.template = this.compileTemplate($(options.template));
+      this.templateVars = options.templateVars;
+
+      this.busy = options.busy;
+      this.preview = options.preview;
       this.ready = options.ready;
 
-      this.baseUrl = options.baseUrl;
+      var shards_promise = $.Deferred().resolve([{
+          indexUrl: options.indexUrl,
+          indexDataUrl: options.indexDataUrl
+      }]);
+      if (options.indexShardsUrl) {
+        var urlParts = options.indexShardsUrl.split('/');
+        var urlPrefix = urlParts.slice(0, urlParts.length - 1).join('/');
+        shards_promise = $.getJSON(options.indexShardsUrl).then(function(shards) {
+          return $.map(shards, function(shard) {
+            return {indexUrl: urlPrefix + '/' + shard.index,
+                    indexDataUrl: urlPrefix + '/' + shard.index_data};
+          });
+        });
+      }
 
-      var promises = [];
-
-      promises.push(
-        (options.deferredIndex || $.getJSON(options.indexUrl, function() {
-            console.log("loading " + options.indexUrl);
-        })).then(function(serialized_index) {
-          self.index = lunr.Index.load(serialized_index);
-        })
-      );
-
-      promises.push(
-        (options.deferredIndexData || $.getJSON(options.indexDataUrl, function() {
-            console.log("loading " + options.indexDataUrl);
-        })).then(function(index_data) {
-          self.entries = index_data.entries;
-        })
-      );
-
-      $.when.apply($, promises).done(function() {
+      this.shards = []
+      shards_promise.then(function(shards) {
+          $.when.apply($, $.map(shards, function(shard) {
+              var promises = [];
+              promises.push($.getJSON(shard.indexUrl).then(function(raw_index) {
+                return lunr.Index.load(raw_index);
+              }));
+              promises.push($.getJSON(shard.indexDataUrl).then(function(raw_entries) {
+                return raw_entries.reduce(function(hash, entry) {
+                  hash[entry["id"]] = entry; return hash;
+                }, {});
+              }));
+              return $.when.apply($, promises).then(function(index, entries) {
+                self.shards.push({index: index, entries: entries});
+              }).then(function() {
+                var results = self.search(self.$input.val());
+                if (results.length > 0) {
+                  self.paginate(results);
+                  self.preview($.noop);
+                }
+              });
+          })).then(function() {
+              self.ready($.noop);
+          });
           self.populateSearchFromQuery();
-          self.resetSearchResults();
           self.bindKeypress();
-          self.ready();
-          console.log("done loading everything");
       });
-    }
+    };
 
     // Compile search results template
     LunrSearch.prototype.compileTemplate = function($template) {
@@ -72,51 +91,50 @@
     LunrSearch.prototype.bindKeypress = function() {
       var self = this;
 
-      var oldValue = self.$input.val();
-      self.$input.bind('keyup', debounce(function() {
+      var oldValue = this.$input.val();
+      this.$input.bind('keyup', debounce(function() {
         var newValue = self.$input.val();
         if (newValue !== oldValue) {
-          self.resetSearchResults();
+          self.busy(function() {
+            self.paginate(self.search(newValue));
+            self.ready($.noop);
+          });
         }
         oldValue = newValue;
       }));
     };
 
-    LunrSearch.prototype.resetSearchResults = function() {
-        var self = this;
-        self.$pagination.pagination({
-            dataSource: function(done) {
-                done(self.search(self.$input.val()));
-            },
-            callback: function(entries, pagination) {
-                var have_entries = (entries.length > 0);
-                self.$results.html(
-                    self.template({
-                        entries: entries,
-                        have_entries: have_entries,
-                        baseurl: self.baseUrl
-                    })
-                );
-            },
-            ulClassName: "pagination pagination-sm",
-            pageSize: 10
-        });
+    LunrSearch.prototype.paginate = function(results) {
+      var self = this;
+      this.$pagination.pagination({
+        dataSource: results,
+        callback: function(entries, pagination) {
+          var have_entries = (entries.length > 0);
+          self.$results.html(
+            self.template($.extend({}, {
+              entries: entries,
+              have_entries: have_entries,
+            }, self.templateVars))
+          );
+        },
+        ulClassName: "pagination pagination-sm",
+        pageSize: 10
+      });
     };
 
     // Search function that leverages lunr. If the query is too short
     // (i.e. less than 2 characters long), no search is performed.
     LunrSearch.prototype.search = function(query) {
-      var self = this;
       if (query.length < 2) {
         // Too short of a query, skip.
         return [];
       }
-      // For each search result, grep all the entries for the entry
-      // which corresponds to the result reference
-      return $.map(this.index.search(query), function(result) {
-          return $.grep(self.entries, function(entry) {
-              return entry.id === parseInt(result.ref, 10);
-          })[0];
+      // For each search result on each shard, grep all the entries
+      // for the entry which corresponds to the result reference
+      return $.map(this.shards, function (shard) {
+        return $.map(shard.index.search(query), function(result) {
+          return shard.entries[result.ref] || [];
+        });
       });
     };
 
@@ -143,6 +161,7 @@
     return this;
   };
 
+  var caller_fn = function(fn) { fn(); };
   $.fn.lunrSearch.defaults = {
     baseUrl: '',                 // Base url for search results links.
     indexUrl: '/index.json',     // Url for the .json file containing the
@@ -151,6 +170,10 @@
                                   // data.
     pagination: '#search-pagination',  // Selector for pagination container
     results: '#search-results',  // Selector for results container
-    template: '#search-results-template'  // Selector for Mustache.js template
+    template: '#search-results-template',  // Selector for Mustache.js template
+    templateVars: {},
+    busy: caller_fn,
+    preview: caller_fn,
+    ready: caller_fn
   };
 })(jQuery);

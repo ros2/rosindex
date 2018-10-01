@@ -9,14 +9,7 @@ layout: default
       <li class="active">Search</li>
     </ol>
   </div>
-  <div class="hide-when-loaded" class="row">
-    <h3>Loading Index...</h3>
-    <div class="progress">
-      <div id="index-loader-bar" class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%">
-      </div>
-    </div>
-  </div>
-  <div id="search-row" class="row show-when-loaded" style="display: none">
+  <div id="search-row" class="row show-when-done-searching" style="display: none;">
     <div id="search">
       <form action="{{site.baseurl}}/search" role="form" method="get">
         <div class="input-group">
@@ -31,13 +24,22 @@ layout: default
   <div class="row">
     &nbsp;
   </div>
-  <div class="row show-when-loaded" style="display: none">
+  <div class="row">
     <div class="panel panel-default">
-      <div class="panel-heading"><h3 class="panel-title">Search results</h3></div>
-      <div id="search-results" class="panel-body table-responsive"/>
+      <div class="panel-heading">
+        <h3 class="panel-title">Search results</h3>
+      </div>
+      <div id="search-results" class="panel-body show-when-done-searching table-responsive" style="display:none;">
+      </div>
+      <div class="panel-footer hide-when-done-searching">
+        <p class="progress-label">Searching packages...</p>
+        <div class="progress" style="margin-bottom: 0;">
+          <div id="index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
+        </div>
+      </div>
     </div>
   </div>
-  <div id="search-pagination" class="row text-center show-when-loaded" style="display: none"/>
+  <div id="search-pagination" class="row text-center show-when-done-searching" style="display: none"/>
 </div>
 
 {% raw %}
@@ -46,41 +48,41 @@ layout: default
   <table class="table table-condensed table-striped table-hover">
     <thead>
       <tr>
-        <th style="text-align: center;"><span class="glyphicon glyphicon-flash"></span></th>
-        <th style="text-align: center;"><span class="glyphicon glyphicon-file"></span></th>
-        <th style="text-align: center;"><span class="glyphicon glyphicon-time"></span></th>
-        <th>Distro</th>
-        <th>Name</th>
-        <th>Repo</th>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-flash"></span></th>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-file"></span></th>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-time"></span></th>
+        <th class="col-xs-1">Distro</th>
+        <th class="col-xs-2">Name</th>
+        <th class="col-xs-4">Repo</th>
       </tr>
     </thead>
     <tbody class="entries">
       {{#entries}}
       <tr>
         {{#released}}
-        <td class="text-center">
+        <td class="text-center col-xs-1">
           <span title="Released" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
         </td>
         {{/released}}
         {{^released}}
-        <td title="Not released" data-toggle="tooltip" data-placement="left" class="text-center">
+        <td title="Not released" data-toggle="tooltip" data-placement="left" class="text-center col-xs-1">
           <span class="glyphicon glyphicon-none"></span>
         </td>
         {{/released}}
         {{#readme}}
-        <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
+        <td title="Has README" data-toggle="tooltip" data-placement="left" align="center" class="col-xs-1">
           <span class="glyphicon glyphicon-file"></span>
         </td>
         {{/readme}}
         {{^readme}}
-        <td title="No README" data-toggle="tooltip" data-placement="left" align="center">
+        <td title="No README" data-toggle="tooltip" data-placement="left" align="center" class="col-xs-1">
           <span class="glyphicon glyphicon-none"></span>
         </td>
         {{/readme}}
-        <td align="center"><span class="label label-default">{{last_commit_time}}</span></td>
-        <td><span class="label label-default">{{distro}}</span></td>
-        <td><a href="{{baseurl}}{{url}}">{{name}}</a></td>
-        <td><a href="{{baseurl}}/r/{{repo_name}}/{{instance}}">{{instance}}</a></td>
+        <td class="col-xs-1" align="center"><span class="label label-default">{{last_commit_time}}</span></td>
+        <td class="col-xs-1"><span class="label label-default">{{distro}}</span></td>
+        <td class="col-xs-2"><a href="{{baseurl}}{{url}}">{{name}}</a></td>
+        <td class="col-xs-4"><a href="{{baseurl}}/r/{{repo_name}}/{{instance}}">{{instance}}</a></td>
       </tr>
       {{/entries}}
     </tbody>
@@ -102,26 +104,21 @@ layout: default
 
 <script type="text/javascript">
 $(function() {
-  console.log('ready');
+  var duration_ms = 400;
   $('#search-query').lunrSearch({
-    baseUrl: '{{site.baseurl}}',
-    deferredIndex: $.Deferred(function(d) {
-      $.sessionStorage.pull("search-index", d.resolve);
-    }).promise(),
-    deferredIndexData: $.Deferred(function(d) {
-      $.sessionStorage.pull("search-index-data", d.resolve);
-    }).promise(),
-    results:  '#search-results',          // jQuery selector for the search results container
+    indexShardsUrl: "{{ '/search/shards.json' | prepend: site.baseurl }}",
+    results:  '#search-results',
     pagination: '#search-pagination',
-    template: '#search-results-template',  // jQuery selector for the Mustache.js template
-    ready: (function() {
-        console.log('done indexing');
-        $('.hide-when-loaded').hide();
-        $('.show-when-loaded').show();
-        console.log('display toggled');
-    })
+    template: '#search-results-template',
+    templateVars: { baseurl: '{{ site.baseurl }}' },
+    preview: function(done) {
+      $('.show-when-done-searching').slideDown(duration_ms, done);
+    },
+    ready: function(done) {
+      $('.show-when-done-searching').slideDown(duration_ms, function() {
+        $('.hide-when-done-searching').slideUp(duration_ms, done);
+      });
+    }
   });
-  console.log('done loading');
 });
 </script>
-
