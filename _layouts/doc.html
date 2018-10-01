@@ -9,19 +9,20 @@ layout: default
         <li><a href="{{site.baseurl}}/">Home</a></li>
         {% assign splitted_url = page.url | split:"/" %}
         {% assign repo_name = splitted_url[2] %}
-        {% for repo in site.docs_repos %}
-          {% if repo.name == repo_name %}
-            {% assign description = repo.description %}
+        {% assign page_name = splitted_url[-1] %}
+
+        {% assign description = site.docs_repos[repo_name].description %}
+
+        {% if repo_name != page_name %}
+          <li><a href="{{site.baseurl}}/doc/{{repo_name}}/">{{ description }}</a></li>
+          {% if page.title == "" or page.title == nil  %}
+            <li class="active">{{ page_name | remove: ".html" }}</li>
+          {% else %}
+            <li class="active">{{ page.title }}</li>
           {% endif %}
-        {% endfor %}
-        {% if splitted_url.size > 3 %}
-          {% for repo in site.docs_repos %}
-            {% if repo.name == repo_name %}
-              <li><a href="{{site.baseurl}}/doc/{{repo_name}}/">{{ repo.description }}</a></li>
-            {% endif %}
-          {% endfor %}
+        {% else %}
+          <li class="active">{{ description }}</li>
         {% endif %}
-        <li class="active">{{ description }}</li>
       </ol>
       {% if page.edit_url %}
       <a type="button" href="{{ page.edit_url }}" class="btn btn-success pull-right">
