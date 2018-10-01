@@ -44,12 +44,12 @@
                     Doc <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    {% for repo_name in site.documentation_repos%}
-                      {% for repo in site.data.remotes.repositories %}
-                        {% if repo[0] == repo_name %}
-                          <li><a href="{{site.baseurl}}/doc/{{ repo[0] }}">{{ repo[1].short_description }}</a></li>
-                        {% endif %}
-                      {% endfor %}
+                    {% for repo in site.docs_repos %}
+                    <li>
+                      <a href="{{site.baseurl}}/doc/{{ repo.name }}">
+                        {{ repo.description }}
+                      </a>
+                    </li>
                     {% endfor %}
                     <li class="hidden" class="divider"></li>
 
