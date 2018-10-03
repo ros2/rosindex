@@ -13,7 +13,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
         if File.directory?(src)
             FileUtils.cp_r(src, dest_dir)
         else
-            raise IOError.new("Unable to copy from #{origin}, the directory doesn't exist.")
+            raise IOError.new("Unable to copy from #{src}, the directory doesn't exist.")
         end
     end
 end
