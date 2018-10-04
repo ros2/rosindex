@@ -13,7 +13,8 @@ Jekyll::Hooks.register :site, :after_init do |site|
         if File.directory?(src)
             FileUtils.cp_r(src, dest_dir)
         else
-            raise IOError.new("Unable to copy from #{src}, the directory doesn't exist.")
+            raise IOError.new("Unable to copy from #{src}, the directory doesn't exist.\n"\
+              "Please ensure the \"download-previous\" target has run prior to this one.\n")
         end
     end
 end
