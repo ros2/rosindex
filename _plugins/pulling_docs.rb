@@ -3,10 +3,10 @@
 require 'fileutils'
 
 Jekyll::Hooks.register :site, :after_init do |site|
-    site.config['docs_repos'].each do |repo|
-        src = File.join(site.source, "_remotes", repo[0])
+    site.config['docs_repos'].each do |key, value|
+        src = File.join(site.source, "_remotes", key)
         dest_dir = File.join(site.source, "doc")
-        dest = File.join(dest_dir, repo[0])
+        dest = File.join(dest_dir, key)
         if File.directory?(dest)
           FileUtils.rm_r(dest)
         end
