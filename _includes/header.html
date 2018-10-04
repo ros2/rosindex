@@ -46,8 +46,8 @@
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                     {% for repo in site.docs_repos %}
                     <li>
-                      <a href="{{site.baseurl}}/doc/{{ repo.name }}">
-                        {{ repo.description }}
+                      <a href="{{site.baseurl}}/doc/{{ repo[0] }}">
+                        {{ repo[1].description }}
                       </a>
                     </li>
                     {% endfor %}
