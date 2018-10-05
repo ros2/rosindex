@@ -35,7 +35,7 @@ debbuild_release_path: _cache/debbuild_releases
 wiki_title_index_filename: _cache/ros_org_wiki_title_index.txt
 
 checkout_threads: 4
-checkout_path: "_plugins_data/checkout"
+checkout_path: _plugins_data/checkout
 
 # if non-empty, only scrape these packages (useful for debugging / partial db updates)
 repo_name_whitelist: []
