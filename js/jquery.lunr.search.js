@@ -71,6 +71,8 @@
                 }
               });
           })).then(function() {
+              var results = self.search(self.$input.val());
+              self.paginate(results);
               self.ready($.noop);
           });
           self.populateSearchFromQuery();
