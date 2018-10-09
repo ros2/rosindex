@@ -111,13 +111,15 @@ $(function() {
     pagination: '#search-pagination',
     template: '#search-results-template',
     templateVars: { baseurl: '{{ site.baseurl }}' },
-    preview: function(done) {
-      $('.show-when-done-searching').slideDown(duration_ms, done);
+    preview: function() {
+      $('.show-when-done-searching').slideDown(duration_ms);
+      return $('.show-when-done-searching').promise();
     },
     ready: function(done) {
       $('.show-when-done-searching').slideDown(duration_ms, function() {
-        $('.hide-when-done-searching').slideUp(duration_ms, done);
+        $('.hide-when-done-searching').slideUp(duration_ms);
       });
+      return $('.show-when-done-searching').promise();
     }
   });
 });

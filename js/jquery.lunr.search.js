@@ -17,6 +17,21 @@
     };
   };
 
+  var reduce = function(arr, fn, acum) {
+    for (i = 0; i < arr.length; i += 1) {
+      acum = fn(arr[i], acum);
+    }
+    return acum;
+  };
+
+  var partition = function(input, n) {
+    output = [];
+    for (i = 0; i < input.length; i += n) {
+      output.push(input.slice(i, i + n));
+    }
+    return output;
+  };
+
   // define lunr.js search class
   var LunrSearch = (function() {
 
@@ -51,7 +66,10 @@
 
       this.shards = []
       shards_promise.then(function(shards) {
-          $.when.apply($, $.map(shards, function(shard) {
+        var partitioning = partition(shards, options.maxConcurrentDownloads);
+        reduce(partitioning, function(part, promise) {
+          return promise.then(function() {
+            return $.when.apply($, $.map(part, function(shard) {
               var promises = [];
               promises.push($.getJSON(shard.indexUrl).then(function(raw_index) {
                 return lunr.Index.load(raw_index);
@@ -63,20 +81,20 @@
               }));
               return $.when.apply($, promises).then(function(index, entries) {
                 self.shards.push({index: index, entries: entries});
-              }).then(function() {
-                var results = self.search(self.$input.val());
-                if (results.length > 0) {
-                  self.paginate(results);
-                  self.preview($.noop);
-                }
               });
-          })).then(function() {
+            })).then(function() {
               var results = self.search(self.$input.val());
-              self.paginate(results);
-              self.ready($.noop);
+              if (results.length > 0) {
+                return self.paginate(results).then(self.preview);
+              }
+            });
           });
-          self.populateSearchFromQuery();
-          self.bindKeypress();
+        }, $.Deferred().resolve().promise()).then(function() {
+          var results = self.search(self.$input.val());
+          return self.paginate(results).then(self.ready);
+        });
+        self.populateSearchFromQuery();
+        self.bindKeypress();
       });
     };
 
@@ -97,17 +115,18 @@
       this.$input.bind('keyup', debounce(function() {
         var newValue = self.$input.val();
         if (newValue !== oldValue) {
-          self.busy(function() {
-            self.paginate(self.search(newValue));
-            self.ready($.noop);
+          self.busy().then(function() {
+            var results = self.search(newValue);
+            self.paginate(results).then(self.ready);
           });
         }
         oldValue = newValue;
       }));
     };
 
-    LunrSearch.prototype.paginate = function(results) {
+    LunrSearch.prototype.paginate = function(results, callback) {
       var self = this;
+      var deferred = $.Deferred();
       this.$pagination.pagination({
         dataSource: results,
         callback: function(entries, pagination) {
@@ -119,9 +138,13 @@
             }, self.templateVars))
           );
         },
+        afterPaging: function() {
+          deferred.resolve();
+        },
         ulClassName: "pagination pagination-sm",
         pageSize: 10
       });
+      return deferred.promise();
     };
 
     // Search function that leverages lunr. If the query is too short
@@ -163,19 +186,20 @@
     return this;
   };
 
-  var caller_fn = function(fn) { fn(); };
+  var deferred_noop = function() { return $.Deferred().resolve(); };
   $.fn.lunrSearch.defaults = {
     baseUrl: '',                 // Base url for search results links.
     indexUrl: '/index.json',     // Url for the .json file containing the
                                  // search index.
     indexDataUrl: '/search.json', // Url for the json file containing search
                                   // data.
+    maxConcurrentDownloads: 2,    // Maximum concurrent downloads count allowed.
     pagination: '#search-pagination',  // Selector for pagination container
     results: '#search-results',  // Selector for results container
     template: '#search-results-template',  // Selector for Mustache.js template
     templateVars: {},
-    busy: caller_fn,
-    preview: caller_fn,
-    ready: caller_fn
+    busy: deferred_noop,
+    preview: deferred_noop,
+    ready: deferred_noop
   };
 })(jQuery);
