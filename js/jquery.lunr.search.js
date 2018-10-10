@@ -41,6 +41,7 @@
       this.$input = input;
       this.$results = $(options.results);
       this.$pagination = $(options.pagination);
+      this.page = null;
 
       this.template = this.compileTemplate($(options.template));
       this.templateVars = options.templateVars;
@@ -85,13 +86,17 @@
             })).then(function() {
               var results = self.search(self.$input.val());
               if (results.length > 0) {
-                return self.paginate(results).then(self.preview);
+                return self.paginate(
+                  results, self.page
+                ).then(self.preview);
               }
             });
           });
         }, $.Deferred().resolve().promise()).then(function() {
           var results = self.search(self.$input.val());
-          return self.paginate(results).then(self.ready);
+          return self.paginate(
+            results, self.page
+          ).then(self.ready);
         });
         self.populateSearchFromQuery();
         self.bindKeypress();
@@ -124,7 +129,7 @@
       }));
     };
 
-    LunrSearch.prototype.paginate = function(results, callback) {
+    LunrSearch.prototype.paginate = function(results, page) {
       var self = this;
       var deferred = $.Deferred();
       this.$pagination.pagination({
@@ -138,10 +143,14 @@
             }, self.templateVars))
           );
         },
-        afterPaging: function() {
+        afterPaging: function(page) {
+          self.page = page;
+        },
+        afterInit: function() {
           deferred.resolve();
         },
         ulClassName: "pagination pagination-sm",
+        pageNumber: page || 1,
         pageSize: 10
       });
       return deferred.promise();
