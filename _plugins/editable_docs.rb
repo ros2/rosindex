@@ -7,13 +7,18 @@ Jekyll::Hooks.register :site, :pre_render do |site, payload|
     end
     next unless page_path.start_with?("doc")
     repo_name, repo_data = repositories.find do |name, data|
-      page_path.start_with? (File.join("doc", name))
+      page_path.start_with?(File.join("doc", name))
     end
     next if repo_name.nil? or repo_data.nil?
 
     # Generate edit url
-    page_relative_url = page_path.sub(File.join("doc", repo_name), "")
-    page.data["edit_url"] = generate_edit_url(repo_data, page_relative_url)
+    edit_relative_url = page_path.sub(File.join("doc", repo_name), "")
+    if edit_relative_url.scan(/\//).length > 1
+      edit_relative_url = edit_relative_url[0..-12] + page.data["file_extension"]
+    else
+      edit_relative_url = "/README.md"
+    end
+    page.data["edit_url"] = generate_edit_url(repo_data, edit_relative_url)
   end
 end
 

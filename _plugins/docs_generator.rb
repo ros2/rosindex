@@ -15,6 +15,7 @@ class DocPage < Jekyll::Page
     self.data ||= {}
     self.data['layout'] = "doc"
     self.content = page_data["body"]
+    self.data['file_extension'] = page_data["page_source_suffix"]
     self.data['title'] = page_data["current_page_name"]
   end
 end
