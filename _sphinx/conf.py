@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ros2_docs documentation build configuration file, created by
+# rosindex documentation build configuration file, created by
 # sphinx-quickstart on Tue Oct  2 16:34:57 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -17,20 +17,11 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 # import os
+# sys.path.insert(0, os.path.abspath('.'))
 import sys
 import os
 import recommonmark
 from recommonmark.transform import AutoStructify
-sys.path.insert(0, os.path.abspath('.'))
-
-# -- General configuration ------------------------------------------------
-
-# If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
-
-# Add any paths that contain templates here, relative to this directory.
-#templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -41,9 +32,9 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = u'ros2_docs'
-copyright = u'2018, osrf'
-author = u'osrf'
+project = u'rosindex'
+copyright = u'2018, Open Robotics'
+author = u'Open Robotics'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -80,12 +71,6 @@ todo_include_todos = False
 #
 html_theme = 'alabaster'
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
-
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -120,10 +105,6 @@ texinfo_documents = [
 source_parsers = {
    '.md': 'recommonmark.parser.CommonMarkParser',
 }
-
-extensions = [
-    'sphinx_markdown_tables',
-]
 
 def setup(app):
     app.add_transform(AutoStructify)

@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'nokogiri'
 
 class DocPage < Jekyll::Page
   def initialize(site, repo_name, page_data)
@@ -91,6 +92,16 @@ class DocPageGenerator < Jekyll::Generator
         next unless File.file?(json_file)
         json_content = File.read(json_file)
         json_files_data[repo_name][name] = JSON.parse(json_content)
+
+        # Generate HTML tables that were left with markdown syntax by sphinx
+        html_doc = Nokogiri::HTML(JSON.parse(json_content)["body"])
+        html_doc.css('p').each do |paragraph|
+          if paragraph.to_s[3..-1].strip[0] == "|"
+            html_table = Kramdown::Document.new(paragraph.to_s.gsub("<p>", "").gsub("</p>", ""))
+            paragraph.replace(html_table.to_html.gsub("<table>", "<table border=\"1\" class=\"docutils>\""))
+          end
+        end
+        json_files_data[repo_name][name]["body"] = html_doc.to_s.lines[2..-2].join
       end
     end
     json_files_data

@@ -15,8 +15,6 @@ rosdistro_paths: [_remotes/rosdistro, _remotes/ros2_rosdistro]
 repos_path: _remotes/rosforks/repos
 attic_file: _remotes/rosforks/attic.yaml
 
-sphinx_conf_dir : sphinx
-sphinx_build_dir : sphinx/_build
 # Indicates which of the repositories tracked in remotes.yml
 # correspond to documentation repos.
 docs_repos:

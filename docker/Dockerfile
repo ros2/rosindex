@@ -35,11 +35,10 @@ RUN apt-get update && \
         tmux && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade setuptools pip &&
-    pip install \
-        recommonmark=0.4 \
-        sphinx==1.5.6 \
-        sphinx-markdown-tables
+RUN pip install --upgrade setuptools pip
+RUN pip install \
+        recommonmark==0.4 \
+        sphinx==1.5.6
 
 RUN ln -s `which nodejs` /usr/local/bin/node
 
