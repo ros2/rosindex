@@ -1415,24 +1415,13 @@ class Indexer < Jekyll::Generator
         end
       end
 
-      # generate index in the json format needed by lunr
-      index_json = JSON.generate({'entries'=>index})
-
-      # save the json file
-      # TODO: is there no way to do this in fewer lines?
-      Dir::mkdir(site.dest) unless File.directory?(site.dest)
-      index_filename = 'search.json'
-
-      File.open(File.join(site.dest, index_filename), "w+") do |index_file|
-        index_file.write(index_json)
-      end
-
-      # add this file as a static site file
-      site.static_files << SearchIndexFile.new(site, site.dest, "/", index_filename)
-
       # precompute the lunr index
-      lunr_cmd = File.join(site.source,'node_modules','lunr-index-build','bin','lunr-index-build')
-      lunr_index_fields = [
+      puts ("Precompiling lunr index...").blue
+
+      lunr_build_index_cmd = File.join(site.source, 'node_modules',
+                                       'lunr-index-build', 'bin',
+                                       'lunr-index-build')
+      lunr_build_index_fields = [
         '-r','id',
         '-f','baseurl',
         '-f','instance',
@@ -1448,25 +1437,46 @@ class Indexer < Jekyll::Generator
         '-f','released',
         '-f','unreleased'
       ].join(' ')
+      lunr_build_full_cmd = "#{lunr_build_index_cmd} #{lunr_build_index_fields}"
 
-      puts ("Precompiling lunr index...").blue
+      sorted_index = index.sort do |a, b|
+        $all_distros.index(a['distro']) <=> $all_distros.index(b['distro'])
+      end
 
-      input_file = File.join(site.dest,index_filename)
-      output_file = File.join(site.dest,'index.json')
-      errput_file = File.join(site.dest,'index_errors')
-      full_cmd = "#{lunr_cmd} #{lunr_index_fields}"
-      puts ("Full lunr cmd: #{full_cmd} < #{input_file} > #{output_file}")
-
-      pid = spawn(full_cmd,
-        :in=>input_file,
-        :out=>[output_file,"w"])
-      Process.waitpid(pid)
-
-      #if success != true
-        #puts ("Could not generate lunr index!").red
-      #end
-
-      site.static_files << SearchIndexFile.new(site, site.dest, "/", "index.json")
+      search_dirname = "search"
+      search_dirpath = File.join(site.dest, search_dirname)
+      Dir::mkdir(site.dest) unless File.directory?(site.dest)
+      Dir::mkdir(search_dirpath) unless File.directory?(search_dirpath)
+      shard_count = site.config['search_index_shards'] || 1
+      shard_size = sorted_index.length / shard_count
+      shards = sorted_index.each_slice(shard_size).with_index.collect do |index_slice, i|
+        puts("Building lunr index shard #{i}...")
+        index_filename = "index.#{i}.json"
+        index_data_filename = "data.#{i}.json"
+        index_data_filepath = File.join(search_dirpath, index_data_filename)
+        File.open(index_data_filepath, "w") do |index_data_file|
+          index_data_file.write(JSON.generate(index_slice))
+        end
+        site.static_files << SearchIndexFile.new(
+          site, site.dest, search_dirname, index_data_filename)
+        puts("Index data written to #{index_data_filename}.")
+        index_filepath = File.join(search_dirpath, index_filename)
+        puts("#{lunr_build_full_cmd} < #{index_data_filepath} > #{index_filepath}")
+        pid = spawn(lunr_build_full_cmd, :in=>index_data_filepath, :out=>[index_filepath, "w"])
+        Process.waitpid(pid)
+        site.static_files << SearchIndexFile.new(
+          site, site.dest, search_dirname, index_filename)
+        puts("Index written to #{search_dirname}/#{index_filename}.")
+        {:index => index_filename, :index_data => index_data_filename}
+      end
+      shards_filename = "shards.json"
+      shards_filepath = File.join(search_dirpath, shards_filename)
+      File.open(shards_filepath, "w") do |shards_file|
+        shards_file.write(JSON.generate(shards))
+      end
+      site.static_files << SearchIndexFile.new(
+        site, site.dest, search_dirname, shards_filename)
+      puts("Shards list written to #{search_dirname}/#{shards_filename}.")
     end
 
     # create stats page
