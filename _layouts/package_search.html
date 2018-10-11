@@ -9,37 +9,39 @@ layout: default
       <li class="active">Search</li>
     </ol>
   </div>
-  <div id="search-row" class="row show-when-done-searching" style="display: none;">
+  <div id="search-row" class="row">
     <div id="search">
-      <form action="{{site.baseurl}}/search" role="form" method="get">
-        <div class="input-group">
-          <input id="search-query" autocomplete="off" type="text" class="form-control" name="q" placeholder="Search ROS packages">
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-          </span>
-        </div>
-      </form>
+      <div class="input-group">
+        <input id="search-query" class="form-control" type="text"
+               autocomplete="off" placeholder="Search ROS packages">
+        <span class="input-group-btn">
+          <button id="search-button" class="btn btn-default">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+        </span>
+      </div>
     </div>
   </div>
   <div class="row">
     &nbsp;
   </div>
-  <div class="row">
+  <div class="row hide-when-index-loaded">
+    <p class="progress-label">Indexing packages...</p>
+    <div class="progress" style="margin-bottom: 0;">
+      <div id="index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
+    </div>
+  </div>
+  <div class="row show-when-searching" style="display: none;">
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Search results</h3>
       </div>
-      <div id="search-results" class="panel-body show-when-done-searching table-responsive" style="display:none;">
-      </div>
-      <div class="panel-footer hide-when-done-searching">
-        <p class="progress-label">Searching packages...</p>
-        <div class="progress" style="margin-bottom: 0;">
-          <div id="index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
-        </div>
-      </div>
+      <div id="search-results" class="panel-body table-responsive"></div>
     </div>
   </div>
-  <div id="search-pagination" class="row text-center show-when-done-searching" style="display: none"/>
+  <div id="search-pagination" style="display: none;"
+       class="row text-center show-when-searching">
+  </div>
 </div>
 
 {% raw %}
@@ -110,17 +112,22 @@ $(function() {
     results:  '#search-results',
     pagination: '#search-pagination',
     template: '#search-results-template',
-    templateVars: { baseurl: '{{ site.baseurl }}' },
-    preview: function() {
-      $('.show-when-done-searching').slideDown(duration_ms);
-      return $('.show-when-done-searching').promise();
+    templateVars: { baseurl: '{{ site.baseurl }}' }, 
+    indexLoaded: function () {
+      $('.hide-when-index-loaded').slideUp(duration_ms);
+      return $('.hide-when-index-loaded').promise();
     },
-    ready: function(done) {
-      $('.show-when-done-searching').slideDown(duration_ms, function() {
-        $('.hide-when-done-searching').slideUp(duration_ms);
-      });
-      return $('.show-when-done-searching').promise();
+    invalidSearch: function() {
+      $('.show-when-searching').slideUp(duration_ms);
+      return $('.show-when-searching').promise();
+    },
+    validSearch: function() {
+      $('.show-when-searching').slideDown(duration_ms);
+      return $('.show-when-searching').promise();
     }
   });
+  $('#search-button').click(function() {
+    $('#search-query').trigger('save');
+  })
 });
 </script>
