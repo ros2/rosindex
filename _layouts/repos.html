@@ -24,26 +24,39 @@ layout: default
             <table class="table table-condensed table-striped table-hover">
               <thead>
                 <tr>
-                  <th style="text-align: center;"><span class="glyphicon glyphicon-th"></span></th>
+                  <th style="text-align: center;">
+                    <span class="glyphicon glyphicon-th"
+                          title="Package instance">
+                    </span>
+                  </th>
                   <th style="text-align: center;">
                     {% if page.sort_id == 'released' %}
-                      <span class="glyphicon glyphicon-flash selected-sort-label"></span>
+                      <span class="glyphicon glyphicon-flash selected-sort-label"
+                            title="Sorted by release status"></span>
                     {% else %}
-                      <a href="{{site.baseurl}}/repos/page/1/released" class="unselected-sort-label glyphicon glyphicon-flash"></a>
+                      <a href="{{site.baseurl}}/repos/page/1/released"
+                         class="unselected-sort-label glyphicon glyphicon-flash"
+                         title="Sort by release status"></a>
                     {% endif %}
                   </th>
                   <th style="text-align: center;">
                     {% if page.sort_id == 'doc' %}
-                      <span class="glyphicon glyphicon-file selected-sort-label"></span>
+                      <span class="glyphicon glyphicon-file selected-sort-label"
+                            title="Sorted by README status"></span>
                     {% else %}
-                      <a href="{{site.baseurl}}/repos/page/1/doc" class="unselected-sort-label glyphicon glyphicon-file"></a>
+                      <a href="{{site.baseurl}}/repos/page/1/doc"
+                         class="unselected-sort-label glyphicon glyphicon-file"
+                         title="Sort by README status"></a>
                     {% endif %}
                   </th>
                   <th style="text-align: center;">
                     {% if page.sort_id == 'time' %}
-                      <span class="glyphicon glyphicon-time selected-sort-label"></span>
+                      <span class="glyphicon glyphicon-time selected-sort-label"
+                            title="Sorted by last commit date"></span>
                     {% else %}
-                      <a href="{{site.baseurl}}/repos/page/1/time" class="unselected-sort-label glyphicon glyphicon-time"></a>
+                      <a href="{{site.baseurl}}/repos/page/1/time"
+                         class="unselected-sort-label glyphicon glyphicon-time"
+                         title="Sort by last commit date"></a>
                     {% endif %}
                   </th>
                   <th style="text-align: left;">
