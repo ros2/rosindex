@@ -1,25 +1,7 @@
 require 'fileutils'
 require 'nokogiri'
 
-class DocPage < Jekyll::Page
-  def initialize(site, repo_name, page_data)
-    basepath = File.join('doc', repo_name)
-    @site = site
-    @base = site.source
-    @name = "index.html"
-    if page_data["current_page_name"].scan(/index|readme/i).length > 0
-      @dir = "doc/#{repo_name}/"
-    else
-      @dir = "doc/#{repo_name}/#{page_data["current_page_name"]}/"
-    end
-    self.process(@name)
-    self.data ||= {}
-    self.data['layout'] = "doc"
-    self.content = page_data["body"]
-    self.data['file_extension'] = page_data["page_source_suffix"]
-    self.data['title'] = page_data["current_page_name"]
-  end
-end
+require_relative '../_ruby_libs/pages'
 
 class Hash
   def self.recursive
@@ -67,10 +49,7 @@ class DocPageGenerator < Jekyll::Generator
   def search_docfiles(doc_repos_hash)
     docfiles_hash = Hash.new
     doc_repos_hash.each do |repo_name, repo|
-      docs_in_repo = Array.new
-      Dir.glob(File.join("_remotes", repo_name) + '**/*.{md, rst}', File::FNM_CASEFOLD) do |doc_relpath|
-        docs_in_repo.push(doc_relpath)
-      end
+      docs_in_repo = Dir.glob(File.join("_remotes", repo_name) + '**/*.{md, rst}', File::FNM_CASEFOLD)
       docfiles_hash[repo_name] = docs_in_repo
     end
     docfiles_hash
@@ -79,29 +58,40 @@ class DocPageGenerator < Jekyll::Generator
   def convert_with_sphinx(docfiles)
     json_files_data = Hash.recursive
     docfiles.each do |repo_name, files|
-      command = "sphinx-build -b json -c _sphinx #{File.join('_sphinx', 'repos', repo_name)} _sphinx/_build"
-      puts command
+      repo_path = File.join('_sphinx', 'repos', repo_name)
+      command = "sphinx-build -b json -c _sphinx #{repo_path} _sphinx/_build/#{repo_name}"
       pid = Kernel.spawn(command)
       Process.wait pid
+
       files.each do |file|
+        leading_single_quotation = /^'/
+        trailing_single_quotation = /'$/
+        file.sub!(/#{leading_single_quotation} | #{trailing_single_quotation}/, '')
         name = File.basename(file, File.extname(file))
         if name.scan(/readme/i).length > 0
           name = "index"
         end
-        json_file = File.join('_sphinx/_build/', name + '.fjson')
+        json_file = File.join('_sphinx/_build/', repo_name, name + '.fjson')
         next unless File.file?(json_file)
         json_content = File.read(json_file)
         json_files_data[repo_name][name] = JSON.parse(json_content)
+        json_files_data[repo_name][name]["relative_path"] = file
 
-        # Generate HTML tables that were left with markdown syntax by sphinx
+        # Generate HTML tables that were left with markdown syntax by sphinx.
+        # Please refer to this issue for more information:
+        # https://github.com/rtfd/recommonmark/issues/3
+        # Although there's a sphinx-markdown-tables extension now, its
+        # functionality is limited and doesn't fit our requirements.
         html_doc = Nokogiri::HTML(JSON.parse(json_content)["body"])
         html_doc.css('p').each do |paragraph|
-          if paragraph.to_s[3..-1].strip[0] == "|"
-            html_table = Kramdown::Document.new(paragraph.to_s.gsub("<p>", "").gsub("</p>", ""))
-            paragraph.replace(html_table.to_html.gsub("<table>", "<table border=\"1\" class=\"docutils>\""))
+          if paragraph.content.strip[0] == "|"
+            html_table = Kramdown::Document.new(paragraph.to_s[paragraph.to_s.index(/\|/)..-1].sub("</p>", "")).to_html
+            if html_table.scan(/\<table/).length > 0
+              paragraph.replace(html_table.gsub("<table", "<table border=\"1\" class=\"docutils\" "))
+              json_files_data[repo_name][name]["body"] = html_doc.to_s.lines[2..-2].join
+            end
           end
         end
-        json_files_data[repo_name][name]["body"] = html_doc.to_s.lines[2..-2].join
       end
     end
     json_files_data

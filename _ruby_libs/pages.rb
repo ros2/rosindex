@@ -171,6 +171,27 @@ class DepListPage < Jekyll::Page
   end
 end
 
+class DocPage < Jekyll::Page
+  def initialize(site, repo_name, page_data)
+    basepath = File.join('doc', repo_name)
+    @site = site
+    @base = site.source
+    @name = "index.html"
+    if page_data["current_page_name"].scan(/index|readme/i).length > 0
+      @dir = "doc/#{repo_name}/"
+    else
+      @dir = "doc/#{repo_name}/#{page_data["current_page_name"]}/"
+    end
+    self.process(@name)
+    self.data ||= {}
+    self.data['layout'] = "doc"
+    self.content = page_data["body"]
+    self.data['file_extension'] = page_data["page_source_suffix"]
+    self.data['file_relpath'] = page_data["relative_path"]
+    self.data['title'] = page_data["current_page_name"]
+  end
+end
+
 class PackagePage < Jekyll::Page
   def initialize(site, package_instances)
     @site = site

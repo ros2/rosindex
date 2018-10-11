@@ -72,7 +72,6 @@ def get_browse_uri(uri_s, type, branch)
     uri_split = File.split(uri.path)
     path_split = uri_split[1].rpartition('.')
     repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
-    puts uri_split
     return 'https://github.com/%s/%s/tree/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
   when 'bitbucket.org'
     uri_split = File.split(uri.path)

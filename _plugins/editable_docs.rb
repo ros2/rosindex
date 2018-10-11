@@ -10,19 +10,13 @@ Jekyll::Hooks.register :site, :pre_render do |site, payload|
       page_path.start_with?(File.join("doc", name))
     end
     next if repo_name.nil? or repo_data.nil?
-
     # Generate edit url
-    edit_relative_url = page_path.sub(File.join("doc", repo_name), "")
-    if edit_relative_url.scan(/\//).length > 1
-      edit_relative_url = edit_relative_url[0..-12] + page.data["file_extension"]
-    else
-      edit_relative_url = "/README.md"
-    end
-    page.data["edit_url"] = generate_edit_url(repo_data, edit_relative_url)
+    original_filepath = page.data["file_relpath"].split('/')[2..-1].join('/')
+    page.data["edit_url"] = generate_edit_url(repo_data, original_filepath)
   end
 end
 
-def generate_edit_url(repo_data, page_relative_url)
+def generate_edit_url(repo_data, original_filepath)
   is_https = repo_data['url'].include? "https"
   is_github = repo_data['url'].include? "github.com"
   is_bitbucket = repo_data['url'].include? "bitbucket.org"
@@ -40,9 +34,9 @@ def generate_edit_url(repo_data, page_relative_url)
   repo.chomp!(".git") if repo.end_with? ".git"
   if is_github
     edit_url = "https://#{host}/#{organization}/#{repo}/edit/#{repo_data['version']}"
-    return File.join(edit_url, page_relative_url)
+    return File.join(edit_url, original_filepath)
   elsif is_bitbucket
     edit_url = "https://#{host}/#{organization}/#{repo}/src/#{repo_data['version']}"
-    return File.join(edit_url, page_relative_url) + "?mode=edit&spa=0&at=#{repo_data['version']}&fileviewer=file-view-default"
+    return File.join(edit_url, original_filepath) + "?mode=edit&spa=0&at=#{repo_data['version']}&fileviewer=file-view-default"
   end
 end
