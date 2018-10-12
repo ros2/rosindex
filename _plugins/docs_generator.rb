@@ -85,13 +85,24 @@ class DocPageGenerator < Jekyll::Generator
         html_doc = Nokogiri::HTML(JSON.parse(json_content)["body"])
         html_doc.css('p').each do |paragraph|
           if paragraph.content.strip[0] == "|"
-            html_table = Kramdown::Document.new(paragraph.to_s[paragraph.to_s.index(/\|/)..-1].sub("</p>", "")).to_html
-            if html_table.scan(/\<table/).length > 0
-              paragraph.replace(html_table.gsub("<table", "<table border=\"1\" class=\"docutils\" "))
-              json_files_data[repo_name][name]["body"] = html_doc.to_s.lines[2..-2].join
+            html_table = Kramdown::Document.new(paragraph.inner_html).to_html
+            nokogiri_table = Nokogiri::HTML(html_table)
+            next unless nokogiri_table.css('td').length > 0
+            nokogiri_table.css('table').each do |table|
+              # Fixes table by removing the second row that's always filled
+              # with hyphens, as a consequence of conversion.
+              table.css('tr').each_with_index do |tr, index|
+                if index == 1
+                  tr.remove
+                  break
+                end
+              end
+              table.set_attribute("class", "table table-striped table-dark")
             end
+            paragraph.replace(nokogiri_table.to_html)
           end
         end
+        json_files_data[repo_name][name]["body"] = html_doc.css('body').first.inner_html 
       end
     end
     json_files_data

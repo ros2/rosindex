@@ -11,8 +11,9 @@ Jekyll::Hooks.register :site, :pre_render do |site, payload|
     end
     next if repo_name.nil? or repo_data.nil?
     # Generate edit url
-    original_filepath = page.data["file_relpath"].split('/')[2..-1].join('/')
-    page.data["edit_url"] = generate_edit_url(repo_data, original_filepath)
+    file_relpath = page.data["file_relpath"]
+    file_relpath_to_repo = file_relpath.slice((file_relpath.index(repo_name) + repo_name.length)..-1)
+    page.data["edit_url"] = generate_edit_url(repo_data, file_relpath_to_repo)
   end
 end
 
