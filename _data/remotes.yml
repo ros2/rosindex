@@ -21,7 +21,11 @@ repositories:
     url: git@github.com:ros-infrastructure/index.ros.org.git
     version: gh-pages
 # List of all non-package specific documentation repositories.
-  ros2_overview:
+  ros2_documentation/bouncy:
+    type: git
+    url: git@github.com:ros2/ros2_documentation.git
+    version: master
+  ros2_documentation/ardent:
     type: git
     url: git@github.com:ros2/ros2_documentation.git
     version: master

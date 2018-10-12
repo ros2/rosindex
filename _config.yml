@@ -66,6 +66,17 @@ exclude:
 
 index_old_doc_paths: false
 
+# If true, this skips finding repos based on the repo sources
+skip_discover: false
+# If true, this skips updating the known repos
+skip_update: false
+# If true, this skips scraping the cloned repos
+skip_scrape: false
+# If true, this skips generating the search index
+skip_search_index: false
+# Shard count for search index partitioning.
+search_index_shards: 20
+
 # ROS distros to look for
 #
 # Distros are given big buttons and "old" distros are relegated to share a
@@ -77,12 +88,12 @@ distros:
   - 'lunar'
   - 'kinetic'
   - 'indigo'
-
+               
 old_distros:
   - 'ardent'
   - 'jade'
   - 'hydro'
-  
+
 # package list page
 packages_per_page: 50
 repos_per_page: 50
@@ -90,12 +101,6 @@ repos_per_page: 50
 # uncomment the following line for testing (limit the number of indexed repos)
 max_repos: 00
 
-readme_index:
-  remove_originals: true
-
 plugins:
   - jekyll-sitemap
-  - jekyll-optional-front-matter
-  - jekyll-titles-from-headings
-  - jekyll-readme-index
   - jekyll-relative-links

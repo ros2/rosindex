@@ -17,22 +17,23 @@ search_config=_config/search_index.yml
 # This target is invoked by a doc_independent job on the ROS buildfarm.
 html: build deploy
 
-build: download-previous discover update scrape search-index
-
 download-previous:
 	mkdir -p $(remotes_dir)
 	vcs import --input $(remotes_file) --force $(remotes_dir)
 
-discover:
+build: download-previous
+	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file)
+
+discover: download-previous
 	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(discover_config)
 
-update:
+update: download-previous
 	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(update_config)
 
-scrape:
+scrape: download-previous
 	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(scrape_config)
 
-search-index:
+search-index: download-previous
 	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(search_config)
 
 # deploy assumes build has run already

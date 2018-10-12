@@ -44,12 +44,14 @@
                     Doc <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    {% for repo in site.docs_repos %}
+                    {% for docs in site.independent_docs %}
+                    {% if docs[1].description %}
                     <li>
-                      <a href="{{site.baseurl}}/doc/{{ repo[0] }}">
-                        {{ repo[1].description }}
+                      <a href="{{ site.baseurl }}/doc/{{ docs[0] }}">
+                        {{ docs[1].description }}
                       </a>
                     </li>
+                    {% endif %}
                     {% endfor %}
                     <li class="hidden" class="divider"></li>
 

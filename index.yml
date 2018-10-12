@@ -15,8 +15,11 @@ rosdistro_paths: [_remotes/rosdistro, _remotes/ros2_rosdistro]
 repos_path: _remotes/rosforks/repos
 attic_file: _remotes/rosforks/attic.yaml
 
-# Indicates which of the repositories tracked in remotes.yml
-# correspond to documentation repos.
-docs_repos:
+# Lists indenpendent documentation sources, referencing
+# one remote per distro (see remotes.yml).
+independent_docs:
   ros2_overview:
+    versions:
+      bouncy: ros2_documentation/bouncy
+      ardent: ros2_documentation/ardent
     description: "ROS2 Overview"

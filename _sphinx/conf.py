@@ -31,6 +31,9 @@ source_suffix = ['.rst', '.md']
 # The master toctree document.
 master_doc = 'index'
 
+# The set of warnings to suppress.
+suppress_warnings = ['image.nonlocal_uri']
+
 # General information about the project.
 project = u'rosindex'
 copyright = u'2018, Open Robotics'
@@ -74,7 +77,11 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
+
+# Remove header permalinks as these clash with URL fragment usage
+# for distro switching.
+html_add_permalinks = None
 
 # -- Options for HTMLHelp output ------------------------------------------
 
@@ -85,5 +92,9 @@ source_parsers = {
    '.md': 'recommonmark.parser.CommonMarkParser',
 }
 
+
 def setup(app):
+    app.add_config_value('recommonmark_config', {
+        'enable_auto_toc_tree': False
+    }, True)
     app.add_transform(AutoStructify)
