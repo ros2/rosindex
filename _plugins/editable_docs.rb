@@ -7,17 +7,17 @@ Jekyll::Hooks.register :site, :pre_render do |site, payload|
     end
     next unless page_path.start_with?("doc")
     repo_name, repo_data = repositories.find do |name, data|
-      page_path.start_with? (File.join("doc", name))
+      page_path.start_with?(File.join("doc", name))
     end
     next if repo_name.nil? or repo_data.nil?
-
     # Generate edit url
-    page_relative_url = page_path.sub(File.join("doc", repo_name), "")
-    page.data["edit_url"] = generate_edit_url(repo_data, page_relative_url)
+    file_relpath = page.data["file_relpath"]
+    file_relpath_to_repo = file_relpath.slice((file_relpath.index(repo_name) + repo_name.length)..-1)
+    page.data["edit_url"] = generate_edit_url(repo_data, file_relpath_to_repo)
   end
 end
 
-def generate_edit_url(repo_data, page_relative_url)
+def generate_edit_url(repo_data, original_filepath)
   is_https = repo_data['url'].include? "https"
   is_github = repo_data['url'].include? "github.com"
   is_bitbucket = repo_data['url'].include? "bitbucket.org"
@@ -35,9 +35,9 @@ def generate_edit_url(repo_data, page_relative_url)
   repo.chomp!(".git") if repo.end_with? ".git"
   if is_github
     edit_url = "https://#{host}/#{organization}/#{repo}/edit/#{repo_data['version']}"
-    return File.join(edit_url, page_relative_url)
+    return File.join(edit_url, original_filepath)
   elsif is_bitbucket
     edit_url = "https://#{host}/#{organization}/#{repo}/src/#{repo_data['version']}"
-    return File.join(edit_url, page_relative_url) + "?mode=edit&spa=0&at=#{repo_data['version']}&fileviewer=file-view-default"
+    return File.join(edit_url, original_filepath) + "?mode=edit&spa=0&at=#{repo_data['version']}&fileviewer=file-view-default"
   end
 end

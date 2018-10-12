@@ -25,6 +25,7 @@ RUN apt-get update && \
         openssl \
         pandoc \
         pkg-config \
+        python-pip \
         python3-vcstool \
         ruby \
         ruby-dev \
@@ -33,6 +34,11 @@ RUN apt-get update && \
         sudo \
         tmux && \
     rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade setuptools pip
+RUN pip install \
+        recommonmark==0.4 \
+        sphinx==1.5.6
 
 RUN ln -s `which nodejs` /usr/local/bin/node
 
