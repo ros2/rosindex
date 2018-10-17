@@ -42,7 +42,7 @@ class DocPageGenerator < Jekyll::Generator
   def copy_docs(src_path, dst_path)
     copied_docs = Hash.new
     src_path = Pathname.new(src_path)
-    Dir.glob(File.join(src_path, '**/*.{md, rst}'),
+    Dir.glob(File.join(src_path, '**/*.{md,rst}'),
              File::FNM_CASEFOLD).each do |src_doc_path|
       src_doc_path = Pathname.new(src_doc_path)
       dst_doc_path = Pathname.new(File.join(

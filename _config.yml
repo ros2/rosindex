@@ -88,7 +88,7 @@ distros:
   - 'lunar'
   - 'kinetic'
   - 'indigo'
-               
+
 old_distros:
   - 'ardent'
   - 'jade'
