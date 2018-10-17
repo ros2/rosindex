@@ -18,7 +18,7 @@ layout: default
   </div>
   <div class="row">
 
-    <form action="{{site.baseurl}}/search/" role="form">
+    <form id="searchbox" action="{{site.baseurl}}/search/" role="form">
       <div class="input-group input-group-lg">
         <input type="text" class="form-control" name="q" placeholder="Search ROS Packages">
         <span class="input-group-btn">
@@ -26,7 +26,13 @@ layout: default
         </span>
       </div>
     </form>
-
+    <script type="text/javascript">
+      $('#searchbox').submit(function() {
+        return $('#searchbox input:text').filter(function() {
+          return $(this).val() == "";
+        }).length == 0;
+      });
+    </script>
   </div>
   <hr>
   <div class="row">

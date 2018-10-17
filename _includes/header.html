@@ -69,7 +69,7 @@
 
         <!-- searchbox -->
         <div class="col-sm-12 col-md-3" style="margin-top: 12px">
-          <form action="{{site.baseurl}}/search/" role="form" method="get">
+          <form id="top-searchbox" action="{{site.baseurl}}/search/" role="form" method="get">
             <div class="input-group input-group-sm">
               <input type="text" class="form-control" name="q" placeholder="Search ROS packages">
               <span class="input-group-btn">
@@ -102,5 +102,11 @@
     -->
 
   </div>
-
+  <script type="text/javascript">
+    $('#top-searchbox').submit(function() {
+        return $('#top-searchbox input:text').filter(function() {
+          return $(this).val() == "";
+        }).length == 0;
+    });
+  </script>
 </header>

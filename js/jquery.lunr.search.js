@@ -46,9 +46,9 @@
       this.template = this.compileTemplate($(options.template));
       this.templateVars = options.templateVars;
 
-      this.busy = options.busy;
-      this.preview = options.preview;
-      this.ready = options.ready;
+      this.indexLoaded = options.indexLoaded;
+      this.invalidSearch = options.invalidSearch;
+      this.validSearch = options.validSearch;
 
       var shards_promise = $.Deferred().resolve([{
           indexUrl: options.indexUrl,
@@ -84,23 +84,45 @@
                 self.shards.push({index: index, entries: entries});
               });
             })).then(function() {
-              var results = self.search(self.$input.val());
-              if (results.length > 0) {
-                return self.paginate(
-                  results, self.page
-                ).then(self.preview);
+              var query = self.$input.val();
+              if (query) {
+                var results = self.search(query);
+                if (results.length > 0) {
+                  return self.paginate(
+                    results, self.page
+                  ).then(self.validSearch);
+                }
               }
             });
           });
         }, $.Deferred().resolve().promise()).then(function() {
-          var results = self.search(self.$input.val());
-          return self.paginate(
-            results, self.page
-          ).then(self.ready);
+          self.$input.bind('search', function() {
+            var query = self.$input.val();
+            if (query) {
+              var results = self.search(query);
+              self.paginate(
+                results, self.page
+              ).then(self.validSearch);
+            } else {
+              self.invalidSearch();
+            }
+          });
+
+          self.bindInputKeys();
+          self.indexLoaded();
         });
-        self.populateSearchFromQuery();
-        self.bindKeypress();
       });
+      self.populateSearchFromQuery();
+      $(window).bind('popstate', function() {
+        self.populateSearchFromQuery();
+        self.$input.trigger('search');
+      });
+      self.$input.bind('save', function() {
+        if (self.$input.val()) {
+          self.populateQueryFromSearch();
+        }
+      });
+      self.bindSaveKeys();
     };
 
     // Compile search results template
@@ -113,19 +135,24 @@
     };
 
     // Bind keyup events to search results refreshes.
-    LunrSearch.prototype.bindKeypress = function() {
+    LunrSearch.prototype.bindInputKeys = function() {
       var self = this;
-
       var oldValue = this.$input.val();
       this.$input.bind('keyup', debounce(function() {
         var newValue = self.$input.val();
         if (newValue !== oldValue) {
-          self.busy().then(function() {
-            var results = self.search(newValue);
-            self.paginate(results).then(self.ready);
-          });
+          self.$input.trigger('search');
         }
         oldValue = newValue;
+      }));
+    };
+
+    LunrSearch.prototype.bindSaveKeys = function() {
+      var self = this;
+      this.$input.bind('keypress', debounce(function(e) {
+        if (e.which == 13) {
+          self.$input.trigger('save');
+        }
       }));
     };
 
@@ -179,7 +206,17 @@
 
       if (queryString.hasOwnProperty('q')) {
         this.$input.val(queryString.q);
+      } else {
+        this.$input.val("");
       }
+    };
+
+    // Populate the search input with 'q' querystring parameter if set
+    LunrSearch.prototype.populateQueryFromSearch = function() {
+      var uri = new URI(window.location.toString());
+      uri.setSearch({q: this.$input.val()});
+      window.history.pushState({path: uri.toString()},
+                                '', uri.toString());
     };
 
     return LunrSearch;
@@ -207,8 +244,8 @@
     results: '#search-results',  // Selector for results container
     template: '#search-results-template',  // Selector for Mustache.js template
     templateVars: {},
-    busy: deferred_noop,
-    preview: deferred_noop,
-    ready: deferred_noop
+    invalidSearch: deferred_noop,
+    validSearch: deferred_noop,
+    indexLoaded: deferred_noop
   };
 })(jQuery);
