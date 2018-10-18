@@ -66,6 +66,21 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+extensions = ['sphinx.ext.intersphinx']
+
+# Intersphinx mapping
+
+intersphinx_mapping = {
+    'catkin_pkg':    ('http://docs.ros.org/independent/api/catkin_pkg/html', None),
+    'jenkins_tools': ('http://docs.ros.org/independent/api/jenkins_tools/html', None),
+    'rosdep':        ('http://docs.ros.org/independent/api/rosdep/html', None),
+    'rosdistro':     ('http://docs.ros.org/independent/api/rosdistro/html', None),
+    'rosinstall':    ('http://docs.ros.org/independent/api/rosinstall/html', None),
+    'rospkg':        ('http://docs.ros.org/independent/api/rospkg/html', None),
+    'vcstools':      ('http://docs.ros.org/independent/api/vcstools/html', None)
+}
 
 # -- Options for HTML output ----------------------------------------------
 
