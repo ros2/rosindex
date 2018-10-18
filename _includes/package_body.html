@@ -156,7 +156,7 @@ Assumes distro and package are defined
         <div class="row">
           <div class="col-xs-12">
             <div class="panel panel-default">
-              <div class="panel-heading"><span class="glyphicon glyphicon-file"></span><a href="{{readme.browse_uri}}">{{ readme.relpath }}</a></div>
+              <div class="panel-heading"><span class="glyphicon glyphicon-file"></span><a href="{{readme.browse_uri}}" title="Open in git repository">{{ readme.relpath }}</a></div>
               <div class="panel-body">
                     {{ readme.readme_rendered }}
               </div>
@@ -236,7 +236,7 @@ Assumes distro and package are defined
               <table class="table table-condensed table-striped">
                 <thead>
                   <th class="text-center">Deps</th>
-                  <th class="text-center"><span class="glyphicon glyphicon-th"></span></th>
+                  <th class="text-center"><span class="glyphicon glyphicon-th" title="Package instances"></span></th>
                   <th style="width: 100%">Name</th>
                 </thead>
                 <tbody>
@@ -249,7 +249,7 @@ Assumes distro and package are defined
                           {% assign n_2nd_order_sdeps = p[1].snapshots[distro].data.system_deps | size %}
                           {% assign n_2nd_order_deps = n_2nd_order_pdeps | plus: n_2nd_order_sdeps %}
                           <a href="{{site.baseurl}}/p/{{p[0]}}#{{distro}}-deps" {% if n_2nd_order_deps == 0 %}class="inactive"{% endif %}>
-                            <span class="glyphicon glyphicon-arrow-left"></span>
+                            <span class="glyphicon glyphicon-arrow-left" title="Package dependencies"></span>
                           </a>
                         </td>
                         <td class="text-center">
