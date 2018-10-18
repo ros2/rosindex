@@ -74,7 +74,6 @@ exclude:
   - README.md
   - Makefile
   - docker
-  - vendor
 
 index_old_doc_paths: false
 
@@ -85,15 +84,15 @@ index_old_doc_paths: false
 #
 distros:
   - 'bouncy'
-  # - 'melodic'
-  # - 'lunar'
-  # - 'kinetic'
-  # - 'indigo'
+  - 'melodic'
+  - 'lunar'
+  - 'kinetic'
+  - 'indigo'
 
 old_distros:
   - 'ardent'
-  # - 'jade'
-  # - 'hydro'
+  - 'jade'
+  - 'hydro'
 
 # package list page
 packages_per_page: 50
