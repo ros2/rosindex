@@ -13,7 +13,7 @@ Assumes the following are defined:
 {% endif %}
 
 <div class="list-group list-group-sm {%if horizontal%}list-group-horizontal list-group-justified{%endif%}">
-  <a class="{{list_group_class}}" target="_blank" href="http://docs.ros.org/{{distro}}/api/{{page.package_name}}/html/" {% unless package.snapshot.documented %}disabled{% endunless %}><span style="margin-right: 5px;" class="glyphicon glyphicon-file"></span>{%if hide_link_labels%}<br>{%endif%} API Docs</a>
+  <a class="{{list_group_class}}" target="_blank" href="{{ package.data.docs_uri }}" {% unless package.snapshot.documented %}disabled{% endunless %}><span style="margin-right: 5px;" class="glyphicon glyphicon-file"></span>{%if hide_link_labels%}<br>{%endif%} API Docs</a>
   <a class="{{list_group_class}}" target="_blank" href="{{ package.data.browse_uri }}"><span class="glyphicon glyphicon-folder-open" style="margin-right:5px;"></span>{%if hide_link_labels%}<br>{%endif%} Browse Code</a>
   <a class="{{list_group_class}} {% unless package.data.wiki.exists %}inactive{% endunless %}" target="_blank" href="http://wiki.ros.org/{{page.package_name}}?distro={{distro}}"><span style="margin-right: 5px;" class="glyphicon glyphicon-info-sign"></span>{%if hide_link_labels%}<br>{%endif%} Wiki</a>
   <a class="{{list_group_class}} {% unless package.data.wiki.exists %}inactive{% endunless %}" target="_blank" href="http://http404error.github.io/roseco/graph.html?id=ros.json&focus={{page.package_name}}&height=1&depth=2&tred=standard&metagroup=false&colorby=Health&direction=LR" {% unless package.snapshot.documented %}disabled{% endunless %}><span style="margin-right: 5px;" class="glyphicon glyphicon-tree-deciduous"></span>{%if hide_link_labels%}<br>{%endif%}</a>
