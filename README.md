@@ -114,3 +114,6 @@ Deployment is done by calling the following make command:
 ```
 make deploy
 ```
+
+# Cross referencing documentation
+It's possible to cross reference packages that have been documented with Sphinx within rosindex. Please refer to [this document](https://github.com/ros2/ros2_documentation/blob/master/Inter-Sphinx-Example.rst) to get more information.
