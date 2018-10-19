@@ -54,3 +54,8 @@ USER $user
 ENV BUNDLE_PATH=$HOME/.bundle
 ENV BUNDLE_GEMFILE=$HOME/.bundle/Gemfile
 RUN bundle install
+
+RUN git config --global user.name "rosindex"
+RUN git config --global user.email "rosindex@build.ros.org"
+
+CMD update_site ${REPO} ${SITE}

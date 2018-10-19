@@ -16,5 +16,6 @@ else
 fi
 
 docker run \
+  -w /home/`whoami`/rosindex \
   -v $SCRIPT_DIR/..:/home/`whoami`/rosindex:rw \
   --net=host -ti rosindex/rosindex $COMMAND
