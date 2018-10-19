@@ -73,13 +73,13 @@ index_old_doc_paths: false
 #
 distros:
   - 'bouncy'
+  - 'ardent'
   - 'melodic'
   - 'lunar'
   - 'kinetic'
   - 'indigo'
 
 old_distros:
-  - 'ardent'
   - 'jade'
   - 'hydro'
   
