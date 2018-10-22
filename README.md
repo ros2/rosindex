@@ -14,22 +14,24 @@ and uses client-side javascript for quick searching and visualization.
 
 [![Stories in Ready](https://badge.waffle.io/rosindex/rosindex.svg?label=ready&title=Ready)](http://waffle.io/rosindex/rosindex)
 
-## Building
+## Building the site
 
-### Pre-Requisites
+### On an Ubuntu 16.04 box
 
-#### Basic Ubuntu 16.04 Deps
+#### Pre-Requisites
 
-```
+##### Dependencies
+
+```bash
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 sudo apt-get update
 sudo apt-get install curl git git-svn mercurial nodejs pandoc python3-vcstool
 ```
 
-#### Ruby 2.2 via RVM
+##### Ruby 2.2 via RVM
 
-```
+```bash
 curl -L https://get.rvm.io | bash -s stable
 # if this fails, add the PGP key and run again
 source ~/.rvm/scripts/rvm
@@ -38,51 +40,74 @@ rvm install ruby
 rvm rubygems current
 ```
 
-#### Node.js on Ubuntu 12.04
+##### Node.js on Ubuntu 12.04
 
-```
+```bash
 sudo apt-get install python-software-properties
 sudo apt-add-repository ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get install nodejs
 ```
 
-#### Ruby Requirements
+##### Ruby Requirements
 
-```
+```bash
 gem install bundler
 ```
 
 #### Clone Source and Install Gems
 
-```
+```bash
 git clone git@github.com:ros2/rosindex.git --recursive
-cd rosindex.github.io
+cd rosindex
 bundle install
 ```
 
-### Clone repos that are part of rosdistro and build the index
+#### Clone repos that are part of rosdistro and build the index
 
-```
+Run:
+
+```bash
 make build
 ```
 
-### Serve the devel (tiny) version locally
+By default, site will be written to _site. This behavior can be
+overriden as follows:
 
-```
-make serve-devel
-```
-
-### Serve the full version locally
-
-**Note:** This requires a minimum of 30GB of
-free space for the `checkout` directory.
-
-```
-make serve
+```bash
+make build site_path=/path/to/site
 ```
 
-### Skipping Parts of the Build
+### On the provided Ubuntu 16.04 container
+
+#### Pre-requisites
+
+##### Docker
+
+See https://docs.docker.com/install/linux/ for details on docker installation.
+
+#### Build docker image
+
+```bash
+docker/build.sh
+```
+
+#### Build the index inside the container
+
+Run:
+
+```bash
+docker/run.sh
+make build  # once inside the container
+```
+
+Or the following can be used as a shorthand:
+
+```bash
+docker/run.sh build_site
+```
+
+## Skipping parts of the build
 
 The build process entails four long-running steps:
 
@@ -107,10 +132,71 @@ skip_scrape: false
 skip_search_index: false
 ```
 
+Additionally, some make targets are provided for convenience:
+
+- To skip everything but repo discovering:
+
+  ```bash
+  make discover   #
+  ```
+
+- To skip everything but repo updates:
+
+  ```bash
+  make update
+  ```
+
+- To skip everything but repo scraping:
+
+  ```bash
+  make scrape
+  ```
+
+- To skip everything but a search index build:
+
+  ```bash
+  make search-index
+  ```
+
+Note that skipping parts of the rosindex build does not interfere with
+Jekyll's build process (e.g. generated files are still written to site).
+
+
+## Serving the site
+
+### Serve the devel (tiny) version locally
+
+Run:
+
+```bash
+make serve-devel
+```
+
+The following can be used as a shorthand if using
+docker containers:
+
+```bash
+docker/run.sh test_site
+```
+
+### Serve the full version locally
+
+Run:
+
+```bash
+make serve
+```
+
+**Note:** This requires a minimum of 30GB of free space for the
+`checkout` directory.
+
 ## Deployment
 
-Deployment is done by calling the following make command:
+Deployment is not managed by these tools. It is to be managed
+externally e.g. using a local repository as site destination.
 
-```
-make deploy
-```
+## ROS buildfarm integration
+
+ROSIndex qualifies as independent documentation of **'external_site'**
+type. Therefore, it can readily be built and deployed as Github Pages by
+a *doc_independent* job.
