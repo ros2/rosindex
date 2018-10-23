@@ -3,6 +3,7 @@ _site
 _devel
 _roswiki
 _cache
-_sphinx
 _remotes
 _plugins_data
+_sphinx/_build
+_sphinx/repos

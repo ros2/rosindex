@@ -6,34 +6,19 @@ layout: default
   <div class="container-fluid">
     <div class="row">
       <ol class="breadcrumb">
-        <li><a href="{{site.baseurl}}/">Home</a></li>
-        {% assign splitted_url = page.url | split:"/" %}
-        {% assign repo_name = splitted_url[2] %}
-        {% assign page_name = splitted_url[-1] %}
-
-        {% assign description = site.docs_repos[repo_name].description %}
-
-        {% if repo_name != page_name %}
-          <li><a href="{{site.baseurl}}/doc/{{repo_name}}/">{{ description }}</a></li>
-          {% if page.title == "" or page.title == nil  %}
-            <li class="active">{{ page_name | remove: ".html" }}</li>
-          {% else %}
-            <li class="active">{{ page.title }}</li>
-          {% endif %}
-        {% else %}
-          <li class="active">{{ description }}</li>
+        <li><a href="{{ site.baseurl }}/">Home</a></li>
+        <li><a href="{{ page.docs_baseurl }}/">{{ page.docs_title }}</a></li>
+        {% if page.title != "." %}
+        <li class="active">{{ page.title }}</li>
         {% endif %}
       </ol>
-      {% if page.edit_url %}
+    </div>
+    <div class="row">
       <a type="button" href="{{ page.edit_url }}" class="btn btn-success pull-right">
         Edit on Github
       </a>
-      {% endif %}
-    </div>
-    <div class="row">
-      <div class="col-md-10">  
-        {{ content }}
-      </div>
+      {{ content }}
+      &nbsp;
     </div>
   </div>
 </div>
