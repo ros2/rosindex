@@ -137,7 +137,7 @@ Additionally, some make targets are provided for convenience:
 - To skip everything but repo discovering:
 
   ```bash
-  make discover   #
+  make discover
   ```
 
 - To skip everything but repo updates:
