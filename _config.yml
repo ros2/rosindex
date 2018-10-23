@@ -34,6 +34,17 @@ report_diff_filename: _cache/_deploy_index_report_diff.yaml
 debbuild_release_path: _cache/debbuild_releases
 wiki_title_index_filename: _cache/ros_org_wiki_title_index.txt
 
+# If true, this skips finding repos based on the repo sources
+skip_discover: false
+# If true, this skips updating the known repos
+skip_update: false
+# If true, this skips scraping the cloned repos
+skip_scrape: false
+# If true, this skips generating the search index
+skip_search_index: false
+# Shard count for search index partitioning.
+search_index_shards: 20
+
 checkout_threads: 4
 checkout_path: _plugins_data/checkout
 
@@ -82,7 +93,7 @@ distros:
 old_distros:
   - 'jade'
   - 'hydro'
-  
+
 # package list page
 packages_per_page: 50
 repos_per_page: 50
@@ -95,7 +106,4 @@ readme_index:
 
 plugins:
   - jekyll-sitemap
-  - jekyll-optional-front-matter
-  - jekyll-titles-from-headings
-  - jekyll-readme-index
   - jekyll-relative-links

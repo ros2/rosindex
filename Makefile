@@ -1,3 +1,5 @@
+site_path ?= _site
+
 devel_config_file=_config_devel.yml
 
 data_dir=_data
@@ -5,7 +7,6 @@ cache_dir=_cache
 remotes_dir=_remotes
 plugins_data_dir=_plugins_data
 remotes_file=$(data_dir)/remotes.yml
-deploy_dir=$(remotes_dir)/deploy
 
 config_file=_config.yml
 index_file=index.yml
@@ -14,39 +15,30 @@ update_config=_config/update.yml
 scrape_config=_config/scrape.yml
 search_config=_config/search_index.yml
 
-# This target is invoked by a doc_independent job on the ROS buildfarm.
-html: build deploy
+build: prepare-sources
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file)
 
-build: download-previous discover update scrape search-index
-
-download-previous:
+prepare-sources:
 	mkdir -p $(remotes_dir)
 	vcs import --input $(remotes_file) --force $(remotes_dir)
 
-discover:
-	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(discover_config)
+discover: prepare-sources
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(discover_config)
 
-update:
-	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(update_config)
+update: prepare-sources
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(update_config)
 
-scrape:
-	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(scrape_config)
+scrape: prepare-sources
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(scrape_config)
 
-search-index:
-	bundle exec jekyll build --verbose --trace -d $(deploy_dir) --config=$(config_file),$(index_file),$(search_config)
-
-# deploy assumes build has run already
-deploy:
-	cd $(deploy_dir) && git add --all
-	cd $(deploy_dir) && git status
-	cd $(deploy_dir) && git commit -m "make deploy by `whoami` on `date`"
-	cd $(deploy_dir) && git push --verbose
+search-index: prepare-sources
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(search_config)
 
 serve:
-	bundle exec jekyll serve --host 0.0.0.0 --trace -d $(deploy_dir) --config=$(config_file),$(index_file) --skip-initial-build
+	bundle exec jekyll serve --host 0.0.0.0 --no-watch --trace -d $(site_path) --config=$(config_file),$(index_file) --skip-initial-build
 
 serve-devel:
-	bundle exec jekyll serve --host 0.0.0.0 --no-watch -d $(deploy_dir) --trace --config=$(config_file),$(devel_config_file),$(index_file) --skip-initial-build
+	bundle exec jekyll serve --host 0.0.0.0 --no-watch --trace -d $(site_path) --config=$(config_file),$(devel_config_file),$(index_file) --skip-initial-build
 
 clean-sources:
 	rm -rf $(plugins_data_dir)

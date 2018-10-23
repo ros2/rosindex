@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 SCRIPT_DIR=`dirname $( readlink -m $( type -p $0 ))`
 
 # Ensure your SSH private key has been added to the ssh-agent as follows:
@@ -16,10 +16,6 @@ else
 fi
 
 docker run \
-  --env SSH_AUTH_SOCK=/ssh-agent \
-  -v $SSH_AUTH_SOCK:/ssh-agent \
-  -v $SCRIPT_DIR/..:/workdir/rosindex:rw \
-  --net=host \
-  -p 4000:4000 \
-  -ti rosindex/rosindex \
-  $COMMAND
+  -w /home/`whoami`/rosindex \
+  -v $SCRIPT_DIR/..:/home/`whoami`/rosindex:rw \
+  --net=host -ti rosindex/rosindex $COMMAND
