@@ -61,6 +61,6 @@ RUN git config --global user.email "rosindex@build.ros.org"
 # The environment variables REPO and SITE should be set when running this container.
 # REPO: The path to this source repository in the container
 # SITE: The path to the destination repository in the container
-ENV REPO
-ENV SITE
+ENV REPO ""
+ENV SITE ""
 CMD update_site ${REPO} ${SITE}
