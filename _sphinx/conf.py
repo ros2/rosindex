@@ -18,18 +18,19 @@
 #
 # import os
 # sys.path.insert(0, os.path.abspath('.'))
-import sys
-import os
-import recommonmark
-from recommonmark.transform import AutoStructify
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
+
+# The default role
+default_role = 'any'
+
+# The set of warnings to suppress.
+suppress_warnings = ['image.nonlocal_uri']
 
 # General information about the project.
 project = u'rosindex'
@@ -66,6 +67,21 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+extensions = ['sphinx.ext.intersphinx']
+
+# Intersphinx mapping
+
+intersphinx_mapping = {
+    'catkin_pkg':    ('http://docs.ros.org/independent/api/catkin_pkg/html', None),
+    'jenkins_tools': ('http://docs.ros.org/independent/api/jenkins_tools/html', None),
+    'rosdep':        ('http://docs.ros.org/independent/api/rosdep/html', None),
+    'rosdistro':     ('http://docs.ros.org/independent/api/rosdistro/html', None),
+    'rosinstall':    ('http://docs.ros.org/independent/api/rosinstall/html', None),
+    'rospkg':        ('http://docs.ros.org/independent/api/rospkg/html', None),
+    'vcstools':      ('http://docs.ros.org/independent/api/vcstools/html', None)
+}
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -77,16 +93,9 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'ros2_docsdoc'
-
-source_parsers = {
-   '.md': 'recommonmark.parser.CommonMarkParser',
-}
-
-def setup(app):
-    app.add_transform(AutoStructify)
