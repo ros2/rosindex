@@ -8,9 +8,9 @@ layout: default
       <ol class="breadcrumb">
         <li><a href="{{ site.baseurl }}/">Home</a></li>
         <li><a href="{{ page.docs_baseurl }}/">{{ page.docs_title }}</a></li>
-        {% if page.title != "." %}
+        {% unless page.at_root %}
         <li class="active">{{ page.title }}</li>
-        {% endif %}
+        {% endunless %}
       </ol>
     </div>
     <div class="row">

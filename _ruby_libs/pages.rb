@@ -181,7 +181,10 @@ class DocPage < Jekyll::Page
     self.data ||= {}
     self.content = page_data['body']
     self.data['layout'] = "doc"
-    self.data['title'] = File.basename(page_name).gsub('-', ' ')
+    self.data['at_root'] = (page_name == '.')
+    self.data['title'] = File.basename(
+      page_name != '.' ? page_name.gsub('-', ' ') : docs_title
+    )
     self.data['edit_url'] = page_data['edit_url']
     self.data['docs_baseurl'] = "#{site.baseurl}/doc/#{docs_name}"
     self.data['docs_title'] = docs_title
