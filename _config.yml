@@ -82,15 +82,19 @@ index_old_doc_paths: false
 # Distros are given big buttons and "old" distros are relegated to share a
 # drop-down list in the distro selector.
 #
-distros:
+ros2_distros:
   - 'bouncy'
   - 'ardent'
+
+ros_distros:
   - 'melodic'
   - 'lunar'
   - 'kinetic'
   - 'indigo'
 
-old_distros:
+old_ros2_distros: []
+
+old_ros_distros:
   - 'jade'
   - 'hydro'
 

@@ -358,12 +358,19 @@ class Indexer < Jekyll::Generator
         end
       end
 
+      if $ros_distros.include? distro
+        docs_uri = "http://docs.ros.org/#{distro}/api/#{package_name}/html/"
+      else
+        docs_uri = "http://docs.ros2.org/#{distro}/api/#{package_name}/"
+      end
+
       package_info = {
         'name' => package_name,
         'pkg_type' => pkg_type,
         'distro' => distro,
         'raw_uri' => raw_uri,
         'browse_uri' => browse_uri,
+        'docs_uri' => docs_uri,
         # required package info
         'version' => version,
         'license' => license,
@@ -763,6 +770,10 @@ class Indexer < Jekyll::Generator
     # construct list of known ros distros
     $recent_distros = site.config['distros']
     $all_distros = site.config['distros'] + site.config['old_distros']
+    $ros_distros = site.config['ros_distros'] +
+                    site.config['old_ros_distros']
+    $ros2_distros = site.config['ros2_distros'] +
+                    site.config['old_ros2_distros']
 
     @domain_blacklist = site.config['domain_blacklist']
 
