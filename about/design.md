@@ -30,33 +30,33 @@ ROS Index organizes ROS source code in two ways:
 
 ### Repository Organization
 
-The repository organization is simple: each repository identifier corresponds
-to a set of repository `instances`. Repository instances are different versions
+Each repository identifier corresponds to a set of repository `instances`.
+Repository instances are different versions
 of a repository with the same name but different URIs. This enables ROS Index
 to index forks of known repositories. Within each instance, branches and tags
 correspond to different ROS distributions. So versions of repositories can be
 organized hierarchically like so:
 
- 1. repository identifier
- 2. repository instance
- 3. ROS distribution (branch/tag)
+ 1. repository identifier (i.e. `geometry`)
+ 2. repository instance (i.e. `github-ros-geometry`)
+ 3. ROS distribution (branch/tag, i.e. `kinetic`)
 
 This gives rise to urls like:
 
 ```
-rosindex.github.io/r/<<REPOSITORY>>/<<INSTANCE>>/<<DISTRO>>
+index.ros.org/r/<<REPOSITORY>>/<<INSTANCE>>/#<<DISTRO>>
 ```
 
 So for the ``geometry`` repository, the default instance would be resolved by:
 
 ```
-rosindex.github.io/r/geometry
+index.ros.org/r/geometry
 ```
 
 In this case, this would be equivalent to:
 
 ```
-rosindex.github.io/r/geometry/github-ros-geometry
+index.ros.org/r/geometry/github-ros-geometry
 ```
 
 This link would resolve to the repository corresponding to the URI given in the
@@ -67,16 +67,9 @@ repository* with the distro selector buttons.
 > distributions. In this case, it is expected that older versions of the sources
 > are tagged in the *latest* version of the repository.
 
-Specific instances of packages can be resolved by the following:
-
- 1. repository identifier
- 2. repository instance
- 3. package name
- 4. ROS distribution (branch/tag)
-
 ### Package Organization
 
-Normally, however, users are interested in looking up ROS code by package name.
+Often, however, users are interested in looking up ROS code by package name.
 In this case, it's more subtle. Between ROS distributions, a package can migrate
 from one repository to another. As such, a hierarchical organization like that
 used for repositories doesn't fit as well. It could have the effect of obscuring
@@ -87,8 +80,27 @@ Most importantly, people want to see the documentation for *official* packages.
 As such, it makes sense that when browsing packages, the default instances for a
 distribution are organized like so:
 
- 1. package name
- 2. ROS distribution (repo/instance/branch/tag)
+ 1. package name (i.e. `tf`)
+ 2. repository instance (i.e. `github-ros-geometry`)
+ 2. ROS distribution (branch/tag) (i.e. `melodic`)
+
+This gives rise to urls like:
+
+```
+index.ros.org/p/<<PACKAGE>>/<<INSTANCE>>/#<<DISTRO>>
+```
+
+So for the ``tf`` package, the default instance would be resolved by:
+
+```
+index.ros.org/p/tf
+```
+
+In this case, this would be equivalent to:
+
+```
+index.ros.org/p/tf/github-ros-geometry
+```
 
 When viewing the tab for a given ROS distribution, the user can see additional
 metadata about the package, as well as in which repository that package is
@@ -98,17 +110,18 @@ located.
 
 ### Official Index
 
-The ROS Index site generator reads `rosdistro` files to get lists of released
+The ROS Index site generator reads `rosdistro` files like the ones
+[here](https://github.com/ros/rosdistro) to get lists of released
 and unreleased ROS repositories. For all repositories with source links, it
-adds them to a known repositories index. 
+adds them to a known repositories index.
 
 Files are read from two places in `rosdistro`:
 
- * `_rosdistro/<<DISTRO>>/distribution.yaml`
- * `_rosdistro/doc/<<DISTRO>>/*.rosinstall`
+ * `rosdistro/<<DISTRO>>/distribution.yaml`
+ * `rosdistro/doc/<<DISTRO>>/*.rosinstall`
 
-ROS packages are uniquely located in `rosdistro` by a distribution (groovy,
-hydro, indigo) and a repository identifier. In a given distribution, package
+ROS packages are uniquely located in `rosdistro` by a distribution (kinetic,
+melodic, bouncy) and a repository identifier. In a given distribution, package
 names are unique.
 
 ### Forks
@@ -143,10 +156,10 @@ instances:
 After creating an index of version control repositories containing ROS code,
 all of these repositories are cloned to the local system. Only Git, Mercurial,
 and SVN repositories are supported. For SVN repositories, the `git-svn` module
-is used to manage the local checkout. 
+is used to manage the local checkout.
 
-At this time, checking out all known (and available) ROS code uses less than
-15GB of disk space. These clones of remote repositories persist, and are simply
+Checking out all known (and available) ROS code uses several gigabytes
+of disk space. These clones of remote repositories persist, and are simply
 updated the next time the index is built.
 
 Each of these repositories is then scraped for information relevant to

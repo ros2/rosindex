@@ -23,15 +23,13 @@ For more information see:
 * [Design]({{ "/about/design" | prepend: site.baseurl }})
 * [Development]({{ "/about/development" | prepend: site.baseurl }})
 
-See [rosindex on GitHub](https://github.com/rosindex/rosindex.github.io) for
-active development.
+See [rosindex on GitHub](https://github.com/ros2/rosindex) for active development.
 
-# Funding
+# Maintenance
 
-ROS Index is a community-driven project and is not directly funded
-by any grant or organization. If you're interested in supporting the implemention of new features or 
-want specific bugs fixed, but would rather contribute funds than modify the code yourself,
-don't hesitate to donate or pledge bounties on
-[BountySource](https://www.bountysource.com/teams/rosindex/issues).
+ROS Index is maintained and hosted by [Open Robotics](https://www.openrobotics.org/)
+for the global ROS community. Contributions and financial support are always welcome.
 
-<a href="https://salt.bountysource.com/teams/rosindex" target="_blank" class="btn btn-success">Support ROS Index on Bountysource!</a>
+The source code was originally forked from
+[Jonathan Bohren](http://jbohren.com/)'s [rosindex](https://github.com/rosindex/rosindex).
+
