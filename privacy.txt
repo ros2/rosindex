@@ -22,7 +22,7 @@ form on our website.
 For any questions regarding this policy, please don't hesitate to post questions
 on the GitHub project issues page:
 
-https://github.com/ros2/rosindex/issues/new
+https://github.com/ros-infrastructure/rosindex/issues/new
 
 
 Additional Cookie Use

@@ -6,7 +6,7 @@ description: > # this means to ignore newlines until "baseurl:"
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "https://ros-infrastructure.github.io/index.ros.org/" # the base hostname & protocol for your site
 #twitter_username: jekyllrb
-github_username:  ros2
+github_username:  ros-infrastructure
 keep_files: [cache, .git]
 
 # Sources

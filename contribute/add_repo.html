@@ -92,10 +92,12 @@ permalink: /contribute/add_repo/
           <label for="distro_select" class="col-sm-2 control-label">ROS Distro</label>
           <div class="col-sm-6">
             <select id="distro_select" class="form-control">
-              <option value="jade">Jade</option>
+              <option value="bouncy">Bouncy</option>
+              <option value="ardent">Ardent</option>
+              <option value="melodic">Melodic</option>
+              <option value="lunar">Lunar</option>
+              <option value="kinetic">Kinetic</option>
               <option value="indigo">Indigo</option>
-              <option value="hydro">Hydro</option>
-              <option value="groovy">Groovy</option>
             </select>
           </div>
           <div class="col-sm-4">
@@ -291,7 +293,7 @@ $(function () {
         var t2 = t1+t1;
         var t3 = t1+t1+t1;
         var nl = "\n";
-        var yaml = 
+        var yaml =
             t1+$('#repo_name_input').val()+":"+nl+
             t2+"doc:"+nl+
             t3+"type: "+$('#vcs_select').val()+nl+
