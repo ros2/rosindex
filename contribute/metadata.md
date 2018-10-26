@@ -35,15 +35,15 @@ a single `<rosindex></rosindex>` tag.
 
 ## Metadata Elements
 
-The following are accepted ROS Index metadata elements for further describing 
+The following are accepted ROS Index metadata elements for further describing
 a ROS package:
 
 * **Category Tags** -- `<tags>...</tags>`
+* **Alternate README** -- `<readme>...</readme>`
 
 The following are ROS Index metadata elements which are either unimplemented or
-still being designed.
+still being designed:
 
-* **Alternate README** -- `<readme>...</readme>`
 * **Tutorials** -- `<tutorials>...</tutorials>`
 * **Nodes** -- `<nodes>...</nodes>`
 

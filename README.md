@@ -5,12 +5,12 @@ A simple static index for known ROS packages. It builds in jekyll with a plugin
 to clone repositories containing ROS packages, scrapes them for information,
 and uses client-side javascript for quick searching and visualization.
 
-[ROS Index](http://rosindex.github.io/)
+[ROS Index](http://index.ros.org/)
 
-* [About](http://rosindex.github.io/about)
-* [Design](http://rosindex.github.io/about/design)
-* [Development](http://rosindex.github.io/about/development)
-* [Contribute](http://rosindex.github.io/contribute)
+* [About](http://index.ros.org/about)
+* [Design](http://index.ros.org/about/design)
+* [Development](http://index.ros.org/about/development)
+* [Contribute](http://index.ros.org/contribute)
 
 [![Stories in Ready](https://badge.waffle.io/rosindex/rosindex.svg?label=ready&title=Ready)](http://waffle.io/rosindex/rosindex)
 
@@ -58,7 +58,7 @@ gem install bundler
 #### Clone Source and Install Gems
 
 ```bash
-git clone git@github.com:ros2/rosindex.git --recursive
+git clone git@github.com:ros-infrastructure/rosindex.git --recursive
 cd rosindex
 bundle install
 ```

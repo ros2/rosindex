@@ -28,14 +28,6 @@ layout: default
       &nbsp;
     </div>
     <div class="row">
-      <div class="panel panel-default">
-        <div class="panel-heading"><h3 class="panel-title">Known Packages</h3></div>
-        <div class="panel-body" style="overflow-x:auto;">
-          <div class="venn text-center"></div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
       &nbsp;
     </div>
     <div class="row">
@@ -85,7 +77,7 @@ layout: default
 // define sets and set set intersections
 var sets = [
     {% for distro in page.distro_counts %}
-      {label: "{{distro[0]}}", size: {{distro[1]}}}, 
+      {label: "{{distro[0]}}", size: {{distro[1]}}},
     {% endfor %}
   ],
   overlaps = [
@@ -143,8 +135,8 @@ diagram.svg.selectAll("path")
     .data(overlaps)
     .enter()
     .append("path")
-    .attr("d", function(d) { 
-        return venn.intersectionAreaPath(d.sets.map(function(j) { return sets[j]; })); 
+    .attr("d", function(d) {
+        return venn.intersectionAreaPath(d.sets.map(function(j) { return sets[j]; }));
     })
     .style("fill-opacity","0")
     .style("fill", "black")
@@ -241,7 +233,7 @@ function makeHist(selector, values) {
     .enter().append("g")
       .attr("class", "bar")
       .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-  
+
   var tooltip = d3.select("body").append("div")
     .attr("class", "histtooltip");
 
