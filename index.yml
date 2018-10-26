@@ -18,5 +18,5 @@ attic_file: _remotes/rosforks/attic.yaml
 # Indicates which of the repositories tracked in remotes.yml
 # correspond to documentation repos.
 docs_repos:
-  ros2_overview:
+  ros2:
     description: "ROS2 Overview"
