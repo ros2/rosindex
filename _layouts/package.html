@@ -51,4 +51,8 @@ layout: default
   </div>
 {% endfor %}
 
-
+<script type="text/javascript">
+  $(document).ready(function() {
+    setupDistroSwitch("{{ page.default_distro }}");
+  });
+</script>

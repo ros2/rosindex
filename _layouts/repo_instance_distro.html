@@ -85,13 +85,15 @@ layout: default
 <script src="{{ '/js/repo_switch.js' | prepend: site.baseurl }}"></script>
 
 <script>
-$(document).ready(function(){
-                  $('#content-tabs a').click(
-                      function (e) {
-                      //e.preventDefault();
-                      $(this).tab('show');
-                      console.log(this)
-                      });
-                  });
+$(document).ready(function() {
+  setupDistroSwitch("{{ site.distros[0] }}");
+  $('#content-tabs a').click(
+    function (e) {
+      //e.preventDefault();
+      $(this).tab('show');
+      console.log(this)
+    }
+  );
+});
 </script>
 

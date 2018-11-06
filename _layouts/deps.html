@@ -120,3 +120,8 @@ layout: default
 </div>
 
 <script src="/js/distro_switch.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    setupDistroSwitch("{{ site.distros[0] }}");
+  });
+</script>
