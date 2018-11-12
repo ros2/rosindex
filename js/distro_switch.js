@@ -1,5 +1,4 @@
-
-function setupDistroSwitch(default_distro) { 
+function setupDistroSwitch(default_distro) {
   $('#distro-switch label').click(function (e) {
     console.log(e.target)
     // get the distro and set the cookie
@@ -55,7 +54,7 @@ function setupDistroSwitch(default_distro) {
   }
 
   if(typeof distro == 'undefined') {
-    distro = default_distro;    
+    distro = default_distro;
   }
 
   $('.distro').not('.distro-'+distro).hide(0);
@@ -63,4 +62,3 @@ function setupDistroSwitch(default_distro) {
   $('#'+distro+'-option').addClass('active');
   $('#'+distro+'-button').trigger("click");
 }
-
