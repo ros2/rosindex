@@ -75,9 +75,14 @@ class RepoPage < Jekyll::Page
     self.data['instance_index_url'] = File.join('repos', repo.name)
     self.data['default_instance_id'] = instances.default.id
 
-    self.data['available_distros'], self.data['available_older_distros'], self.data['n_available_older_distros'] = get_available_distros(site, repo.snapshots)
-
+    self.data['available_distros'],
+    self.data['available_older_distros'],
+    self.data['n_available_older_distros'] = get_available_distros(site, repo.snapshots)
     self.data['all_distros'] = site.config['distros'] + site.config['old_distros']
+
+    self.data['default_distro'] = self.data['available_distros'].keys.first or
+                                  self.data['available_older_distros'].keys.first or
+                                  self.data['all_distros'].first
   end
 end
 
@@ -208,9 +213,14 @@ class PackagePage < Jekyll::Page
     self.data['instance_index_url'] = File.join('packages',package_instances.name)
     self.data['instance_base_url'] = @dir
 
-    self.data['available_distros'], self.data['available_older_distros'], self.data['n_available_older_distros'] = get_available_distros(site, package_instances.snapshots)
-
+    self.data['available_distros'],
+    self.data['available_older_distros'],
+    self.data['n_available_older_distros'] = get_available_distros(site, package_instances.snapshots)
     self.data['all_distros'] = site.config['distros'] + site.config['old_distros']
+
+    self.data['default_distro'] = self.data['available_distros'].keys.first or
+                                  self.data['available_older_distros'].keys.first or
+                                  self.data['all_distros'].first
   end
 end
 
@@ -258,6 +268,10 @@ class PackageInstancePage < Jekyll::Page
     self.data['n_available_older_distros'] = self.data['available_older_distros'].values.count(true)
 
     self.data['all_distros'] = site.config['distros'] + site.config['old_distros']
+
+    self.data['default_distro'] = self.data['available_distros'].keys.first or
+                                  self.data['available_older_distros'].keys.first or
+                                  self.data['all_distros'].first
   end
 end
 

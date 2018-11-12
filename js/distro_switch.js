@@ -1,7 +1,4 @@
----
----
-
-$(document).ready(function(){ 
+function setupDistroSwitch(default_distro) {
   $('#distro-switch label').click(function (e) {
     console.log(e.target)
     // get the distro and set the cookie
@@ -57,12 +54,11 @@ $(document).ready(function(){
   }
 
   if(typeof distro == 'undefined') {
-    distro = "{{site.distros[0]}}";
+    distro = default_distro;
   }
 
   $('.distro').not('.distro-'+distro).hide(0);
   $('.distro-'+distro).show(0);
   $('#'+distro+'-option').addClass('active');
   $('#'+distro+'-button').trigger("click");
-});
-
+}
