@@ -39,7 +39,7 @@ class DocPageGenerator < Jekyll::Generator
       src_doc_path = Pathname.new(src_doc_path)
       dst_doc_path = Pathname.new(File.join(
         dst_path, src_doc_path.relative_path_from(src_path)
-      ).sub(/readme\.rst$/i, 'index.rst'))
+      ))
       unless File.directory? File.dirname(dst_doc_path)
         FileUtils.makedirs(File.dirname(dst_doc_path))
       end
