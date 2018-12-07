@@ -1417,9 +1417,9 @@ class Indexer < Jekyll::Generator
               'authors' => p['authors'] * " ",
               'distro' => distro,
               'instance' => repo.id,
-              'readme' => readme_filtered
+              'readme' => readme_filtered,
+              'system_deps' => p['system_deps'].keys.to_s
             }
-
             dputs 'indexed: ' << "#{package_name} #{instance_id} #{distro}"
           end
         end
@@ -1445,7 +1445,8 @@ class Indexer < Jekyll::Generator
         '-f','distro',
         '-f','readme',
         '-f','released',
-        '-f','unreleased'
+        '-f','unreleased',
+        '-f','system_deps'
       ].join(' ')
       lunr_build_full_cmd = "#{lunr_build_index_cmd} #{lunr_build_index_fields}"
 
