@@ -769,7 +769,7 @@ class Indexer < Jekyll::Generator
 
     # construct list of known ros distros
     $recent_distros = site.config['distros']
-    $all_distros = site.config['distros'] + site.config['old_distros']
+    $all_distros = site.config['distros'] + site.config['old_distros'] + site.config['system_deps_distros']
     $ros_distros = site.config['ros_distros'] +
                     site.config['old_ros_distros']
     $ros2_distros = site.config['ros2_distros'] +
@@ -1423,6 +1423,30 @@ class Indexer < Jekyll::Generator
             dputs 'indexed: ' << "#{package_name} #{instance_id} #{distro}"
           end
         end
+      end
+
+      @rosdeps.each do |dep_name, full_dep_data|
+        puts dep_name.blue
+        puts full_dep_data.to_s
+        index << {
+          'id' => index.length,
+          'baseurl' => site.config['baseurl'],
+          'url' => File.join('/d', dep_name),
+          'last_commit_time' => '',
+          'tags' => '',
+          'name' => dep_name,
+          'repo_name' => '',
+          'released' => 'is:released',
+          'unreleased' => '',
+          'version' => '',
+          'description' => '',
+          'maintainers' => '',
+          'authors' => '',
+          'distro' => site.config['system_deps_distros'][0],
+          'instance' => '',
+          'readme' => '',
+          'system_deps' => ''
+        }
       end
 
       # precompute the lunr index

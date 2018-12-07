@@ -98,6 +98,9 @@ old_ros_distros:
   - 'jade'
   - 'hydro'
 
+system_deps_distros:
+  - 'N/A'
+
 # package list page
 packages_per_page: 50
 repos_per_page: 50
