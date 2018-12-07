@@ -1418,7 +1418,8 @@ class Indexer < Jekyll::Generator
               'distro' => distro,
               'instance' => repo.id,
               'readme' => readme_filtered,
-              'system_deps' => p['system_deps'].keys.to_s
+              'system_deps' => p['system_deps'].keys.to_s,
+              'type' => 'Package'
             }
             dputs 'indexed: ' << "#{package_name} #{instance_id} #{distro}"
           end
@@ -1445,7 +1446,8 @@ class Indexer < Jekyll::Generator
           'distro' => site.config['system_deps_distros'][0],
           'instance' => '',
           'readme' => '',
-          'system_deps' => ''
+          'system_deps' => '',
+          'type' => 'System dependency'
         }
       end
 

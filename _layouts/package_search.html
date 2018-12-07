@@ -50,6 +50,7 @@ layout: default
   <table class="table table-condensed table-striped table-hover">
     <thead>
       <tr>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-question-sign" title="Type"></span></th>
         <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-flash" title="Release status"></span></th>
         <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-file" title="README status"></span></th>
         <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-time" title="Last commit date"></span></th>
@@ -61,6 +62,7 @@ layout: default
     <tbody class="entries">
       {{#entries}}
       <tr>
+        <td class="col-xs-1" align="center"><span class="label label-default">{{type}}</span></td>
         {{#released}}
         <td class="text-center col-xs-1">
           <span title="Released" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
