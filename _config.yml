@@ -93,7 +93,8 @@ ros_distros:
   - 'kinetic'
   - 'indigo'
 
-old_ros2_distros: []
+old_ros2_distros:
+  - 'ardent'
 
 old_ros_distros:
   - 'jade'
