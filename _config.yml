@@ -85,7 +85,6 @@ index_old_doc_paths: false
 ros2_distros:
   - 'crystal'
   - 'bouncy'
-  - 'ardent'
 
 ros_distros:
   - 'melodic'
