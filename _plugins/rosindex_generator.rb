@@ -34,12 +34,12 @@ def get_ros_api(elem)
   return []
 end
 
-def get_readme(site, path, raw_uri)
-  return get_md_rst_txt(site, path, "README*", raw_uri)
+def get_readme(site, path, raw_uri, browse_uri)
+  return get_md_rst_txt(site, path, "README*", raw_uri, browse_uri)
 end
 
-def get_changelog(site, path, raw_uri)
-  return get_md_rst_txt(site, path, "CHANGELOG*", raw_uri)
+def get_changelog(site, path, raw_uri, browse_uri)
+  return get_md_rst_txt(site, path, "CHANGELOG*", raw_uri, browse_uri)
 end
 
 # Get a raw URI from a repo uri
@@ -310,7 +310,7 @@ class Indexer < Jekyll::Generator
       # Iterate over each of the readme file paths that were explicitly declared in package
       readmes = Array.new
       readmes_relpath.each do |readme_relpath|
-        tmp_readme_rendered, tmp_readme  = get_md_rst_txt(site, path, readme_relpath, raw_uri)
+        tmp_readme_rendered, tmp_readme  = get_md_rst_txt(site, path, readme_relpath, raw_uri, browse_uri)
         readme = {
           'browse_uri' => File.join(browse_uri, readme_relpath),
           'readme' => tmp_readme,
@@ -328,7 +328,7 @@ class Indexer < Jekyll::Generator
       end
 
       # check for changelog in same directory as package.xml
-      changelog_rendered, changelog = get_changelog(site, path, raw_uri)
+      changelog_rendered, changelog = get_changelog(site, path, raw_uri, browse_uri)
 
       # TODO: don't do this for cmake-based packages
       # look for launchfiles in this package
@@ -473,9 +473,7 @@ class Indexer < Jekyll::Generator
 
     # load the repo readme for this branch if it exists
     data['readme_rendered'], data['readme'] = get_readme(
-      site,
-      vcs.local_path,
-      data['raw_uri'])
+      site, vcs.local_path, data['raw_uri'], data['browse_uri'])
 
     unless repo.release_manifests[distro].nil?
       package_info = extract_package(site, distro, repo, snapshot, vcs.local_path, vcs.local_path, 'catkin', repo.release_manifests[distro])
