@@ -17,13 +17,27 @@ end
 def fix_local_links(text, raw_uri, browse_uri)
   readme_doc = Nokogiri::HTML(text)
   readme_doc.css("img[src]").each() do |img|
-    unless Addressable::URI.parse(img['src']).absolute?
-      img['src'] = raw_uri + "/" + img['src']
+    begin
+      unless Addressable::URI.parse(img['src']).absolute?
+        img['src'] = raw_uri + "/" + img['src']
+      end
+    rescue Exception
+      # If alt is defined displays it, removing the img otherwise
+      unless img['alt'].empty? do
+        img.replace(img['alt'])
+      else
+        img.remove
+      end
     end
   end
   readme_doc.css("a[href]").each() do |a|
-    unless Addressable::URI.parse(a['href']).absolute?
-      a['href'] = browse_uri + "/" + a['href']
+    begin
+      unless Addressable::URI.parse(a['href']).absolute?
+        a['href'] = browse_uri + "/" + a['href']
+      end
+    rescue Exception
+      # Removes the ill-formed href leaving the only base word
+      a.replace(a.content)
     end
   end
   readme_doc.at('body').inner_html
