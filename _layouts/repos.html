@@ -70,58 +70,62 @@ layout: default
                 </tr>
               </thead>
               <tbody>
-              {% for repo in page.list %}
-                {% assign instance = repo[1].default %}
-                {% assign n_instances = repo[1].instances | size %}
-                <tr>
-                  <td data-toggle="tooltip" data-placement="left" title="View Repo Instances" align="center">
-                    <a href="{{site.baseurl}}/repos/{{repo[0]}}"class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
-                        {{n_instances}}
-                    </a>
-                  </td>
-                  {% assign r = instance.snapshots[distro] %}
-                  {% if r.version %}
-                    {% if r.released %}
-                      <td class="text-center">
-                        <span title="Released in {{distro}}" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
+              {% for repos_per_distro in page.list %}
+                {% if repos_per_distro[0] == distro %}
+                  {% for repo in repos_per_distro[1] %}
+                    {% assign instance = repo[1].default %}
+                    {% assign n_instances = repo[1].instances | size %}
+                    <tr>
+                      <td data-toggle="tooltip" data-placement="left" title="View Repo Instances" align="center">
+                        <a href="{{site.baseurl}}/repos/{{repo[0]}}"class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
+                            {{n_instances}}
+                        </a>
                       </td>
-                    {% else %}
-                      <td title="Not released in {{distro}}" data-toggle="tooltip" data-placement="left" class="text-center">
-                        <span class="glyphicon glyphicon-none"></span>
-                      </td>
-                    {% endif %}
-                    {% if r.data.readme %}
-                      <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
-                        <span class="glyphicon glyphicon-file"></span>
-                      </td>
-                    {% else %}
-                      <td title="No README" data-toggle="tooltip" data-placement="left" align="center">
-                        <span class="glyphicon glyphicon-none"></span>
-                      </td>
-                    {% endif %}
-                    <td>
-                      {% assign date_str = r.data.last_commit_time %}
-                      <span class="label label-default">{{ date_str }}</span>
-                    </td>
-                    <td>
-                      <a href="{{site.baseurl}}/r/{{repo[0]}}">{{ repo[0] }}</a>
-                    </td>
-                    <td>
-                      {% for p in r.packages %}
-                        {% assign labeled_package = p[1] %}
-                        <a href="{{site.baseurl}}/p/{{p[0]}}/{{default}}" class="label label-primary pkg-label">{% include peer_label.html %}</a>
-                      {% endfor %}
-                    </td>
-                  {% else %}
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                      <a class="inactive" href="{{site.baseurl}}/r/{{repo[0]}}">{{ repo[0] }}</a>
-                    </td>
-                    <td></td>
-                  {% endif %}
-                </tr>
+                      {% assign r = instance.snapshots[distro] %}
+                      {% if r.version %}
+                        {% if r.released %}
+                          <td class="text-center">
+                            <span title="Released in {{distro}}" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
+                          </td>
+                        {% else %}
+                          <td title="Not released in {{distro}}" data-toggle="tooltip" data-placement="left" class="text-center">
+                            <span class="glyphicon glyphicon-none"></span>
+                          </td>
+                        {% endif %}
+                        {% if r.data.readme %}
+                          <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
+                            <span class="glyphicon glyphicon-file"></span>
+                          </td>
+                        {% else %}
+                          <td title="No README" data-toggle="tooltip" data-placement="left" align="center">
+                            <span class="glyphicon glyphicon-none"></span>
+                          </td>
+                        {% endif %}
+                        <td>
+                          {% assign date_str = r.data.last_commit_time %}
+                          <span class="label label-default">{{ date_str }}</span>
+                        </td>
+                        <td>
+                          <a href="{{site.baseurl}}/r/{{repo[0]}}">{{ repo[0] }}</a>
+                        </td>
+                        <td>
+                          {% for p in r.packages %}
+                            {% assign labeled_package = p[1] %}
+                            <a href="{{site.baseurl}}/p/{{p[0]}}/{{default}}" class="label label-primary pkg-label">{% include peer_label.html %}</a>
+                          {% endfor %}
+                        </td>
+                      {% else %}
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                          <a class="inactive" href="{{site.baseurl}}/r/{{repo[0]}}">{{ repo[0] }}</a>
+                        </td>
+                        <td></td>
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
+                {% endif %}
               {% endfor %}
               </tbody>
             </table>
