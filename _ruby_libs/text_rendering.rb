@@ -16,26 +16,26 @@ end
 # Modifies markdown local links so that they link to github user content
 def fix_local_links(text, raw_uri, browse_uri)
   readme_doc = Nokogiri::HTML(text)
-  readme_doc.css("img[src]").each() do |img|
+  readme_doc.css("img[src]").each do |img|
     begin
       unless Addressable::URI.parse(img['src']).absolute?
         img['src'] = raw_uri + "/" + img['src']
       end
-    rescue Exception
+    rescue InvalidURIError
       # If alt is defined displays it, removing the img otherwise
-      unless img['alt'].empty? do
+      unless img['alt'].empty?
         img.replace(img['alt'])
       else
         img.remove
       end
     end
   end
-  readme_doc.css("a[href]").each() do |a|
+  readme_doc.css("a[href]").each do |a|
     begin
       unless Addressable::URI.parse(a['href']).absolute?
         a['href'] = browse_uri + "/" + a['href']
       end
-    rescue Exception
+    rescue InvalidURIError
       # Removes the ill-formed href leaving the only base word
       a.replace(a.content)
     end
