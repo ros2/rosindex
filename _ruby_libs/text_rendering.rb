@@ -21,7 +21,8 @@ def fix_local_links(text, raw_uri, browse_uri)
       unless Addressable::URI.parse(img['src']).absolute?
         img['src'] = raw_uri + "/" + img['src']
       end
-    rescue InvalidURIError
+    rescue Addressable::URI::InvalidURIError
+      puts " --- WARNING: Markdown image link is ill-formed and had to be disabled: #{img['src'].to_s}".yellow
       # If alt is defined displays it, removing the img otherwise
       unless img['alt'].empty?
         img.replace(img['alt'])
@@ -35,7 +36,8 @@ def fix_local_links(text, raw_uri, browse_uri)
       unless Addressable::URI.parse(a['href']).absolute?
         a['href'] = browse_uri + "/" + a['href']
       end
-    rescue InvalidURIError
+    rescue Addressable::URI::InvalidURIError
+      puts " --- WARNING: Markdown link is ill-formed and had to be disabled: #{a['href'].to_s}".yellow
       # Removes the ill-formed href leaving the only base word
       a.replace(a.content)
     end
