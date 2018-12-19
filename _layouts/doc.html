@@ -2,34 +2,31 @@
 layout: default
 ---
 
-<div class="container-fluid" style="margin-top:20px">
-  <div class="container-fluid">
-    <div class="row">
-      <ol class="breadcrumb">
-        <li><a href="{{ site.baseurl }}/">Home</a></li>
-        <li><a href="{{ page.docs_baseurl }}/">{{ page.docs_title }}</a></li>
-        {% unless page.at_root %}
-        <li class="active">{{ page.title }}</li>
-        {% endunless %}
-      </ol>
-    </div>
-    <div class="row">
+<div class="container-fluid" style="margin-top: 20px">
+  <div class="row">
+    <ol class="breadcrumb">
+      <li><a href="{{ site.baseurl }}">Home</a></li>
+      <li>
+        <a href="{{ site.baseurl }}{{ page.root_page.url }}">
+          {{ page.root_page.title }}
+        </a>
+      </li>
+      {% unless page.is_root_page %}
+      <li class="active">{{ page.title }}</li>
+      {% endunless %}
+    </ol>
+  </div>
+  <div class="row">
+    <nav class="col-md-4 well">
+      <h3 style="margin-top: 10px;">Index</h3>
+      {% assign root_page = page.root_page %}
+      {% include pages_index.html %}
+    </nav>
+    <div class="col-md-8">
       <a type="button" href="{{ page.edit_url }}" class="btn btn-success pull-right">
         Edit on Github
       </a>
       {{ content }}
-      &nbsp;
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-$(document).ready(
-    function() {
-      $('#toc').toc({
-        title: '',
-        listType: 'ul',
-        showSpeed: 0,
-        headers: 'h2, h3' });
-});
-</script>

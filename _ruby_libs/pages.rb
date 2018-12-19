@@ -177,22 +177,37 @@ class DepListPage < Jekyll::Page
 end
 
 class DocPage < Jekyll::Page
-  def initialize(site, docs_name, docs_title, page_name, page_data)
+  def initialize(site, parent_page, path, data)
     @site = site
     @base = site.source
-    @dir  = "doc/#{docs_name}/#{page_name}"
+    @dir  = "doc/#{path}"
     @name = "index.html"
     self.process(@name)
     self.data ||= {}
-    self.content = page_data['body']
+    self.content = data['body']
     self.data['layout'] = "doc"
-    self.data['at_root'] = (page_name == '.')
-    self.data['title'] = File.basename(
-      page_name != '.' ? page_name.gsub('-', ' ') : docs_title
-    )
-    self.data['edit_url'] = page_data['edit_url']
-    self.data['docs_baseurl'] = "#{site.baseurl}/doc/#{docs_name}"
-    self.data['docs_title'] = docs_title
+    self.data['title'] = data['title']
+    self.data['edit_url'] = data['edit_url']
+    self.data['root_page'] =
+      if not parent_page.nil?
+        parent_page.data['root_page']
+      else
+        self
+      end
+    self.data['is_root_page'] = parent_page.nil?
+    self.data['child_pages'] = []
+
+    parent_page.add_child_page(self) unless parent_page.nil?
+  end
+
+  def all_child_pages
+    self.child_pages.collect do |p|
+      p.child_pages
+    end.flatten + self.child_pages
+  end
+
+  def add_child_page(page)
+    self.data['child_pages'] << page
   end
 end
 

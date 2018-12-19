@@ -22,10 +22,16 @@ class DocPageGenerator < Jekyll::Generator
     site.config['docs_repos'].each do |repo_name, repo_options|
       next unless all_repos.key? repo_name
       repo_data = all_repos[repo_name]
-      repo_description = repo_options['description'] || repo_name
+
+      repo_pages = {}
       convert_with_sphinx(repo_name, repo_data).each do |path, content|
-        site.pages << DocPage.new(
-          site, repo_name, repo_description, path, content
+        parent_path, * = path.rpartition('/')
+        parent_page = repo_pages.fetch(parent_path, nil)
+        if parent_page.nil? and repo_options.key? 'description'
+          content['title'] = repo_options['description']
+        end
+        site.pages << repo_pages[path] = DocPage.new(
+          site, parent_page, "#{repo_name}/#{path}", content
         )
       end
     end
@@ -100,9 +106,10 @@ class DocPageGenerator < Jekyll::Generator
       permalink = json_content["current_page_name"]
       if File.basename(permalink) == "index"
         permalink = File.dirname(permalink)
+        permalink = '' if permalink == '.'
       end
       repo_content[permalink] = json_content
     end
-    repo_content
+    repo_content.sort {|a, b| a[0].length <=> b[0].length}
   end
 end
