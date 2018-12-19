@@ -1,5 +1,6 @@
 # Tools for rendering of markdown and rst documents
 
+require 'addressable'
 require 'nokogiri'
 require 'pandoc-ruby'
 
@@ -12,17 +13,36 @@ def rst_to_md(rst)
   end
 end
 
-# Modifies markdown image links so that they link to github user content
-def fix_image_links(text, raw_uri, additional_path = '')
+# Modifies markdown local links so that they link to github user content
+def fix_local_links(text, raw_uri, browse_uri)
   readme_doc = Nokogiri::HTML(text)
-  readme_doc.xpath("//img[@src]").each() do |el|
-    #puts 'img: '+el['src'].to_s
-    unless el['src'].start_with?('http')
-      el['src'] = ('%s/%s/' % [raw_uri, additional_path])+el['src']
+  readme_doc.css("img[src]").each do |img|
+    begin
+      unless Addressable::URI.parse(img['src']).absolute?
+        img['src'] = raw_uri + "/" + img['src']
+      end
+    rescue Addressable::URI::InvalidURIError
+      puts " --- WARNING: Markdown image link is ill-formed and had to be disabled: #{img['src'].to_s}".yellow
+      # If alt is defined displays it, removing the img otherwise
+      unless img['alt'].empty?
+        img.replace(img['alt'])
+      else
+        img.remove
+      end
     end
   end
-
-  return readme_doc.to_s, readme_doc
+  readme_doc.css("a[href]").each do |a|
+    begin
+      unless Addressable::URI.parse(a['href']).absolute?
+        a['href'] = browse_uri + "/" + a['href']
+      end
+    rescue Addressable::URI::InvalidURIError
+      puts " --- WARNING: Markdown link is ill-formed and had to be disabled: #{a['href'].to_s}".yellow
+      # Removes the ill-formed href leaving the only base word
+      a.replace(a.content)
+    end
+  end
+  readme_doc.at('body').inner_html
 end
 
 # Renders markdown to html (and apply some required tweaks)
@@ -43,7 +63,7 @@ def render_md(site, readme)
 end
 
 
-def get_md_rst_txt(site, path, glob, raw_uri)
+def get_md_rst_txt(site, path, glob, raw_uri, browse_uri)
 
   file_md = nil
 
@@ -73,7 +93,7 @@ def get_md_rst_txt(site, path, glob, raw_uri)
     # read in the file and fix links
     file_html = render_md(site, file_md)
     file_html = '<div class="rendered-markdown">'+file_html+"</div>"
-    file_rendered, _ = fix_image_links(file_html, raw_uri)
+    file_rendered = fix_local_links(file_html, raw_uri, browse_uri)
   else
     file_rendered = nil
   end
