@@ -188,27 +188,22 @@ class DocPage < Jekyll::Page
     self.data['layout'] = "doc"
     self.data['title'] = data['title']
     self.data['edit_url'] = data['edit_url']
-    self.data['root_page'] =
-      if not parent_page.nil?
-        parent_page.data['root_page']
-      else
-        self
-      end
-    self.data['is_root_page'] = parent_page.nil?
+
     self.data['child_pages'] = []
-
-    parent_page.add_child_page(self) unless parent_page.nil?
-  end
-
-  def all_child_pages
-    self.child_pages.collect do |p|
-      p.child_pages
-    end.flatten + self.child_pages
+    self.data['ancestor_pages'] = []
+    self.data['root_page'] = self
+    if not parent_page.nil?
+      self.data['ancestor_pages'] =
+        parent_page.data['ancestor_pages'] + [parent_page]
+      self.data['root_page'] = parent_page.data['root_page']
+      parent_page.add_child_page(self)
+    end
   end
 
   def add_child_page(page)
     self.data['child_pages'] << page
   end
+
 end
 
 class PackagePage < Jekyll::Page

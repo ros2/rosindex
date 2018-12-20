@@ -6,14 +6,14 @@ layout: default
   <div class="row">
     <ol class="breadcrumb">
       <li><a href="{{ site.baseurl }}">Home</a></li>
+      {% for ancestor_page in page.ancestor_pages %}
       <li>
-        <a href="{{ site.baseurl }}{{ page.root_page.url }}">
-          {{ page.root_page.title }}
+        <a href="{{ site.baseurl }}{{ ancestor_page.url }}">
+          {{ ancestor_page.title }}
         </a>
       </li>
-      {% unless page.is_root_page %}
+      {% endfor %}
       <li class="active">{{ page.title }}</li>
-      {% endunless %}
     </ol>
   </div>
   <div class="row">
