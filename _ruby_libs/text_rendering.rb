@@ -24,7 +24,7 @@ def fix_local_links(text, raw_uri, browse_uri)
     rescue Addressable::URI::InvalidURIError
       puts " --- WARNING: Markdown image link is ill-formed and had to be disabled: #{img['src'].to_s}".yellow
       # If alt is defined displays it, removing the img otherwise
-      unless img['alt'].empty?
+      unless img['alt'].nil? || img['alt'].empty?
         img.replace(img['alt'])
       else
         img.remove
