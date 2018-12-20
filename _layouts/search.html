@@ -1,0 +1,305 @@
+---
+layout: default
+---
+
+<div class="container-fluid" style="margin:20px">
+  <div class="row">
+    <ol class="breadcrumb">
+      <li><a href="{{site.baseurl}}/">Home</a></li>
+      <li class="active">Search</li>
+    </ol>
+  </div>
+  <div id="search-row" class="row">
+    <div id="search">
+      <div class="input-group">
+        <input id="search-query" class="form-control" type="text"
+               autocomplete="off" placeholder="Search ROS">
+        <span class="input-group-btn">
+          <button id="search-button" title="Search ROS" class="btn btn-default">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+          <a href="https://lunrjs.com/guides/searching.html"
+             title="Help to Search" class="btn btn-default">
+            <span class="glyphicon glyphicon-question-sign"></span>
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    &nbsp;
+  </div>
+
+  <div class="row hide-when-search-is-ready">
+    <p class="progress-label">Indexing content...</p>
+    <div class="progress" style="margin-bottom: 0;">
+      <div id="packages-index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
+    </div>
+  </div>
+
+  <div class="row show-if-packages-found" style="display: none;">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Packages search results</h3>
+      </div>
+      <div id="packages-search-results" class="panel-body table-responsive"></div>
+    </div>
+  </div>
+  <div id="packages-search-pagination" style="display: none;"
+       class="row text-center show-if-packages-found">
+  </div>
+
+  <div class="row show-if-deps-found" style="display: none;">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">System dependencies search results</h3>
+      </div>
+      <div id="deps-search-results" class="panel-body table-responsive"></div>
+    </div>
+  </div>
+  <div id="deps-search-pagination" style="display: none;"
+       class="row text-center show-if-deps-found">
+  </div>
+
+  <div class="row show-if-docs-found" style="display: none;">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Documentation search results</h3>
+      </div>
+      <div id="docs-search-results" class="panel-body table-responsive"></div>
+    </div>
+  </div>
+  <div id="docs-search-pagination" style="display: none;"
+       class="row text-center show-if-docs-found">
+  </div>
+</div>
+
+{% raw %}
+<script id="packages-search-results-template" type="text/mustache">
+  {{#have_entries}}
+  <table class="table table-condensed table-striped table-hover">
+    <thead>
+      <tr>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-flash" title="Release status"></span></th>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-file" title="README status"></span></th>
+        <th class="col-xs-1" style="text-align: center;"><span class="glyphicon glyphicon-time" title="Last commit date"></span></th>
+        <th class="col-xs-1">Distro</th>
+        <th class="col-xs-2">Name</th>
+        <th class="col-xs-4">Repo</th>
+      </tr>
+    </thead>
+    <tbody class="entries">
+      {{#entries}}
+      <tr>
+        {{#released}}
+        <td class="text-center col-xs-1">
+          <span title="Released" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
+        </td>
+        {{/released}}
+        {{^released}}
+        <td title="Not released" data-toggle="tooltip" data-placement="left" class="text-center col-xs-1">
+          <span class="glyphicon glyphicon-none"></span>
+        </td>
+        {{/released}}
+        {{#readme}}
+        <td title="Has README" data-toggle="tooltip" data-placement="left" align="center" class="col-xs-1">
+          <span class="glyphicon glyphicon-file"></span>
+        </td>
+        {{/readme}}
+        {{^readme}}
+        <td title="No README" data-toggle="tooltip" data-placement="left" align="center" class="col-xs-1">
+          <span class="glyphicon glyphicon-none"></span>
+        </td>
+        {{/readme}}
+        <td class="col-xs-1" align="center"><span class="label label-default">{{last_commit_time}}</span></td>
+        <td class="col-xs-1"><span class="label label-default">{{distro}}</span></td>
+        <td class="col-xs-2"><a href="{{baseurl}}{{url}}">{{name}}</a></td>
+        <td class="col-xs-4"><a href="{{baseurl}}/r/{{repo_name}}/{{instance}}">{{instance}}</a></td>
+      </tr>
+      {{/entries}}
+    </tbody>
+  </table>
+  {{/have_entries}}
+  {{^have_entries}}
+  <h4>No related packages found.</h4>
+  {{/have_entries}}
+</script>
+{% endraw %}
+
+
+{% raw %}
+<script id="deps-search-results-template" type="text/mustache">
+  {{#have_entries}}
+  <table class="table table-condensed table-striped table-hover">
+    <thead>
+      <tr>
+        <th class="col-xs-2">Name</th>
+        <th class="col-xs-4">Platforms</th>
+        <th class="col-xs-4">Dependants</th>
+      </tr>
+    </thead>
+    <tbody class="entries">
+      {{#entries}}
+      <tr>
+        <td class="col-xs-2"><a href="{{baseurl}}{{url}}">{{name}}</a></td>
+        <td class="col-xs-4">
+          {{#platforms}}
+          <span class="label label-default">{{.}}</span>
+          {{/platforms}}
+        </td>
+        <td class="col-xs-4">
+          {{#dependants}}
+          <span class="label label-primary pkg-label">{{.}}</span>
+          {{/dependants}}
+        </td>
+      </tr>
+      {{/entries}}
+    </tbody>
+  </table>
+  {{/have_entries}}
+  {{^have_entries}}
+  <h4>No related system dependencies found.</h4>
+  {{/have_entries}}
+</script>
+{% endraw %}
+
+{% raw %}
+<script id="docs-search-results-template" type="text/mustache">
+  {{#have_entries}}
+  <div class="list-group">
+    {{#entries}}
+    <a href="{{baseurl}}{{url}}" class="list-group-item list-group-item-action flex-column align-items-start">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{title}}</h5>
+      </div>
+      <p class="mb-1">{{{excerpt}}}</p>
+    </a>
+    {{/entries}}
+  </div>
+  {{/have_entries}}
+  {{^have_entries}}
+  <h4>No references in documentation found.</h4>
+  {{/have_entries}}
+</script>
+{% endraw %}
+
+
+<script src="{{site.baseurl}}/js/lunr.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{site.baseurl}}/js/mustache.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{site.baseurl}}/js/pagination.js" type="text/javascript" charset="utf-8"></script>
+<!--<script src="/js/date.format.js" type="text/javascript" charset="utf-8"></script>-->
+<script src="{{site.baseurl}}/js/URI.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="{{site.baseurl}}/js/jquery.lunr.db.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{site.baseurl}}/js/jquery.lunr.views.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{site.baseurl}}/js/jquery.lunr.search.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+$(function() {
+  $('#search-query').lunrSearch({
+    baseUrl: '{{ site.baseurl }}',
+    sections: [{
+      partition: {
+        shardsUrl: "/search/packages/shards.json",  
+      },
+      view: $('#packages-search-pagination').pagedView({
+        pageView: $('#packages-search-results').templateView({
+          template: $('#packages-search-results-template').text()
+        }),
+        doShow: function(duration) {
+          $('.show-if-packages-found').slideDown(duration);
+          return $('.show-if-packages-found').promise();
+        },
+        doHide: function(duration) {
+          $('.show-if-packages-found').slideUp(duration);
+          return $('.show-if-packages-found').promise();
+        }
+      })
+    }, {
+      partition: {
+        shardsUrl: "/search/deps/shards.json"
+      },
+      view: $('#deps-search-pagination').pagedView({
+        pageView: $('#deps-search-results').templateView({
+          template: $('#deps-search-results-template').text(),
+          doPreprocess: function(raw_entries, context) {
+            return $.map(raw_entries, function(raw_entry) {
+              return $.extend({}, raw_entry, {
+                platforms: raw_entry['platforms'].split(' : '),
+                dependants: raw_entry['dependants'].split(' : '),
+              });
+            });
+          }
+        }),
+        doShow: function(duration) {
+          $('.show-if-deps-found').slideDown(duration);
+          return $('.show-if-deps-found').promise();
+        },
+        doHide: function(duration) {
+          $('.show-if-deps-found').slideUp(duration);
+          return $('.show-if-deps-found').promise();
+        }
+      })
+    }, {
+      partition: {
+        shardsUrl: "/search/docs/shards.json"
+      },
+      view: $('#docs-search-pagination').pagedView({
+        pageView: $('#docs-search-results').templateView({
+          template: $('#docs-search-results-template').text(),
+          doPreprocess: function(raw_entries, context) {
+            var excerpt_length = 140;
+            return $.map(raw_entries, function(raw_entry) {
+              var excerpt = raw_entry['content'].slice(0, excerpt_length - 1);
+              if (excerpt_length < raw_entry['content'].length) excerpt += '...';
+              if ('content' in raw_entry['_metadata']) {
+                var content_metadata = raw_entry['_metadata']['content'];
+                if ('position' in content_metadata) {
+                  var match_index = content_metadata['position'][0][0] + 1;
+                  var match_length = content_metadata['position'][0][1];
+                  if (match_length < excerpt_length) {
+                    var start_index = match_index - (excerpt_length - match_length) / 2;
+                    if (start_index < 0) start_index = 0;
+                    var end_index = start_index + excerpt_length;
+                    excerpt = raw_entry['content'].slice(start_index, match_index);
+                    excerpt += '<mark>' + raw_entry['content'].slice(
+                      match_index, match_index + match_length
+                    ) + '</mark>';
+                    excerpt += raw_entry['content'].slice(match_index + match_length, end_index);
+                    if (start_index != 0) excerpt = '...' + excerpt;  
+                    if (end_index < raw_entry['content'].length - 1) excerpt = excerpt + '...';
+                  } else {
+                    excerpt = '<mark>' + raw_entry['content'].slice(
+                      match_index, match_index + match_length
+                    ) + '</mark>';
+                    if (match_index != 0) excerpt = '...' + excerpt;
+                    if (match_index + match_length < raw_entry['content'].length - 1) {
+                      excerpt = excerpt + '...';
+                    }
+                  }
+                }
+              }
+              return $.extend({}, raw_entry, { excerpt: excerpt });
+            })
+          }
+        }),
+        doShow: function(duration) {
+          $('.show-if-docs-found').slideDown(duration);
+          return $('.show-if-docs-found').promise();
+        },
+        doHide: function(duration) {
+          $('.show-if-docs-found').slideUp(duration);
+          return $('.show-if-docs-found').promise();
+        }
+      })
+    }],
+    ready: function () {
+      $('.hide-when-search-is-ready').slideUp(400);
+      return $('.hide-when-search-is-ready').promise();
+    }
+  });
+  $('#search-button').click(function() {
+    $('#search-query').trigger('save');
+  })
+});
+</script>

@@ -91,9 +91,15 @@
         <div class="col-sm-12 col-md-3" style="margin-top: 12px">
           <form id="top-searchbox" action="{{site.baseurl}}/search/" role="form" method="get">
             <div class="input-group input-group-sm">
-              <input type="text" class="form-control" name="q" placeholder="Search ROS Packages">
+              <input type="text" class="form-control" name="q" placeholder="Search ROS">
               <span class="input-group-btn">
-                <button class="btn btn-default btn-sm" title="Search ROS Packages" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                <button class="btn btn-default btn-sm" title="Search ROS" type="submit">
+                  <span class="glyphicon glyphicon-search"></span>
+                </button>
+                <a href="https://lunrjs.com/guides/searching.html"
+                   title="Help to Search" class="btn btn-default btn-sm">
+                  <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
               </span>
             </div>
           </form>

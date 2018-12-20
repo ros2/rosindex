@@ -35,7 +35,7 @@ layout: default
     <div class="panel-heading"><h3 class="panel-title">Dependency Availability</h3></div>
     <div class="panel-body" style="overflow-x: auto">
       <div class="container-fluid">
-        {% for p in site.data.platforms %}
+        {% for p in site.data.common.platforms %}
           {% assign platform_key = p[0] %}
           {% assign platform_details = p[1] %}
           {% assign platform_versions = platform_details.versions %}

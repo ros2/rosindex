@@ -20,9 +20,15 @@ layout: default
 
     <form id="searchbox" action="{{site.baseurl}}/search/" role="form">
       <div class="input-group input-group-lg">
-        <input type="text" class="form-control" name="q" placeholder="Search ROS Packages">
+        <input type="text" class="form-control" name="q" placeholder="Search ROS">
         <span class="input-group-btn">
-          <button class="btn btn-default btn-lg" type="submit" title="Search ROS Packages"><span class="glyphicon glyphicon-search"></span></button>
+          <button class="btn btn-default btn-lg" type="submit" title="Search ROS">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+          <a href="https://lunrjs.com/guides/searching.html"
+             title="Help to Search" class="btn btn-default">
+            <span class="glyphicon glyphicon-question-sign"></span>
+          </a>
         </span>
       </div>
     </form>
