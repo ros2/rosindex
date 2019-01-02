@@ -1,14 +1,8 @@
 module Jekyll
   module ArrayFilters
-
-    def drop(input, count)
-      input.drop(count)
+    def include(input, which)
+      input.include? which
     end
-
-    def keep(input, count)
-      input[0, count]
-    end
-
   end
 end
 

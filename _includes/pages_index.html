@@ -4,8 +4,10 @@
 
 <script type="text/javascript">
   $(function() {
-    $('.list-group-ellipsis-toggle').on('click', function() {
-      $(this).toggle();
+    $('.list-group-toggle').on('click', function() {
+      $(this).find('span').toggleClass(
+        'glyphicon-chevron-up glyphicon-chevron-down'
+      );
     });
   });
 </script>

@@ -435,31 +435,10 @@ th.rotate45 {
 .list-group.list-group-root > .list-group-item:first-child {
   border-top-width: 0;
 }
-
 .list-group.list-group-root > .list-group > .list-group-item {
   padding-left: 30px;
 }
-.list-group.list-group-root > .list-group > .list-group-ellipsis > .list-group-item {
-  padding-left: 30px;
-}
-.list-group.list-group-root > .list-group >
-.list-group > .list-group-item {
-  padding-left: 45px;
-}
-
-.list-group.list-group-root > .list-group >
-.list-group > .list-group-ellipsis > .list-group-item {
-  padding-left: 45px;
-}
-
-.list-group.list-group-root > .list-group >
-.list-group-ellipsis > .list-group > .list-group-item {
-  padding-left: 45px;
-}
-
-.list-group.list-group-root > .list-group >
-.list-group-ellipsis > .list-group >
-.list-group-ellipsis > .list-group-item {
+.list-group.list-group-root > .list-group > .list-group > .list-group-item {
   padding-left: 45px;
 }
 

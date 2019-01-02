@@ -1,23 +1,27 @@
-<a class="list-group-item" href="{{ site.baseurl }}{{ include.root_page.url }}">
-  {{ include.root_page.title }}
-</a>
+{% assign root_page_id = include.root_page.url | replace: '/', '_' %}
+{% assign ancestor_urls = current_page.ancestor_pages | map: "url" %}
+{% assign in_current_page_path = ancestor_urls | include: include.root_page.url %}
+<div class="list-group-item">
+  <a href="{{ site.baseurl }}{{ include.root_page.url }}">{{ include.root_page.title }}</a>
+  {% unless include.root_page.child_pages == empty %}
+  <a href="#{{ root_page_id }}_children" class="list-group-toggle pull-right"
+     data-toggle="collapse" aria-expanded="false">
+    {% if in_current_page_path %}
+    <span class="glyphicon glyphicon-chevron-up"></span>
+    {% else %}
+    <span class="glyphicon glyphicon-chevron-down"></span>
+    {% endif %}
+  </a>
+  {% endunless %}
+</div>
 {% unless include.root_page.child_pages == empty %}
-<div class="list-group">
-  {% assign visible_child_pages = include.root_page.child_pages | keep: 3 %}
-  {% for child_page in visible_child_pages %}
+  {% if in_current_page_path %}
+<div id="{{ root_page_id }}_children" class="list-group collapse in">
+  {% else %}
+<div id="{{ root_page_id }}_children" class="list-group collapse">
+  {% endif %}
+  {% for child_page in include.root_page.child_pages %}
   {% include pages_index_entry.html root_page=child_page %}
   {% endfor %}
-  {% assign collapsed_child_pages = include.root_page.child_pages | drop: 3 %}
-  {% unless collapsed_child_pages == empty %}
-  {% assign root_page_id = include.root_page.url | replace: '/', '_' %}
-  <a class="list-group-item list-group-ellipsis-toggle"
-     href="#{{ root_page_id }}_ellipsis" aria-expanded="false"
-     data-toggle="collapse">...</a>
-  <div id="{{ root_page_id }}_ellipsis" class="list-group-ellipsis collapse">
-    {% for child_page in collapsed_child_pages %}
-    {% include pages_index_entry.html root_page=child_page %}
-    {% endfor %}
-  </div>
-  {% endunless %}
 </div>
 {% endunless %}
