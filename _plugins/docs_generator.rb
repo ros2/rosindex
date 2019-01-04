@@ -39,7 +39,7 @@ class DocPageGenerator < Jekyll::Generator
       src_doc_path = Pathname.new(src_doc_path)
       dst_doc_path = Pathname.new(File.join(
         dst_path, src_doc_path.relative_path_from(src_path)
-      ).sub(/readme\.rst$/i, 'index.rst'))
+      ))
       unless File.directory? File.dirname(dst_doc_path)
         FileUtils.makedirs(File.dirname(dst_doc_path))
       end
@@ -76,7 +76,7 @@ class DocPageGenerator < Jekyll::Generator
   end
 
   def convert_with_sphinx(repo_name, repo_data)
-    repo_path = Pathname.new(File.join("_remotes", repo_name))
+    repo_path = Pathname.new(File.join("_remotes", "#{repo_name}/source/"))
     in_path = Pathname.new(File.join('_sphinx', 'repos', repo_name))
     FileUtils.rm_r(in_path) if File.directory? in_path
     copied_docs_paths = copy_docs(repo_path, in_path)
