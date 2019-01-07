@@ -94,7 +94,7 @@ layout: default
                             <span class="glyphicon glyphicon-none"></span>
                           </td>
                         {% endif %}
-                        {% n_readmes = p.data[1].readmes | size %}
+                        {% assign n_readmes = p.data[1].readmes | size %}
                         {% if n_readmes > 0 %}
                           <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
                             <span class="glyphicon glyphicon-file"></span>

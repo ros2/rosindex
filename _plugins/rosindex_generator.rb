@@ -656,9 +656,13 @@ class Indexer < Jekyll::Generator
 
       elements_sorted.each do |sort_key, elements|
         # Get a subset of the elements
-        elements_sliced = Hash.new
-        elements.each do |distro, items|
-          elements_sliced[distro] = items.slice(p_start, elements_per_page)
+        unless sort_key == 'name' then
+          elements_sliced = Hash.new
+          elements.each do |distro, items|
+            elements_sliced[distro] = items.slice(p_start, elements_per_page)
+          end
+        else
+          elements_sliced = elements.slice(p_start, elements_per_page)
         end
         site.pages << page_class.new( site, sort_key, n_pages, page_index, elements_sliced)
         # create page 1 without a page number or key in the url
@@ -690,7 +694,7 @@ class Indexer < Jekyll::Generator
         -(instances.default.snapshots.count { |d,s|
           $recent_distros.include?(d) and not s.data['readmes'].nil? or not d == distro
         })
-      }
+      }.reverse
     end
 
     repos_sorted['released'] = Hash.new
@@ -723,11 +727,11 @@ class Indexer < Jekyll::Generator
 
     packages_sorted['doc'] = Hash.new
     $all_distros.each do |distro|
-      packages_sorted['doc'][distro] = packages_sorted['name'].sort_by { |name, instances|
+      packages_sorted['doc'][distro] = packages_sorted['name'].reverse.sort_by { |name, instances|
         -(instances.snapshots.count { |d,s|
           not s.nil? and $recent_distros.include?(d) and not s.data['readmes'].count > 0 or not distro == d
         })
-      }
+      }.reverse
     end
 
     packages_sorted['released'] = Hash.new
