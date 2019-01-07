@@ -13,8 +13,8 @@ def precompile_lunr_index(site, index, ref, fields, output_dir, shard_count = 1)
   build_cmd_line = "#{build_index_cmd} #{build_index_args.join(' ')}"
 
   output_dirpath = File.join(site.dest, output_dir)
-  Dir::mkdir(site.dest) unless File.directory?(site.dest)
-  Dir::mkdir(output_dirpath) unless File.directory?(output_dirpath)
+  FileUtils.mkdir_p(site.dest) unless File.directory?(site.dest)
+  FileUtils.mkdir_p(output_dirpath) unless File.directory?(output_dirpath)
   shard_size = index.length / shard_count
 
   Enumerator.new do |enum| 
