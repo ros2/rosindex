@@ -76,10 +76,10 @@ class DocPageGenerator < Jekyll::Generator
   end
 
   def convert_with_sphinx(repo_name, repo_data)
-    repo_path = Pathname.new(File.join("_remotes", "#{repo_name}/source/"))
+    repo_path = Pathname.new(File.join("_remotes", repo_name))
     in_path = Pathname.new(File.join('_sphinx', 'repos', repo_name))
     FileUtils.rm_r(in_path) if File.directory? in_path
-    copied_docs_paths = copy_docs(repo_path, in_path)
+    copied_docs_paths = copy_docs(File.join(repo_path, "source"), in_path)
     return if copied_docs_paths.empty?
     out_path = Pathname.new(File.join('_sphinx', '_build', repo_name))
     FileUtils.rm_r(out_path) if File.directory? out_path
