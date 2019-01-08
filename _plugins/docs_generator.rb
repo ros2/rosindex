@@ -45,7 +45,7 @@ class DocPageGenerator < Jekyll::Generator
           'url' => page.url,
           'title' => Nokogiri::HTML(page.data['title']).text,
           'content' => Nokogiri::HTML(content['body'], &:noent).text
-        } unless site.config['skip_search_index']
+        } unless site.config['skip_search_index'] if page.data['indexed']
         site.pages << page
       end
     end
