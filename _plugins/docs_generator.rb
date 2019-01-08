@@ -21,10 +21,14 @@ class DocPageGenerator < Jekyll::Generator
     all_repos = site.data['remotes']['repositories']
     site.config['docs_repos'].each do |repo_name, repo_options|
       next unless all_repos.key? repo_name
-      repo_data = all_repos[repo_name]
+
+      repo_path = Pathname.new(File.join("_remotes", repo_name))
+      repo_data_path = File.join(repo_path, 'rosindex.yml')
+      repo_data = File.file?(repo_data_path) ? YAML.load_file(repo_data_path) : {}
+      repo_data.update(all_repos[repo_name])
 
       repo_pages = {}
-      convert_with_sphinx(repo_name, repo_data).each do |path, content|
+      convert_with_sphinx(repo_name, repo_path, repo_data).each do |path, content|
         parent_path, * = path.rpartition('/')
         parent_page = repo_pages.fetch(parent_path, nil)
         if parent_page.nil? and repo_options.key? 'description'
@@ -81,28 +85,34 @@ class DocPageGenerator < Jekyll::Generator
     end
   end
 
-  def convert_with_sphinx(repo_name, repo_data)
-    repo_path = Pathname.new(File.join("_remotes", repo_name))
-    in_path = Pathname.new(File.join('_sphinx', 'repos', repo_name))
-    FileUtils.rm_r(in_path) if File.directory? in_path
-    copied_docs_paths = copy_docs(File.join(repo_path, "source"), in_path)
+  def convert_with_sphinx(repo_name, repo_path, repo_data)
+    sphinx_input_path = Pathname.new(File.join('_sphinx', 'repos', repo_name))
+    FileUtils.rm_r(sphinx_input_path) if File.directory? sphinx_input_path
+    repo_sources_path = Pathname.new(
+      File.join(repo_path, repo_data.fetch("sources_dir", "source"))
+    )
+    copied_docs_paths = copy_docs(repo_sources_path, sphinx_input_path)
     return if copied_docs_paths.empty?
-    out_path = Pathname.new(File.join('_sphinx', '_build', repo_name))
-    FileUtils.rm_r(out_path) if File.directory? out_path
-    FileUtils.makedirs(out_path)
-    command = "sphinx-build -b json -c _sphinx #{in_path} #{out_path}"
+    sphinx_output_path = Pathname.new(File.join('_sphinx', '_build', repo_name))
+    FileUtils.rm_r(sphinx_output_path) if File.directory? sphinx_output_path
+    FileUtils.makedirs(sphinx_output_path)
+    command = "sphinx-build -b json -c _sphinx #{sphinx_input_path} #{sphinx_output_path}"
     pid = Kernel.spawn(command)
     Process.wait pid
     repo_content = Hash.recursive
     copied_docs_paths.each do |src_path, dst_path|
       json_path = File.join(
-        out_path, dst_path.relative_path_from(in_path)
+        sphinx_output_path, dst_path.relative_path_from(sphinx_input_path)
       ).sub(File.extname(dst_path), '.fjson')
       next unless File.file? json_path
       json_content = JSON.parse(File.read(json_path))
       json_content["edit_url"] = generate_edit_url(
         repo_data, src_path.relative_path_from(repo_path)
       )
+      json_content["indexed_page"] = \
+        repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"]).any? do |pattern|
+          File.fnmatch?(pattern, src_path.relative_path_from(repo_sources_path))
+        end
       permalink = json_content["current_page_name"]
       if File.basename(permalink) == "index"
         permalink = File.dirname(permalink)

@@ -188,6 +188,7 @@ class DocPage < Jekyll::Page
     self.data['layout'] = "doc"
     self.data['title'] = data['title']
     self.data['edit_url'] = data['edit_url']
+    self.data['indexed'] = data['indexed_page']
 
     self.data['child_pages'] = []
     self.data['ancestor_pages'] = []
