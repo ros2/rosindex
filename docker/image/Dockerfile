@@ -25,18 +25,22 @@ RUN apt-get update && \
         mercurial \
         nodejs \
         openssl \
-        pandoc \
         pkg-config \
         python-pip \
         python3-vcstool \
         ruby \
         ruby-dev \
-        rubygems-integration && \
+        rubygems-integration \
+        wget && \
     rm -rf /var/lib/apt/lists/*
 
 RUN gem install bundle
 RUN pip install --upgrade setuptools pip
 RUN pip install recommonmark==0.4 sphinx==1.5.6
+
+# Install pandoc
+RUN wget -nv https://github.com/jgm/pandoc/releases/download/2.5/pandoc-2.5-1-amd64.deb -O /tmp/pandoc.deb && \
+    dpkg -i /tmp/pandoc.deb
 
 RUN ln -s `which nodejs` /usr/local/bin/node
 
