@@ -1,13 +1,29 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 ARG user=rosindex
 ARG uid=1000
 
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+        gnupg && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > \
          /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
+
+RUN echo 'deb http://archive.ubuntu.com/ubuntu/ cosmic universe\n' >> \
+        /etc/apt/sources.list
+RUN echo 'Package: *\n\
+Pin: release n=cosmic\n\
+Pin-Priority: -10\n\
+\n\
+Package: pandoc*\n\
+Pin: release n=cosmic\n\
+Pin-Priority: 500\n\
+' > /etc/apt/preferences.d/cosmic.pref
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -20,27 +36,22 @@ RUN apt-get update && \
         libgit2-dev \
         libpthread-stubs0-dev \
         libssl-dev \
-        libsslcommon2-dev \
         libz-dev \
         mercurial \
         nodejs \
         openssl \
+        pandoc \
         pkg-config \
         python-pip \
         python3-vcstool \
         ruby \
         ruby-dev \
-        rubygems-integration \
-        wget && \
+        rubygems-integration && \
     rm -rf /var/lib/apt/lists/*
 
 RUN gem install bundle
 RUN pip install --upgrade setuptools pip
 RUN pip install recommonmark==0.4 sphinx==1.5.6
-
-# Install pandoc
-RUN wget -nv https://github.com/jgm/pandoc/releases/download/2.5/pandoc-2.5-1-amd64.deb -O /tmp/pandoc.deb && \
-    dpkg -i /tmp/pandoc.deb
 
 RUN ln -s `which nodejs` /usr/local/bin/node
 
