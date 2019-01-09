@@ -1,0 +1,31 @@
+{% if include.root_page.indexed %}
+{% assign root_page_id = include.root_page.url | replace: '/', '_' %}
+{% assign ancestor_urls = current_page.ancestor_pages | map: "url" %}
+{% assign in_current_page_path = ancestor_urls | include: include.root_page.url %}
+<div class="list-group-item">
+  <a href="{{ site.baseurl }}{{ include.root_page.url }}">{{ include.root_page.title }}</a>
+  {% unless include.root_page.child_pages == empty %}
+  <a href="#{{ root_page_id }}_children" class="list-group-toggle pull-right"
+     data-toggle="collapse" aria-expanded="false">
+    {% if in_current_page_path %}
+    <span class="glyphicon glyphicon-chevron-up"></span>
+    {% else %}
+    <span class="glyphicon glyphicon-chevron-down"></span>
+    {% endif %}
+  </a>
+  {% endunless %}
+</div>
+{% unless include.root_page.child_pages == empty %}
+  {% if in_current_page_path %}
+<div id="{{ root_page_id }}_children" class="list-group collapse in">
+  {% else %}
+<div id="{{ root_page_id }}_children" class="list-group collapse">
+  {% endif %}
+  {% for child_page in include.root_page.child_pages %}
+  {% if child_page.indexed %}
+  {% include pages_index_entry.html root_page=child_page %}
+  {% endif %}
+  {% endfor %}
+</div>
+{% endunless %}
+{% endif %}

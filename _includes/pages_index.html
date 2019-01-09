@@ -1,0 +1,13 @@
+<div class="list-group list-group-root">
+  {% include pages_index_entry.html root_page=root_page %}
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    $('.list-group-toggle').on('click', function() {
+      $(this).find('span').toggleClass(
+        'glyphicon-chevron-up glyphicon-chevron-down'
+      );
+    });
+  });
+</script>
