@@ -43,6 +43,7 @@ RUN apt-get update && \
         pandoc \
         pkg-config \
         python-pip \
+        python3-pip \
         python3-vcstool \
         ruby \
         ruby-dev \
@@ -52,12 +53,15 @@ RUN apt-get update && \
 RUN gem install bundle
 RUN pip install --upgrade setuptools pip
 RUN pip install recommonmark==0.4 sphinx==1.5.6
+RUN pip3 install --upgrade pip
+RUN pip3 install gitpython
 
 RUN ln -s `which nodejs` /usr/local/bin/node
 
 COPY docker/image/build_site.sh /usr/local/bin/build_site
 COPY docker/image/test_site.sh /usr/local/bin/test_site
 COPY docker/image/update_site.sh /usr/local/bin/update_site
+COPY docker/image/git_add_files.py /usr/local/bin/git_add_files
 
 RUN useradd -u $uid -m $user
 ENV HOME=/home/$user
