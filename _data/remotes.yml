@@ -4,10 +4,6 @@ repositories:
     type: git
     url: https://github.com/ros/rosdistro.git
     version: master
-  ros2_rosdistro:
-    type: git
-    url: https://github.com/ros2/rosdistro.git
-    version: ros2
   rosdep:
     type: git
     url: https://github.com/ros/rosdistro.git
