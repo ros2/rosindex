@@ -4,41 +4,48 @@ import argparse
 import git
 import re
 
-parser = argparse.ArgumentParser(
-    description='Add selected files to git repository.')
-parser.add_argument('repository_path', action='store')
-args = parser.parse_args()
-repo = git.Repo(args.repository_path)
 
-git_diff_numstat = repo.git.diff(numstat=True)
-git_diff = repo.git.diff().encode("utf-8")
+def run(args):
+    repo = git.Repo(args.repository_path)
 
-# Parse information from git's numstat
-modified_files = {}
-for line in git_diff_numstat.splitlines():
-    tmp = re.split(r'\t+', line)
-    modified_files[tmp[2]] = {}
-    modified_files[tmp[2]]["lines_added"] = int(tmp[0])
-    modified_files[tmp[2]]["lines_removed"] = int(tmp[1])
+    git_diff_numstat = repo.git.diff(numstat=True)
+    git_diff = repo.git.diff().encode("utf-8")
 
-# Filter files that have been modified and contain blacklisted strings
-diff_index = repo.index.diff(None)
-for diff_item in diff_index.iter_change_type('M'):
-    filename = diff_item.a_path
-    if filename in modified_files:
-        modified_files[filename]["blacklisted"] = "generated on" in diff_item.a_blob.data_stream.read(
-        ).decode('utf-8')
+    # Parse information from git's numstat
+    modified_files = {}
+    for line in git_diff_numstat.splitlines():
+        lines_added, lines_removed, file_path = re.split(r'\t+', line)[:3]
 
-# Add all files to git
-repo.git.add('--all')
-blacklisted_files = []
+        modified_files[file_path] = {}
+        modified_files[file_path]["lines_added"] = int(lines_added)
+        modified_files[file_path]["lines_removed"] = int(lines_removed)
 
-# Classify modified files by blacklisted status
-for file, change in modified_files.items():
-    if change['lines_added'] == 1 and \
-       change['lines_removed'] == 1 and \
-       change['blacklisted']:
-        blacklisted_files.append(file)
+    # Filter files that have been modified and contain blacklisted strings
+    diff_index = repo.index.diff(None)
+    for diff_item in diff_index.iter_change_type('M'):
+        filename = diff_item.a_path
+        if filename in modified_files:
+            diff_string = diff_item.a_blob.data_stream.read().decode('utf-8')
+            modified_files[filename]["blacklisted"] = "generated on" in diff_string
 
-# Remove blacklisted files from git
-repo.git.reset(blacklisted_files)
+    # Add all files to git
+    repo.git.add('--all')
+    blacklisted_files = []
+
+    # Classify modified files by blacklisted status
+    for file, change in modified_files.items():
+        if change['lines_added'] == 1 and \
+           change['lines_removed'] == 1 and \
+           change['blacklisted']:
+            blacklisted_files.append(file)
+
+    # Remove blacklisted files from git
+    repo.git.reset(blacklisted_files)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='Add selected files to git repository.')
+    parser.add_argument('repository_path', action='store')
+    args = parser.parse_args()
+    run(args)
