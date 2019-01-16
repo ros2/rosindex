@@ -468,7 +468,6 @@ class Indexer < Jekyll::Generator
       'browse_uri' => get_browse_uri(repo.uri, repo.type, snapshot.version),
       # get the date of the last modification
       'last_commit_time' => vcs.get_last_commit_time(),
-
       'readme' => nil,
       'readme_rendered' => nil}
 
@@ -652,106 +651,94 @@ class Indexer < Jekyll::Generator
     (1..n_pages).each do |page_index|
 
       p_start = (page_index-1) * elements_per_page
-      p_end = [n_elements, p_start+elements_per_page].min
 
       elements_sorted.each do |sort_key, elements|
         # Get a subset of the elements
-        unless sort_key == 'name' then
-          elements_sliced = Hash.new
-          elements.each do |distro, items|
-            elements_sliced[distro] = items.slice(p_start, elements_per_page)
+        elements_sliced = Hash[
+          elements.collect do |distro, elements_in_distro|
+            [distro, elements_in_distro.slice(p_start, elements_per_page)]
           end
-        else
-          elements_sliced = elements.slice(p_start, elements_per_page)
-        end
-        site.pages << page_class.new( site, sort_key, n_pages, page_index, elements_sliced)
+        ]
+        site.pages << page_class.new(site, sort_key, n_pages, page_index, elements_sliced)
         # create page 1 without a page number or key in the url
         if sort_key == default_sort_key and page_index == 1
-          site.pages << page_class.new( site, sort_key, n_pages, page_index, elements_sliced, true)
+          site.pages << page_class.new(site, sort_key, n_pages, page_index, elements_sliced, true)
         end
       end
     end
   end
 
   def sort_repos(site)
-    repos_sorted = {}
-    repos_sorted['name']= @repo_names.sort_by { |name, instances| name }
+    repos_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
 
-    repos_sorted['time'] = Hash.new
-    $all_distros.each do |distro|
-      repos_sorted['time'][distro] = repos_sorted['name'].reverse.sort_by { |name, instances|
-        instances.default.snapshots.reject { |d,s|
-          s.nil? or not $recent_distros.include?(d) or not distro == d
-        }.map { |d,s|
+    repos_sorted_by_name = @repo_names.sort_by { |name, _| name }
+    $all_distros.collect do |distro|
+      repos_sorted['name'][distro] = repos_sorted_by_name
+
+      repos_sorted['time'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.select do |d, s|
+          distro == d and not s.nil?
+        end.map do |d,s|
           s.data['last_commit_time'].to_s
-        }.max.to_s
-      }.reverse
-    end
+        end.max.to_s
+      end.reverse
 
-    repos_sorted['doc'] = Hash.new
-    $all_distros.each do |distro|
-      repos_sorted['doc'][distro] = repos_sorted['name'].reverse.sort_by { |name, instances|
-        -(instances.default.snapshots.count { |d,s|
-          $recent_distros.include?(d) and not s.data['readmes'].nil? or not d == distro
-        })
-      }.reverse
-    end
+      repos_sorted['doc'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.count do |d, s|
+          d == distro and not s.nil? and not s.data['readme'].nil?
+        end
+      end.reverse
 
-    repos_sorted['released'] = Hash.new
-    $all_distros.each do |distro|
-      repos_sorted['released'][distro] = repos_sorted['name'].reverse.sort_by { |name, instances|
-      -(instances.default.snapshots.count { |d,s|
-        $recent_distros.include?(d) and not s.released or not d == distro
-      })
-    }
+      repos_sorted['released'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.count do |d, s|
+          d == distro and not s.nil? and s.released
+        end
+      end.reverse
     end
 
     return repos_sorted
   end
 
   def sort_packages(site)
-    packages_sorted = {}
+    packages_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
 
-    packages_sorted['name'] = @package_names.sort_by { |name, instances| name }
-
-    packages_sorted['time'] = Hash.new
+    packages_sorted_by_name = @package_names.sort_by { |name, _| name }
     $all_distros.each do |distro|
-      packages_sorted['time'][distro] = packages_sorted['name'].reverse.sort_by { |name, instances|
-        instances.snapshots.reject { |d,s|
-          s.nil? or not $recent_distros.include?(d) or not distro == d
-        }.map { |d,s|
+      packages_sorted['name'][distro] = packages_sorted_by_name
+
+      packages_sorted['time'][distro] = \
+      packages_sorted['name'][distro].sort_by do |_, instances|
+        instances.snapshots.select do |d, s|
+          distro == d and not s.nil?
+        end.map do |_, s|
           s.snapshot.data['last_commit_time'].to_s
-        }.max.to_s
-      }.reverse
-    end
+        end.max.to_s
+      end.reverse
 
-    packages_sorted['doc'] = Hash.new
-    $all_distros.each do |distro|
-      packages_sorted['doc'][distro] = packages_sorted['name'].reverse.sort_by { |name, instances|
-        -(instances.snapshots.count { |d,s|
-          not s.nil? and $recent_distros.include?(d) and not s.data['readmes'].count > 0 or not distro == d
-        })
-      }.reverse
-    end
+      packages_sorted['doc'][distro] = \
+      packages_sorted['name'][distro].sort_by do |_, instances|
+        instances.snapshots.count do |d, s|
+          distro == d and not s.nil? and s.data['readmes'].count > 0
+        end
+      end.reverse
 
-    packages_sorted['released'] = Hash.new
-    $all_distros.each do |distro|
-      packages_sorted['released'][distro] = packages_sorted['name'].reverse.sort_by { |name, instances|
-        -(instances.snapshots.count { |d,s|
-          $recent_distros.include?(d) and not s.nil? and s.snapshot.released or not distro == d
-        })
-      }
+      packages_sorted['released'][distro] = \
+      packages_sorted['name'][distro].sort_by do |_, instances|
+        instances.snapshots.count do |d, s|
+          distro == d and not s.nil? and s.snapshot.released
+        end
+      end.reverse
     end
 
     return packages_sorted
   end
 
   def sort_rosdeps(site)
-    rosdeps_sorted = {}
-
-    rosdeps_sorted['name'] = @rosdeps.sort_by { |name, details| name }
-
-    return rosdeps_sorted
+    sorted_rosdeps = @rosdeps.sort_by { |name, _| name }
+    return {'name' => Hash[$all_distros.collect {|distro| [distro, sorted_rosdeps]}] }
   end
 
   def write_release_manifests(site, repo, package_name, default)

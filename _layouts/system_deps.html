@@ -40,7 +40,7 @@ layout: default
                 </tr>
               </thead>
               <tbody>
-                {% for dep in page.list %}
+                {% for dep in page.list[distro] %}
                   {% assign dep_name = dep[0] %}
                   {% assign dep_details = dep[1] %}
                   <tr>

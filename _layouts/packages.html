@@ -72,64 +72,60 @@ layout: default
                 </tr>
               </thead>
               <tbody>
-              {% for packages_per_repo in page.list %}
-                {% if packages_per_repo[0] == distro %}
-                  {% for package in packages_per_repo[1] %}
-                    {% assign r = package[1].repos[distro].snapshots[distro] %}
-                    {% assign p = package[1].snapshots[distro] %}
-                    {% assign n_instances = package[1].instances | size %}
-                    <tr>
-                      <td title="View Package Instances" data-toggle="tooltip" data-placement="left" align="center">
-                        <a href="{{site.baseurl}}/packages/{{package[0]}}" class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
-                            {{n_instances}}
-                        </a>
+              {% for package in page.list[distro] %}
+                {% assign r = package[1].repos[distro].snapshots[distro] %}
+                {% assign p = package[1].snapshots[distro] %}
+                {% assign n_instances = package[1].instances | size %}
+                <tr>
+                  <td title="View Package Instances" data-toggle="tooltip" data-placement="left" align="center">
+                    <a href="{{site.baseurl}}/packages/{{package[0]}}" class="label label-{% if n_instances > 1 %}primary{% else %}default{% endif %}">
+                        {{n_instances}}
+                    </a>
+                  </td>
+                  {% if p %}
+                    {% if r.released %}
+                      <td class="text-center">
+                        <span title="Released in {{distro}}" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
                       </td>
-                      {% if p %}
-                        {% if r.released %}
-                          <td class="text-center">
-                            <span title="Released in {{distro}}" data-toggle="tooltip" data-placement="left" class="glyphicon glyphicon-flash"></span>
-                          </td>
-                        {% else %}
-                          <td title="Not released in {{distro}}" data-toggle="tooltip" data-placement="left" class="text-center">
-                            <span class="glyphicon glyphicon-none"></span>
-                          </td>
-                        {% endif %}
-                        {% assign n_readmes = p.data[1].readmes | size %}
-                        {% if n_readmes > 0 %}
-                          <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
-                            <span class="glyphicon glyphicon-file"></span>
-                          </td>
-                        {% else %}
-                          <td title="No README" data-toggle="tooltip" data-placement="left" align="center">
-                            <span class="glyphicon glyphicon-none"></span>
-                          </td>
-                        {% endif %}
-                        </td>
-                        <td>
-                          <span title="Last commit date" class="label label-default">{{ r.data.last_commit_time }}</span>
-                        </td>
-                        <td>
-                          <a href="{{site.baseurl}}/p/{{package[0]}}">{{ package[0] }}</a>
-                        </td>
-                        <td>
-                          <div class="truncate">
-                            <div class="spacer">{{ p.data.description }}</div>
-                            <div class="content">{{ p.data.description }}</div>
-                            <span>&nbsp;</span>
-                          </div>
-                        </td>
-                      {% else %}
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                          <a class="inactive" href="{{site.baseurl}}/p/{{package[0]}}">{{ package[0] }}</a>
-                        </td>
-                        <td></td>
-                      {% endif %}
-                      </tr>
-                    {% endfor %}
+                    {% else %}
+                      <td title="Not released in {{distro}}" data-toggle="tooltip" data-placement="left" class="text-center">
+                        <span class="glyphicon glyphicon-none"></span>
+                      </td>
+                    {% endif %}
+                    {% assign n_readmes = p.data[1].readmes | size %}
+                    {% if n_readmes > 0 %}
+                      <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
+                        <span class="glyphicon glyphicon-file"></span>
+                      </td>
+                    {% else %}
+                      <td title="No README" data-toggle="tooltip" data-placement="left" align="center">
+                        <span class="glyphicon glyphicon-none"></span>
+                      </td>
+                    {% endif %}
+                    </td>
+                    <td>
+                      <span title="Last commit date" class="label label-default">{{ r.data.last_commit_time }}</span>
+                    </td>
+                    <td>
+                      <a href="{{site.baseurl}}/p/{{package[0]}}">{{ package[0] }}</a>
+                    </td>
+                    <td>
+                      <div class="truncate">
+                        <div class="spacer">{{ p.data.description }}</div>
+                        <div class="content">{{ p.data.description }}</div>
+                        <span>&nbsp;</span>
+                      </div>
+                    </td>
+                  {% else %}
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <a class="inactive" href="{{site.baseurl}}/p/{{package[0]}}">{{ package[0] }}</a>
+                    </td>
+                    <td></td>
                   {% endif %}
+                </tr>
               {% endfor %}
               </tbody>
             </table>
