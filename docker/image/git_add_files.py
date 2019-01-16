@@ -9,7 +9,6 @@ def run(args):
     repo = git.Repo(args.repository_path)
 
     git_diff_numstat = repo.git.diff(numstat=True)
-    git_diff = repo.git.diff().encode("utf-8")
 
     # Parse information from git's numstat
     modified_files = {}
@@ -39,8 +38,10 @@ def run(args):
            change['blacklisted']:
             blacklisted_files.append(file)
 
-    # Remove blacklisted files from git
-    repo.git.reset(blacklisted_files)
+    if blacklisted_files:
+        # Remove blacklisted files from git
+        repo.index.reset(paths=blacklisted_files)
+        repo.git.checkout('.')
 
 
 if __name__ == "__main__":
