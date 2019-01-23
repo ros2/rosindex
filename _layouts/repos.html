@@ -70,7 +70,7 @@ layout: default
                 </tr>
               </thead>
               <tbody>
-              {% for repo in page.list %}
+              {% for repo in page.list[distro] %}
                 {% assign instance = repo[1].default %}
                 {% assign n_instances = repo[1].instances | size %}
                 <tr>
