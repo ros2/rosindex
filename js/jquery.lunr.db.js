@@ -1,20 +1,5 @@
 (function($) {
 
-  var reduceArray = function(arr, fn, acum) {
-    for (i = 0; i < arr.length; i += 1) {
-      acum = fn(arr[i], acum);
-    }
-    return acum;
-  };
-
-  var partitionArray = function(input, n) {
-    output = [];
-    for (i = 0; i < input.length; i += n) {
-      output.push(input.slice(i, i + n));
-    }
-    return output;
-  };
-
   var LunrDB = (function() {
     function LunrDB() {
       this.shards = [];
@@ -59,7 +44,7 @@
     if (options.shardsUrl) {
       var urlParts = options.shardsUrl.split('/');
       var urlPrefix = urlParts.slice(0, urlParts.length - 1).join('/');
-      shards_promise = $.getJSON(options.shardsUrl).then(function(shards) {
+      shards_promise = options.getData(options.shardsUrl).then(function(shards) {
         return $.map(shards, function(shard) {
           return {indexUrl: urlPrefix + '/' + shard.index,
                   dataUrl: urlPrefix + '/' + shard.data};
@@ -68,41 +53,38 @@
     }
     var db = new LunrDB();
     return shards_promise.then(function(shards) {
-      var partitioning = partitionArray(shards, options.downloadLimit);
-      return reduceArray(partitioning, function(part, promise) {
-        return promise.then(function() {
-          return $.when.apply($, $.map(part, function(shard) {
-            var promises = [];
-            promises.push($.getJSON(shard.indexUrl).then(function(raw_index) {
-              return lunr.Index.load(raw_index);
-            }));
-            promises.push($.getJSON(shard.dataUrl).then(function(raw_data) {
-              return raw_data.reduce(function(hash, entry) {
-                hash[entry["id"]] = entry;
-                return hash;
-              }, {});
-            }));
-            return $.when.apply($, promises).then(function(index, data) {
-              db.extend({index: index, data: data});
-            });
-          })).then(function() {
-            return progress(db);
-          });
+      return $.when.apply($, $.map(shards, function(shard) {
+        var promises = [];
+        promises.push(options.getData(shard.indexUrl).then(function(raw_index) {
+          return lunr.Index.load(raw_index);
+        }));
+        promises.push(options.getData(shard.dataUrl).then(function(raw_data) {
+          return raw_data.reduce(function(hash, entry) {
+            hash[entry["id"]] = entry;
+            return hash;
+          }, {});
+        }));
+        return $.when.apply($, promises).then(function(index, data) {
+          db.extend({index: index, data: data});
         });
-      }, $.Deferred().resolve());
+      })).then(function() {
+        return progress(db);
+      });
     }).then(function() {
+      if (options.ready) {
+        options.ready();
+      }
       return db;
     });
   };
 
   $.getLunrDB = function(options, progress) {
-    options = $.extend({}, options, $.getLunrDB.defaults);
+    options = $.extend({}, $.getLunrDB.defaults, options);
     return getLunrDB(options, progress);
   };
 
   $.getLunrDB.defaults = {
     indexUrl: '/index.json',  // Url for the .json file containing the search index.
-    dataUrl: '/search.json',  // Url for the .json file containing search data.
-    downloadLimit: 2  // Maximum concurrent downloads allowed.
+    dataUrl: '/search.json'  // Url for the .json file containing search data.
   };
 })(jQuery);

@@ -32,24 +32,6 @@
     });
   };
 
-  // Populate the search input with 'q' querystring parameter if set
-  var getWindowSearchQuery = function() {
-    var uri = new URI(window.location.search.toString());
-    var queryString = uri.search(true);
-
-    if (!queryString.hasOwnProperty('q')) {
-      return "";
-    }
-    return queryString.q;
-  };
-
-  // Populate the search input with 'q' querystring parameter if set
-  var setWindowSearchQuery = function(query) {
-    var uri = new URI(window.location.toString());
-    uri.setSearch({q: query});
-    window.history.pushState({path: uri.toString()}, '', uri.toString());
-  };
-
   // define lunr.js search class
   var LunrSearch = (function() {
 
@@ -57,7 +39,6 @@
       var self = this;
 
       this.$input = input;
-      this.$input.val(getWindowSearchQuery());
       this.baseUrl = options.baseUrl;
 
       var views = $.map(options.sections, function(section) {
@@ -111,14 +92,6 @@
           return options.ready();
         }
       });
-      self.$input.bind('save', function() {
-        setWindowSearchQuery(self.$input.val());
-      });
-      $(window).bind('popstate', function() {
-        self.$input.val(getWindowSearchQuery());
-        self.$input.trigger('search');
-      });
-      self.bindSaveKeys();
     };
 
     // Bind keyup events to search results refreshes.
@@ -134,20 +107,12 @@
       }));
     };
 
-    LunrSearch.prototype.bindSaveKeys = function() {
-      var self = this;
-      self.$input.bind('keypress', debouncedCall(function(e) {
-        if (e.which == 13) {
-          self.$input.trigger('save');
-        }
-      }));
-    };
-
     return LunrSearch;
   })();
  
   $.fn.lunrSearch = function(options) {
     // create search object
+    options = $.extend({}, $.fn.lunrSearch.defaults, options);
     new LunrSearch(this, options);
 
     return this;

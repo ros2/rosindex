@@ -26,52 +26,81 @@ layout: default
       </div>
     </div>
   </div>
-  <div class="row">
-    &nbsp;
-  </div>
 
-  <div class="row hide-when-search-is-ready">
-    <p class="progress-label">Indexing content...</p>
-    <div class="progress" style="margin-bottom: 0;">
-      <div id="packages-index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
-    </div>
-  </div>
-
-  <div class="row show-if-packages-found" style="display: none;">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Packages search results</h3>
+  <div class="row" style="margin: 10px 0px 10px 0px;">
+    <div class="btn-group btn-group-justified">
+      <div class="btn-group">
+        <button id="pkgs" type="button" class="search-section-check btn btn-primary active">Packages</button>
       </div>
-      <div id="packages-search-results" class="panel-body table-responsive"></div>
+      <div class="btn-group">
+        <button id="deps" type="button" class="search-section-check btn btn-primary">System Dependencies</button>
+      </div>
+      <div class="btn-group">
+        <button id="docs" type="button" class="search-section-check btn btn-primary">Documentation</button>
+      </div>
     </div>
-  </div>
-  <div id="packages-search-pagination" style="display: none;"
-       class="row text-center show-if-packages-found">
   </div>
 
-  <div class="row show-if-deps-found" style="display: none;">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">System dependencies search results</h3>
+  <div id="pkgs" class="row container-fluid search-section-tab">
+    <div class="row show-if-searching-packages" style="margin: 10px 0px 10px 0px;">
+      <p class="progress-label">Searching...</p>
+      <div class="progress" style="margin-bottom: 0;">
+        <div id="packages-index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
       </div>
-      <div id="deps-search-results" class="panel-body table-responsive"></div>
     </div>
-  </div>
-  <div id="deps-search-pagination" style="display: none;"
-       class="row text-center show-if-deps-found">
+    <div class="row show-if-packages-found" style="display: none;">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Package search results</h3>
+        </div>
+        <div id="packages-search-results" class="panel-body table-responsive"></div>
+      </div>
+    </div>
+    <div id="packages-search-pagination" style="display: none;"
+         class="row text-center show-if-packages-found">
+    </div>
   </div>
 
-  <div class="row show-if-docs-found" style="display: none;">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Documentation search results</h3>
+  <div id="deps" class="row container-fluid search-section-tab" style="display: none;">
+    <div class="row show-if-searching-deps" style="margin: 10px 0px 10px 0px;">
+      <p class="progress-label">Searching...</p>
+      <div class="progress" style="margin-bottom: 0;">
+        <div id="packages-index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
       </div>
-      <div id="docs-search-results" class="panel-body table-responsive"></div>
+    </div>
+    <div class="row show-if-deps-found" style="display: none;">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">System dependencies search results</h3>
+        </div>
+        <div id="deps-search-results" class="panel-body table-responsive"></div>
+      </div>
+    </div>
+    <div id="deps-search-pagination" style="display: none;"
+         class="row text-center show-if-deps-found">
     </div>
   </div>
-  <div id="docs-search-pagination" style="display: none;"
+
+  <div id="docs" class="row container-fluid search-section-tab" style="display: none;">
+    <div class="row show-if-searching-docs" style="margin: 10px 0px 10px 0px;">
+      <p class="progress-label">Searching...</p>
+      <div class="progress" style="margin-bottom: 0;">
+        <div id="packages-index-loader-bar" class="m-0 progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: 100%"></div>
+      </div>
+    </div>
+    <div class="row show-if-docs-found" style="display: none;">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Documentation search results</h3>
+        </div>
+        <div id="docs-search-results" class="panel-body table-responsive"></div>
+      </div>
+    </div>
+    <div id="docs-search-pagination" style="display: none;"
        class="row text-center show-if-docs-found">
+    </div>
   </div>
+
 </div>
 
 {% raw %}
@@ -193,14 +222,82 @@ layout: default
 <script src="{{site.baseurl}}/js/jquery.lunr.db.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{site.baseurl}}/js/jquery.lunr.views.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{site.baseurl}}/js/jquery.lunr.search.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{site.baseurl}}/js/jquery.exec.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 $(function() {
+
+  // Populate the search input with 'q' querystring parameter if set
+  var getWindowSearchQuery = function() {
+    var uri = new URI(window.location.search.toString());
+    return uri.search(true);
+  };
+
+  // Populate the search input with 'q' querystring parameter if set
+  var setWindowSearchQuery = function(query) {
+    var uri = new URI(window.location.toString()); uri.setSearch(query);
+    window.history.pushState({path: uri.toString()}, '', uri.toString());
+  };
+
+  var copySearchQueryToUI = function() {
+    var query = getWindowSearchQuery();
+    $('#search-query').val(query.term || '');
+    var section = query.section || 'pkgs';
+    $('.search-section-tab').hide();
+    $('#' + section + '.search-section-tab').show();
+    $('.search-section-check').removeClass('active');
+    $('#' + section + '.search-section-check').addClass('active');
+  };
+
+  var copyUIToSearchQuery = function() {
+    setWindowSearchQuery({
+      section: $('.search-section-check.active').attr('id'),
+      term: $('#search-query').val()
+    });
+  };
+
+  $('.search-section-check').click(function() {
+    if (!$(this).hasClass('active')) {
+      var section = $(this).attr('id');
+      $('.search-section-check').removeClass('active');
+      $('.search-section-tab').fadeOut("fast").promise().then(function() {
+        $('#' + section + '.search-section-tab').fadeIn("fast");
+      });
+      $(this).addClass('active');
+    }
+  });
+
+  $('#search-query').bind('keypress', function(e) {
+    if (e.which == 13) {
+      copyUIToSearchQuery();
+    }
+  });
+
+  $('#search-button').click(copyUIToSearchQuery);
+
+  var executor = $.makeExecutor({
+    nextTag: function(tags) {
+      var section = $('.search-section-check.active').attr('id');
+      if (tags.indexOf(section) != -1) return section;
+      return tags[Math.floor(Math.random() * tags.length)];
+    }, capacity: 2
+  });
+
+  copySearchQueryToUI();
+
   $('#search-query').lunrSearch({
     baseUrl: '{{ site.baseurl }}',
     sections: [{
       partition: {
-        shardsUrl: "/search/packages/shards.json",  
+        shardsUrl: "/search/packages/shards.json",
+        getData: function(url) {
+          return executor.push(function() {
+            return $.getJSON(url);
+          }, 'pkgs');
+        },
+        ready: function() {
+          $('.show-if-searching-packages').slideUp(400);
+        }
       },
       view: $('#packages-search-pagination').pagedView({
         pageView: $('#packages-search-results').templateView({
@@ -217,7 +314,15 @@ $(function() {
       })
     }, {
       partition: {
-        shardsUrl: "/search/deps/shards.json"
+        shardsUrl: "/search/deps/shards.json",
+        getData: function(url) {
+          return executor.push(function() {
+            return $.getJSON(url);
+          }, 'deps');
+        },
+        ready: function() {
+          $('.show-if-searching-deps').slideUp(400);
+        }
       },
       view: $('#deps-search-pagination').pagedView({
         pageView: $('#deps-search-results').templateView({
@@ -242,7 +347,15 @@ $(function() {
       })
     }, {
       partition: {
-        shardsUrl: "/search/docs/shards.json"
+        shardsUrl: "/search/docs/shards.json",
+        getData: function(url) {
+          return executor.push(function() {
+            return $.getJSON(url);
+          }, 'docs');
+        },
+        ready: function() {
+          $('.show-if-searching-docs').slideUp(400);
+        }
       },
       view: $('#docs-search-pagination').pagedView({
         pageView: $('#docs-search-results').templateView({
@@ -292,14 +405,14 @@ $(function() {
           return $('.show-if-docs-found').promise();
         }
       })
-    }],
-    ready: function () {
-      $('.hide-when-search-is-ready').slideUp(400);
-      return $('.hide-when-search-is-ready').promise();
-    }
+    }]
   });
-  $('#search-button').click(function() {
-    $('#search-query').trigger('save');
-  })
+
+  $(window).bind('popstate', function() {
+    copySearchQueryToUI();
+
+    $('#search-query').trigger('search');
+  });
+
 });
 </script>

@@ -48,7 +48,7 @@
   })();
 
   $.fn.templateView = function(options) {
-    options = $.extend({}, options, $.fn.templateView.defaults);
+    options = $.extend({}, $.fn.templateView.defaults, options);
     return new TemplateView(this, options);
   };
 
@@ -114,7 +114,7 @@
   })();
 
   $.fn.pagedView = function(options) {
-    options = $.extend({}, options, $.fn.pagedView.defaults);
+    options = $.extend({}, $.fn.pagedView.defaults, options);
     return new PagedView(this, options);
   };
 

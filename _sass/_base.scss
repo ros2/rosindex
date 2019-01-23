@@ -45,7 +45,6 @@ div.vcenter {
   float: none;
 }
 
-
 .truncate {
     position: relative;
 }
@@ -442,3 +441,7 @@ th.rotate45 {
   padding-left: 45px;
 }
 
+.btn-primary.active:hover,
+.btn-primary.active:focus {
+  background-color: #106a8c;
+}
