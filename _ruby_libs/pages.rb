@@ -186,6 +186,7 @@ class DocPage < Jekyll::Page
     self.data ||= {}
     self.content = data['body']
     self.data['layout'] = "doc"
+    self.data['redirect'] = data['redirect']
     self.data['title'] = data['title']
     self.data['edit_url'] = data['edit_url']
     self.data['indexed'] = data['indexed_page']
