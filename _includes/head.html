@@ -7,10 +7,10 @@
     <meta name="description" content="{{ site.description }}">
 
     {% if page.canonical_url and page.canonical_url != page.url %}
-    <link rel="canonical" href="{{ page.canonical_url | replace:'index.html','' }}">
-    <meta http-equiv="refresh" content="0; url={{ page.canonical_url | replace:'index.html','' }}" />
+    <link rel="canonical" href="{{ page.canonical_url | replace: 'index.html','' }}">
+    <meta http-equiv="refresh" content="0; url={{ page.canonical_url | replace: 'index.html','' }}" />
     <script>
-      window.location.href = '{{ page.canonical_url | replace:'index.html','' }}';
+      window.location.href = '{{ page.canonical_url | replace: 'index.html','' }}';
     </script>
     {% else %}
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
