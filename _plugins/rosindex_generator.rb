@@ -26,6 +26,7 @@ require_relative '../_ruby_libs/text_rendering'
 require_relative '../_ruby_libs/pages'
 require_relative '../_ruby_libs/asset_parsers'
 require_relative '../_ruby_libs/roswiki'
+require_relative '../_ruby_libs/lunr'
 
 $fetched_uris = {}
 $debug = false
@@ -821,12 +822,12 @@ class Indexer < Jekyll::Generator
 
     raw_rosdeps = load_rosdeps(
       rosdep_path,
-      site.data['rosindex_common']['platforms'],
-      site.data['rosindex_common']['package_manager_names'].keys)
+      site.data['common']['platforms'],
+      site.data['common']['package_manager_names'].keys)
 
     raw_rosdeps.each do |dep_name, dep_data|
-      platforms = site.data['rosindex_common']['platforms']
-      manager_set = Set.new(site.data['rosindex_common']['package_manager_names'])
+      platforms = site.data['common']['platforms']
+      manager_set = Set.new(site.data['common']['package_manager_names'])
 
       platform_data = {}
       platforms.each do |platform_key, platform_details|
@@ -1393,9 +1394,9 @@ class Indexer < Jekyll::Generator
 
     # create lunr index data
     unless site.config['skip_search_index']
-      puts ("Generating search index...").blue
+      puts ("Generating packages search index...").blue
 
-      index = []
+      packages_index = []
 
       @all_repos.each do |instance_id, repo|
         repo.snapshots.each do |distro, repo_snapshot|
@@ -1410,8 +1411,8 @@ class Indexer < Jekyll::Generator
 
             readme_filtered = if p['readme'] then self.strip_stopwords(p['readme']) else "" end
 
-            index << {
-              'id' => index.length,
+            packages_index << {
+              'id' => packages_index.length,
               'baseurl' => site.config['baseurl'],
               'url' => File.join('/p',package_name,instance_id)+"#"+distro,
               'last_commit_time' => repo_snapshot.data['last_commit_time'],
@@ -1434,68 +1435,74 @@ class Indexer < Jekyll::Generator
         end
       end
 
-      # precompute the lunr index
-      puts ("Precompiling lunr index...").blue
-
-      lunr_build_index_cmd = File.join(site.source, 'node_modules',
-                                       'lunr-index-build', 'bin',
-                                       'lunr-index-build')
-      lunr_build_index_fields = [
-        '-r','id',
-        '-f','baseurl',
-        '-f','instance',
-        '-f','url',
-        '-f','tags:100',
-        '-f','name:100',
-        '-f','version',
-        '-f','description:50',
-        '-f','maintainers',
-        '-f','authors',
-        '-f','distro',
-        '-f','readme',
-        '-f','released',
-        '-f','unreleased'
-      ].join(' ')
-      lunr_build_full_cmd = "#{lunr_build_index_cmd} #{lunr_build_index_fields}"
-
-      sorted_index = index.sort do |a, b|
+      sorted_packages_index = packages_index.sort do |a, b|
         $all_distros.index(a['distro']) <=> $all_distros.index(b['distro'])
       end
 
-      search_dirname = "search"
-      search_dirpath = File.join(site.dest, search_dirname)
-      Dir::mkdir(site.dest) unless File.directory?(site.dest)
-      Dir::mkdir(search_dirpath) unless File.directory?(search_dirpath)
-      shard_count = site.config['search_index_shards'] || 1
-      shard_size = sorted_index.length / shard_count
-      shards = sorted_index.each_slice(shard_size).with_index.collect do |index_slice, i|
-        puts("Building lunr index shard #{i}...")
-        index_filename = "index.#{i}.json"
-        index_data_filename = "data.#{i}.json"
-        index_data_filepath = File.join(search_dirpath, index_data_filename)
-        File.open(index_data_filepath, "w") do |index_data_file|
-          index_data_file.write(JSON.generate(index_slice))
-        end
-        site.static_files << SearchIndexFile.new(
-          site, site.dest, search_dirname, index_data_filename)
-        puts("Index data written to #{index_data_filename}.")
-        index_filepath = File.join(search_dirpath, index_filename)
-        puts("#{lunr_build_full_cmd} < #{index_data_filepath} > #{index_filepath}")
-        pid = spawn(lunr_build_full_cmd, :in=>index_data_filepath, :out=>[index_filepath, "w"])
-        Process.waitpid(pid)
-        site.static_files << SearchIndexFile.new(
-          site, site.dest, search_dirname, index_filename)
-        puts("Index written to #{search_dirname}/#{index_filename}.")
-        {:index => index_filename, :index_data => index_data_filename}
+      puts ("Precompiling lunr index for packages...").blue
+      reference_field = 'id'
+      indexed_fields = [
+        'baseurl', 'instance', 'url', 'tags:100','name:100',
+        'version', 'description:50', 'maintainers', 'authors',
+        'distro','readme', 'released', 'unreleased'
+      ]
+      site.static_files.push(*precompile_lunr_index(
+        site, sorted_packages_index, reference_field, indexed_fields,
+        "search/packages/", site.config['search_index_shards'] || 1
+      ).to_a)
+
+      puts ("Generating system dependencies search index...").blue
+
+      system_deps_index = []
+      @rosdeps.each do |dep_name, full_dep_data|
+        dependants_per_distro = full_dep_data['dependants_per_distro']
+        data_per_platform = full_dep_data['data_per_platform']
+        system_deps_index << {
+          'id' => system_deps_index.length,
+          'url' => File.join('/d', dep_name),
+          'name' => dep_name,
+          'platforms' => data_per_platform.collect do |platform_key, data|
+            next if data.empty?
+            next unless site.data['common']['platforms'].key? platform_key
+            platform_details = site.data['common']['platforms'][platform_key]
+
+            platform_name = platform_details['name']
+            platform_versions = platform_details['versions']
+            if platform_versions.size > 0
+              data.collect do |version_key, names_for_version|
+                next unless names_for_version.is_a? Array
+                next unless platform_versions.key? version_key
+                next if names_for_version.empty?
+                version_name = platform_versions[version_key]
+                if version_name.empty?
+                  version_name = version_key.capitalize
+                end
+                names_for_version.collect do |name|
+                  "#{name} (#{platform_name} #{version_name})"
+                end.join(' : ')
+              end.compact.join(' : ')
+            else
+              data.collect do |name|
+                "#{name} (#{platform_name})"
+              end.join(' : ')
+            end
+          end.compact.join(' : '),
+          'dependants' => dependants_per_distro.collect do |distro, dependants|
+            next if dependants.empty?
+            dependants.map do |dependant|
+              dependant['package'].name
+            end.join(' : ')
+          end.compact.join(' : ')
+        }
       end
-      shards_filename = "shards.json"
-      shards_filepath = File.join(search_dirpath, shards_filename)
-      File.open(shards_filepath, "w") do |shards_file|
-        shards_file.write(JSON.generate(shards))
-      end
-      site.static_files << SearchIndexFile.new(
-        site, site.dest, search_dirname, shards_filename)
-      puts("Shards list written to #{search_dirname}/#{shards_filename}.")
+
+      puts ("Precompiling lunr index for system dependencies...").blue
+      reference_field = 'id'
+      indexed_fields = ['name', 'platforms', 'dependants']
+      site.static_files.push(*precompile_lunr_index(
+        site, system_deps_index, reference_field, indexed_fields,
+        "search/deps/", site.config['search_index_shards'] || 1
+      ).to_a)
     end
 
     # create stats page

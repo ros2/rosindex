@@ -3,6 +3,7 @@ require 'fileutils'
 require 'nokogiri'
 
 require_relative '../_ruby_libs/pages'
+require_relative '../_ruby_libs/lunr'
 
 class Hash
   def self.recursive
@@ -19,6 +20,8 @@ class DocPageGenerator < Jekyll::Generator
 
   def generate(site)
     all_repos = site.data['remotes']['repositories']
+    puts ("Scraping documentation pages from repositories...").blue
+    docs_index = []
     site.config['docs_repos'].each do |repo_name, repo_options|
       next unless all_repos.key? repo_name
 
@@ -34,10 +37,26 @@ class DocPageGenerator < Jekyll::Generator
         if parent_page.nil? and repo_options.key? 'description'
           content['title'] = repo_options['description']
         end
-        site.pages << repo_pages[path] = DocPage.new(
+        repo_pages[path] = page = DocPage.new(
           site, parent_page, "#{repo_name}/#{path}", content
         )
+        docs_index << {
+          'id' => docs_index.length,
+          'url' => page.url,
+          'title' => Nokogiri::HTML(page.data['title']).text,
+          'content' => Nokogiri::HTML(content['body'], &:noent).text
+        } unless site.config['skip_search_index'] if page.data['indexed']
+        site.pages << page
       end
+    end
+    unless site.config['skip_search_index']
+      puts ("Generating lunr index for documentation pages...").blue
+      reference_field = 'id'
+      indexed_fields = ['title', 'content']
+      site.static_files.push(*precompile_lunr_index(
+        site, docs_index, reference_field, indexed_fields,
+        "search/docs/", site.config['search_index_shards'] || 1
+      ).to_a)
     end
   end
 
