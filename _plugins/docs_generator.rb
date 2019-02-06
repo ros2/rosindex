@@ -143,10 +143,8 @@ class DocPageGenerator < Jekyll::Generator
       repo_content[permalink] = json_content
     end
     repo_content.sort do |a, b|
-      first_permalink = a[0]
-      second_permalink = b[0]
-      first_depth = first_permalink.count('/')
-      second_depth = second_permalink.count('/')
+      first_depth = a[0].count('/')
+      second_depth = b[0].count('/')
       if first_depth == second_depth
         first_sourcename = a[1]['sourcename'] || ''
         first_order = repo_index_pattern.index do |pattern|
@@ -157,7 +155,9 @@ class DocPageGenerator < Jekyll::Generator
           File.fnmatch?(pattern, second_sourcename)
         end || -1
         if first_order == second_order
-          first_permalink <=> second_permalink
+          first_title = a[1]['title'] || ''
+          second_title = b[1]['title'] || ''
+          first_title <=> second_title
         else
           first_order <=> second_order
         end
