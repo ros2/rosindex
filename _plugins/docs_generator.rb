@@ -21,7 +21,7 @@ class DocPageGenerator < Jekyll::Generator
   def generate(site)
     all_repos = site.data['remotes']['repositories']
     puts ("Scraping documentation pages from repositories...").blue
-    docs_index = []
+    documents_index = []
     site.config['docs_repos'].each do |repo_name, repo_options|
       next unless all_repos.key? repo_name
 
@@ -30,23 +30,33 @@ class DocPageGenerator < Jekyll::Generator
       repo_data = File.file?(repo_data_path) ? YAML.load_file(repo_data_path) : {}
       repo_data.update(all_repos[repo_name])
 
-      repo_pages = {}
-      convert_with_sphinx(repo_name, repo_path, repo_data).each do |path, content|
-        parent_path, * = path.rpartition('/')
-        parent_page = repo_pages.fetch(parent_path, nil)
+      repo_build = build_with_sphinx(repo_name, repo_path, repo_data)
+
+      documents = {}
+      repo_build['documents'].each do |permalink, content|
+        parent_path, * = permalink.rpartition('/')
+        parent_page = documents.fetch(parent_path, nil)
         if parent_page.nil? and repo_options.key? 'description'
           content['title'] = repo_options['description']
         end
-        repo_pages[path] = page = DocPage.new(
-          site, parent_page, "#{repo_name}/#{path}", content
+        documents[permalink] = document = DocPage.new(
+          site, parent_page, "doc/#{repo_name}/#{permalink}", content
         )
-        docs_index << {
-          'id' => docs_index.length,
-          'url' => page.url,
-          'title' => Nokogiri::HTML(page.data['title']).text,
+        documents_index << {
+          'id' => documents_index.length,
+          'url' => document.url,
+          'title' => Nokogiri::HTML(document.data['title']).text,
           'content' => Nokogiri::HTML(content['body'], &:noent).text
-        } unless site.config['skip_search_index'] if page.data['indexed']
-        site.pages << page
+        } unless site.config['skip_search_index'] if document.data['indexed']
+
+        site.pages << document
+      end
+      repo_build['images'].each do |permalink, path|
+        site.static_files << RelocatableStaticFile.new(
+          site, site.source,
+          File.dirname(path), File.basename(path),
+          "doc/#{repo_name}/#{permalink}"
+        )
       end
     end
     unless site.config['skip_search_index']
@@ -54,28 +64,10 @@ class DocPageGenerator < Jekyll::Generator
       reference_field = 'id'
       indexed_fields = ['title', 'content']
       site.static_files.push(*precompile_lunr_index(
-        site, docs_index, reference_field, indexed_fields,
+        site, documents_index, reference_field, indexed_fields,
         "search/docs/", site.config['search_index_shards'] || 1
       ).to_a)
     end
-  end
-
-  def copy_docs(src_path, dst_path)
-    copied_docs = Hash.new
-    src_path = Pathname.new(src_path)
-    Dir.glob(File.join(src_path, '**/*.rst'),
-             File::FNM_CASEFOLD).each do |src_doc_path|
-      src_doc_path = Pathname.new(src_doc_path)
-      dst_doc_path = Pathname.new(File.join(
-        dst_path, src_doc_path.relative_path_from(src_path)
-      ))
-      unless File.directory? File.dirname(dst_doc_path)
-        FileUtils.makedirs(File.dirname(dst_doc_path))
-      end
-      FileUtils.copy_entry(src_doc_path, dst_doc_path, preserve = true)
-      copied_docs[src_doc_path] = dst_doc_path
-    end
-    copied_docs
   end
 
   def generate_edit_url(repo_data, original_filepath)
@@ -104,45 +96,48 @@ class DocPageGenerator < Jekyll::Generator
     end
   end
 
-  def convert_with_sphinx(repo_name, repo_path, repo_data)
-    sphinx_input_path = Pathname.new(File.join('_sphinx', 'repos', repo_name))
-    FileUtils.rm_r(sphinx_input_path) if File.directory? sphinx_input_path
-    repo_sources_path = Pathname.new(
-      File.join(repo_path, repo_data.fetch("sources_dir", "source"))
-    )
-    copied_docs_paths = copy_docs(repo_sources_path, sphinx_input_path)
-    return if copied_docs_paths.empty?
-    sphinx_output_path = Pathname.new(File.join('_sphinx', '_build', repo_name))
-    FileUtils.rm_r(sphinx_output_path) if File.directory? sphinx_output_path
-    FileUtils.makedirs(sphinx_output_path)
-    command = "sphinx-build -b json -c #{repo_path} #{sphinx_input_path} #{sphinx_output_path}"
+  def build_with_sphinx(repo_name, repo_path, repo_data)
+    input_path = Pathname.new(File.join(
+      repo_path, repo_data.fetch('sources_dir', '.')
+    ))
+    output_path = Pathname.new(File.join(repo_path, '_build'))
+    FileUtils.rm_r(output_path) if File.directory? output_path
+    FileUtils.makedirs(output_path)
+    command = "sphinx-build -b json -c #{repo_path} #{input_path} #{output_path}"
     pid = Kernel.spawn(command)
     Process.wait pid
-    repo_content = Hash.recursive
+
+    repo_build = Hash.recursive
     repo_index_pattern = repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"])
-    Dir.glob(File.join(sphinx_output_path, '**/*.fjson'),
-             File::FNM_CASEFOLD).each do |json_file|
-      json_content = JSON.parse(File.read(json_file))
-      rel_path = Pathname(json_file).relative_path_from(sphinx_output_path).sub_ext(".rst")
-      src_path = Pathname(File.join(repo_sources_path, rel_path))
+    repo_ignore_pattern = ["**/search.fjson", "**/searchindex.fjson", "**/genindex.fjson"]
+    repo_ignore_pattern.push(*repo_data.fetch("ignore_pattern", []))
+    Dir.glob(File.join(output_path, '**/*.fjson'),
+             File::FNM_CASEFOLD).each do |json_filepath|
+      json_filepath = Pathname.new(json_filepath)
+      next if repo_ignore_pattern.any? do |pattern|
+        File.fnmatch?(pattern, json_filepath)
+      end
+      content = JSON.parse(File.read(json_filepath))
+      rel_path = json_filepath.relative_path_from(output_path).sub_ext(".rst")
+      src_path = Pathname.new(File.join(input_path, rel_path))
       # Check if the fjson has a rst counterpart
-      if copied_docs_paths.key?(src_path) then
-        json_content["edit_url"] = generate_edit_url(
+      if File.exists? src_path then
+        content["edit_url"] = generate_edit_url(
           repo_data, src_path.relative_path_from(repo_path)
         )
-        json_content["indexed_page"] = repo_index_pattern.any? do |pattern|
-            File.fnmatch?(pattern, src_path.relative_path_from(repo_sources_path))
+        content["indexed_page"] = repo_index_pattern.any? do |pattern|
+            File.fnmatch?(pattern, src_path.relative_path_from(input_path))
         end
-        json_content["sourcename"] = src_path.relative_path_from(repo_sources_path)
+        content["sourcename"] = src_path.relative_path_from(input_path)
       end
-      permalink = json_content["current_page_name"]
+      permalink = content["current_page_name"]
       if File.basename(permalink) == "index"
         permalink = File.dirname(permalink)
         permalink = '' if permalink == '.'
       end
-      repo_content[permalink] = json_content
+      repo_build['documents'][permalink] = content
     end
-    repo_content.sort do |a, b|
+    repo_build['documents'] = repo_build['documents'].sort do |a, b|
       first_depth = a[0].count('/')
       second_depth = b[0].count('/')
       if first_depth == second_depth
@@ -165,5 +160,12 @@ class DocPageGenerator < Jekyll::Generator
         first_depth <=> second_depth
       end
     end
+    Dir.glob(File.join(output_path, '_images/*.*'),
+             File::FNM_CASEFOLD).each do |image_path|
+      image_path = Pathname.new(image_path)
+      image_permalink = image_path.relative_path_from(output_path)
+      repo_build['images'][image_permalink] = image_path
+    end
+    return repo_build
   end
 end

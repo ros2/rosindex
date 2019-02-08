@@ -180,7 +180,7 @@ class DocPage < Jekyll::Page
   def initialize(site, parent_page, path, data)
     @site = site
     @base = site.source
-    @dir  = "doc/#{path}"
+    @dir  = "#{path}"
     @name = "index.html"
     self.process(@name)
     self.data ||= {}
@@ -358,6 +358,22 @@ end
 class ReportFile < Jekyll::StaticFile
   def write(dest)
     true
+  end
+end
+
+class RelocatableStaticFile < Jekyll::StaticFile
+  def initialize(site, base, dir, name, dest = nil)
+    super(site, base, dir, name)
+    @dest = dest
+  end
+
+  def destination(dest)
+    args = if not @dest
+             [dest, destination_rel_dir, @name]
+           else
+             [dest, @dest]
+           end
+    @site.in_dest_dir(*args.compact)
   end
 end
 
