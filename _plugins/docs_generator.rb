@@ -115,23 +115,25 @@ class DocPageGenerator < Jekyll::Generator
     sphinx_output_path = Pathname.new(File.join('_sphinx', '_build', repo_name))
     FileUtils.rm_r(sphinx_output_path) if File.directory? sphinx_output_path
     FileUtils.makedirs(sphinx_output_path)
-    command = "sphinx-build -b json -c _sphinx #{sphinx_input_path} #{sphinx_output_path}"
+    command = "sphinx-build -b json -c #{repo_path} #{sphinx_input_path} #{sphinx_output_path}"
     pid = Kernel.spawn(command)
     Process.wait pid
     repo_content = Hash.recursive
-    copied_docs_paths.each do |src_path, dst_path|
-      json_path = File.join(
-        sphinx_output_path, dst_path.relative_path_from(sphinx_input_path)
-      ).sub(File.extname(dst_path), '.fjson')
-      next unless File.file? json_path
-      json_content = JSON.parse(File.read(json_path))
-      json_content["edit_url"] = generate_edit_url(
-        repo_data, src_path.relative_path_from(repo_path)
-      )
-      json_content["indexed_page"] = \
-        repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"]).any? do |pattern|
-          File.fnmatch?(pattern, src_path.relative_path_from(repo_sources_path))
-        end
+    Dir.glob(File.join(sphinx_output_path, '**/*.fjson'),
+             File::FNM_CASEFOLD).each do |json_file|
+      json_content = JSON.parse(File.read(json_file))
+      rel_path = Pathname(json_file).relative_path_from(sphinx_output_path).sub_ext(".rst")
+      src_path = Pathname(File.join(repo_sources_path, rel_path))
+      # Check if the fjson has a rst counterpart
+      if copied_docs_paths.key?(src_path) then
+        json_content["edit_url"] = generate_edit_url(
+          repo_data, src_path.relative_path_from(repo_path)
+        )
+        json_content["indexed_page"] = \
+          repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"]).any? do |pattern|
+            File.fnmatch?(pattern, src_path.relative_path_from(repo_sources_path))
+          end
+      end
       permalink = json_content["current_page_name"]
       if File.basename(permalink) == "index"
         permalink = File.dirname(permalink)

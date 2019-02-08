@@ -53,7 +53,7 @@ RUN apt-get update && \
 
 RUN gem install bundle
 RUN pip install --upgrade setuptools pip
-RUN pip install recommonmark==0.4 sphinx==1.5.6
+RUN pip install sphinx
 RUN pip3 install --upgrade pip
 RUN pip3 install gitpython
 
