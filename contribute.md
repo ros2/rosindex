@@ -87,7 +87,7 @@ to be generated offline, and then uploaded to GitHub's severs.
 Since the ROS Index website is completely open-source, issues, feature
 requests, and especially pull requests are welcome.
 
-<a href="https://github.com/ros-infrastructure/index.ros.org/issues/new" target="_blank" class="btn btn-success">Post an Issue</a>
+<a href="https://github.com/ros-infrastructure/rosindex/issues/new" target="_blank" class="btn btn-success">Post an Issue</a>
 
 For more details on developing ROS Index, see [development]({{ "/about/development" | prepend: site.baseurl }}).
 
