@@ -364,16 +364,11 @@ end
 class RelocatableStaticFile < Jekyll::StaticFile
   def initialize(site, base, dir, name, dest = nil)
     super(site, base, dir, name)
-    @dest = dest
+    @dest = dest || File.join(destination_rel_dir, @name)
   end
 
-  def destination(dest)
-    args = if not @dest
-             [dest, destination_rel_dir, @name]
-           else
-             [dest, @dest]
-           end
-    @site.in_dest_dir(*args.compact)
+  def destination(dest_root)
+    @site.in_dest_dir(*[dest_root, @dest].compact)
   end
 end
 
