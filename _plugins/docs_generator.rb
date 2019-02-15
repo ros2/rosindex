@@ -25,7 +25,7 @@ class DocPageGenerator < Jekyll::Generator
     site.config['docs_repos'].each do |repo_name, repo_options|
       next unless all_repos.key? repo_name
 
-      repo_path = Pathname.new(File.join("_remotes", repo_name))
+      repo_path = Pathname.new(File.join('_remotes', repo_name))
       repo_data_path = File.join(repo_path, 'rosindex.yml')
       repo_data = File.file?(repo_data_path) ? YAML.load_file(repo_data_path) : {}
       repo_data.update(all_repos[repo_name])
@@ -119,6 +119,7 @@ class DocPageGenerator < Jekyll::Generator
     pid = Kernel.spawn(command)
     Process.wait pid
     repo_content = Hash.recursive
+    repo_index_pattern = repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"])
     Dir.glob(File.join(sphinx_output_path, '**/*.fjson'),
              File::FNM_CASEFOLD).each do |json_file|
       json_content = JSON.parse(File.read(json_file))
@@ -129,10 +130,10 @@ class DocPageGenerator < Jekyll::Generator
         json_content["edit_url"] = generate_edit_url(
           repo_data, src_path.relative_path_from(repo_path)
         )
-        json_content["indexed_page"] = \
-          repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"]).any? do |pattern|
+        json_content["indexed_page"] = repo_index_pattern.any? do |pattern|
             File.fnmatch?(pattern, src_path.relative_path_from(repo_sources_path))
-          end
+        end
+        json_content["sourcename"] = src_path.relative_path_from(repo_sources_path)
       end
       permalink = json_content["current_page_name"]
       if File.basename(permalink) == "index"
@@ -141,6 +142,28 @@ class DocPageGenerator < Jekyll::Generator
       end
       repo_content[permalink] = json_content
     end
-    repo_content.sort {|a, b| a[0].length <=> b[0].length}
+    repo_content.sort do |a, b|
+      first_depth = a[0].count('/')
+      second_depth = b[0].count('/')
+      if first_depth == second_depth
+        first_sourcename = a[1]['sourcename'] || ''
+        first_order = repo_index_pattern.index do |pattern|
+          File.fnmatch?(pattern, first_sourcename)
+        end || -1
+        second_sourcename = b[1]['sourcename'] || ''
+        second_order = repo_index_pattern.index do |pattern|
+          File.fnmatch?(pattern, second_sourcename)
+        end || -1
+        if first_order == second_order
+          first_title = a[1]['title'] || ''
+          second_title = b[1]['title'] || ''
+          first_title <=> second_title
+        else
+          first_order <=> second_order
+        end
+      else
+        first_depth <=> second_depth
+      end
+    end
   end
 end
