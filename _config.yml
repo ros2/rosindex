@@ -59,6 +59,9 @@ domain_blacklist:
   - 'code.in.tum.de'
   #- 'devel.iri.upc.edu'
 
+include:
+  - .nojekyll
+
 exclude:
   - _scripts
   - _cache
