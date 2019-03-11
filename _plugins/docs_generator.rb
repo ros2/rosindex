@@ -103,7 +103,7 @@ class DocPageGenerator < Jekyll::Generator
     output_path = Pathname.new(File.join(repo_path, '_build'))
     FileUtils.rm_r(output_path) if File.directory? output_path
     FileUtils.makedirs(output_path)
-    command = "sphinx-build -b json -c #{repo_path} #{input_path} #{output_path}"
+    command = "python3 -m sphinx -b json -c #{repo_path} #{input_path} #{output_path}"
     pid = Kernel.spawn(command)
     Process.wait pid
 
