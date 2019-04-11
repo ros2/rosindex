@@ -14,6 +14,9 @@ def run(args):
     modified_files = {}
     for line in git_diff_numstat.splitlines():
         lines_added, lines_removed, file_path = re.split(r'\t+', line)[:3]
+        if lines_added == lines_removed == '-':
+            # Diff-ed file is binary, always add.
+            continue
 
         modified_files[file_path] = {}
         modified_files[file_path]["lines_added"] = int(lines_added)
