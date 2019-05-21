@@ -938,7 +938,7 @@ class Indexer < Jekyll::Generator
                   end
 
                   if tracks_file.nil?
-                    raise IndexException.new("Could not find tracks.yaml file in release repo: " + repo_name + " in rosidstro file: " + rosdistro_filename)
+                    raise IndexException.new("Could not find tracks.yaml file in release repo: " + repo_name + " in rosdistro file: " + rosdistro_filename)
                   end
 
                   tracks_file['tracks'].each do |track_name, track|
@@ -964,10 +964,10 @@ class Indexer < Jekyll::Generator
                   end
 
                   if source_uri.nil? or source_type.nil? or source_version.nil?
-                    raise IndexException.new("Could not determine source repo from release repo: " + repo_name + " in rosidstro file: " + rosdistro_filename)
+                    raise IndexException.new("Could not determine source repo from release repo: " + repo_name + " in rosdistro file: " + rosdistro_filename)
                   end
                 else
-                  raise IndexException.new("No source, doc, or release information for repo: " + repo_name+ " in rosidstro file: " + rosdistro_filename)
+                  raise IndexException.new("No source, doc, or release information for repo: " + repo_name+ " in rosdistro file: " + rosdistro_filename)
                 end
 
                 # create a new repo structure for this remote
@@ -979,7 +979,7 @@ class Indexer < Jekyll::Generator
                     'Via rosdistro: '+distro,
                     @checkout_path)
                 rescue
-                  raise IndexException.new("Failed to create repo from #{source_type} repo #{source_uri}: " + repo_name+ " in rosidstro file: " + rosdistro_filename)
+                  raise IndexException.new("Failed to create repo from #{source_type} repo #{source_uri}: " + repo_name+ " in rosdistro file: " + rosdistro_filename)
                 end
 
                 if @all_repos.key?(repo.id)
