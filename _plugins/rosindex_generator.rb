@@ -216,7 +216,18 @@ class Indexer < Jekyll::Generator
         end
 
         # get dependencies
-        deps = REXML::XPath.each(manifest_doc, "/package/build_depend/text() | /package/run_depend/text() | package/depend/text()").map { |a| a.to_s.strip }.uniq
+        deps = REXML::XPath.each(
+          manifest_doc,
+          "/package/build_depend/text() | " +
+          "/package/build_export_depend/text() | " +
+          "/package/buildtool_depend/text() | " +
+          "/package/buildtool_export_depend/text() | " +
+          "/package/exec_depend/text() | " +
+          "/package/doc_depend/text() | " +
+          "/package/run_depend/text() | " +
+          "/package/test_depend/text() | " +
+          "package/depend/text()"
+        ).map { |a| a.to_s.strip }.uniq
 
         # determine which deps are packages or system deps
         pkg_deps = {}
