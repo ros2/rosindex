@@ -10,10 +10,10 @@ RUN apt-get update && \
         gnupg && \
     rm -rf /var/lib/apt/lists/*
 
-COPY docker/image/ros.key /tmp/ros.key
+COPY docker/image/ros.asc /tmp/ros.asc
 RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > \
          /etc/apt/sources.list.d/ros-latest.list
-RUN apt-key add /tmp/ros.key
+RUN apt-key add /tmp/ros.asc
 
 RUN echo 'deb http://archive.ubuntu.com/ubuntu/ cosmic universe\n' >> \
         /etc/apt/sources.list
