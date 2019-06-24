@@ -51,7 +51,7 @@ class DocPageGenerator < Jekyll::Generator
 
         site.pages << document
       end
-      repo_build['images'].each do |permalink, path|
+      repo_build['static_files'].each do |permalink, path|
         site.static_files << RelocatableStaticFile.new(
           site, site.source,
           File.dirname(path), File.basename(path),
@@ -160,11 +160,11 @@ class DocPageGenerator < Jekyll::Generator
         first_depth <=> second_depth
       end
     end
-    Dir.glob(File.join(output_path, '_images/*.*'),
-             File::FNM_CASEFOLD).each do |image_path|
-      image_path = Pathname.new(image_path)
-      image_permalink = image_path.relative_path_from(output_path)
-      repo_build['images'][image_permalink] = image_path
+    Dir.glob(File.join(output_path, '{_images/*.*,_downloads/**/*.*}'),
+             File::FNM_CASEFOLD).each do |static_file_path|
+      static_file_path = Pathname.new(static_file_path)
+      static_file_permalink = static_file_path.relative_path_from(output_path)
+      repo_build['static_files'][static_file_permalink] = static_file_path
     end
     return repo_build
   end
