@@ -92,13 +92,13 @@ ros2_distros:
 
 ros_distros:
   - 'melodic'
-  - 'lunar'
   - 'kinetic'
 
 old_ros2_distros:
   - 'ardent'
 
 old_ros_distros:
+  - 'lunar'
   - 'jade'
   - 'indigo'
   - 'hydro'
