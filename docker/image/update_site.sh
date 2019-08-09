@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 REPO_PATH=${1:-`pwd`}
 SITE_PATH=${2:-${REPO_PATH}/_site}
