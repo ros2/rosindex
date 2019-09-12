@@ -27,7 +27,7 @@ def run(args):
     for diff_item in diff_index.iter_change_type('M'):
         filename = diff_item.a_path
         if filename in modified_files:
-            diff_string = diff_item.a_blob.data_stream.read().decode('utf-8')
+            diff_string = diff_item.a_blob.data_stream.read().decode('utf-8', 'ignore')
             modified_files[filename]["blacklisted"] = "generated on" in diff_string
 
     # Add all files to git
