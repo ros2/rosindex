@@ -19,4 +19,4 @@ attic_file: _remotes/rosforks/attic.yaml
 # correspond to documentation repos.
 docs_repos:
   ros2:
-    description: "ROS2 Overview"
+    description: "ROS 2 Overview"
