@@ -1,6 +1,7 @@
 require 'addressable'
 require 'fileutils'
 require 'nokogiri'
+require 'uri'
 
 require_relative '../_ruby_libs/pages'
 require_relative '../_ruby_libs/lunr'
@@ -32,16 +33,50 @@ class DocPageGenerator < Jekyll::Generator
 
       repo_build = build_with_sphinx(repo_name, repo_path, repo_data)
 
+      global_content = {}
+
+      css_files = repo_build["context"]["css_files"]
+      global_content["css_uris"] = css_files.map do |css_file|
+        css_uri = URI(css_file)
+        if not css_uri.absolute?
+          css_uri = File.join(
+            site.baseurl,
+            "doc/#{repo_name}",
+            css_uri.path
+          )
+        end
+        css_uri.to_s
+      end
+
+      script_files = repo_build["context"]["script_files"]
+      global_content["script_uris"] = script_files.map do |script_file|
+        script_uri = URI(script_file)
+        if not script_uri.absolute?
+          script_uri = File.join(
+            site.baseurl,
+            "doc/#{repo_name}",
+            script_uri.path
+          )
+        end
+        script_uri.to_s
+      end
+
       documents = {}
-      repo_build['documents'].each do |permalink, content|
+      repo_build['documents'].each do |permalink, local_content|
         parent_path, * = permalink.rpartition('/')
         parent_page = documents.fetch(parent_path, nil)
+
+        content = global_content.clone
+        content.update(local_content)
+
         if parent_page.nil? and repo_options.key? 'description'
           content['title'] = repo_options['description']
         end
+
         documents[permalink] = document = DocPage.new(
           site, parent_page, "doc/#{repo_name}/#{permalink}", content
         )
+
         documents_index << {
           'id' => documents_index.length,
           'url' => document.url,
@@ -51,6 +86,7 @@ class DocPageGenerator < Jekyll::Generator
 
         site.pages << document
       end
+
       repo_build['static_files'].each do |permalink, path|
         site.static_files << RelocatableStaticFile.new(
           site, site.source,
@@ -59,6 +95,7 @@ class DocPageGenerator < Jekyll::Generator
         )
       end
     end
+
     unless site.config['skip_search_index']
       puts ("Generating lunr index for documentation pages...").blue
       reference_field = 'id'
@@ -108,6 +145,35 @@ class DocPageGenerator < Jekyll::Generator
     Process.wait pid
 
     repo_build = Hash.recursive
+
+    global_context_path = File.join(output_path, "globalcontext.json")
+    repo_build["context"] = JSON.parse(File.read(global_context_path))
+
+    repo_build["context"]["css_files"].each do |css_file|
+      css_uri = URI(css_file)
+      if not css_uri.absolute?
+        css_file_permalink = css_uri.path
+        css_file_path = File.join(output_path, css_file_permalink)
+        repo_build['static_files'][css_file_permalink] = css_file_path
+      end
+    end
+
+    repo_build["context"]["script_files"].each do |script_file|
+      script_uri = URI(script_file)
+      if not script_uri.absolute?
+        script_file_permalink = script_uri.path
+        script_file_path = File.join(output_path, script_file_permalink)
+        repo_build['static_files'][script_file_permalink] = script_file_path
+      end
+    end
+
+    Dir.glob(File.join(output_path, "{_images/*.*,_downloads/**/*.*}"),
+             File::FNM_CASEFOLD).each do |static_file_path|
+      static_file_path = Pathname.new(static_file_path)
+      static_file_permalink = static_file_path.relative_path_from(output_path)
+      repo_build["static_files"][static_file_permalink] = static_file_path
+    end
+
     repo_index_pattern = repo_data.fetch("index_pattern", ["*.rst", "**/*.rst"])
     repo_ignore_pattern = ["**/search.fjson", "**/searchindex.fjson", "**/genindex.fjson"]
     repo_ignore_pattern.push(*repo_data.fetch("ignore_pattern", []))
@@ -159,12 +225,6 @@ class DocPageGenerator < Jekyll::Generator
       else
         first_depth <=> second_depth
       end
-    end
-    Dir.glob(File.join(output_path, '{_images/*.*,_downloads/**/*.*}'),
-             File::FNM_CASEFOLD).each do |static_file_path|
-      static_file_path = Pathname.new(static_file_path)
-      static_file_permalink = static_file_path.relative_path_from(output_path)
-      repo_build['static_files'][static_file_permalink] = static_file_path
     end
     return repo_build
   end

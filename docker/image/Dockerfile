@@ -52,7 +52,8 @@ RUN apt-get update && \
 
 RUN gem install bundle
 RUN pip3 install --upgrade setuptools pip
-RUN pip3 install sphinx gitpython sphinx-tabs
+RUN pip3 install sphinx gitpython
+RUN pip3 install git+https://github.com/hidmic/sphinx-tabs.git@support-json-builder#egg=sphinx-tabs
 
 RUN ln -s `which nodejs` /usr/local/bin/node
 
