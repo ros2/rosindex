@@ -190,6 +190,8 @@ class DocPage < Jekyll::Page
     self.data['edit_url'] = data['edit_url']
     self.data['indexed'] = data['indexed_page']
     self.data['canonical_url'] = data['canonical_url']
+    self.data['css_uris'] = data['css_uris']
+    self.data['script_uris'] = data['script_uris']
 
     self.data['child_pages'] = []
     self.data['ancestor_pages'] = []
