@@ -84,6 +84,16 @@ Assumes distro and package are defined
                 </td>
               </tr>
               <tr>
+                <td class="text-right"><b>Continuous Integration</b></td>
+                <td>
+                  {% if package.data.ci_data.error %}
+                    <span class="label label-default">No Continuous Integration
+                  {% else %}
+                    <span class="label label-primary"><span class="glyphicon glyphicon-check"></span>Continuous Integration
+                  {% endif %}</span>
+                </td>
+              </tr>
+              <tr>
                 <td class="text-right"><strong>Use</strong></td>
                 <td>
                 {% if package.data.deprecated and package.data.deprecated != '' %}

@@ -197,6 +197,87 @@ class Indexer < Jekyll::Generator
     end
   end
 
+  def map_build_result_to_icon(build_result)
+    if build_result == 'success'
+      return 'ok'
+    end
+    if build_result == 'unstable' || build_result == 'not_built'
+      return 'minus'
+    end
+    if build_result == 'failure' || build_result == 'aborted'
+      return 'remove'
+    end
+    # TODO: use better icon for unknown build statuses
+    return 'remove'
+  end
+
+  def get_ci_data(distro, package_name)
+    ci_data = Hash.new
+    # build the parse string
+    results_url = '/'+distro+'/devel_jobs/'+package_name+'/results.yaml'
+    response = Net::HTTP.get_response('docs.ros.org', results_url)
+    if response.code != '200'
+      ci_data['tooltip'] = 'Failed to get test statistics for this package.'
+      ci_data['error'] = true
+      return ci_data
+    end
+    yaml_obj = YAML.load(response.body)
+    if !yaml_obj.key?('dev_job_data')
+      ci_data['tooltip'] = 'No test statistics available for this package.'
+      ci_data['error'] = true
+      return ci_data
+    end
+    dev_job_data = yaml_obj['dev_job_data']
+    latest_build = dev_job_data['latest_build']
+    tests_skipped = latest_build['skipped']
+    tests_failed = latest_build['failed']
+    tests_total = latest_build['total']
+    # TODO: this essentially considers skipped tests as failures
+    tests_ok = tests_total - tests_failed - tests_skipped
+    ci_data['total_builds'] = dev_job_data['total_builds']
+    ci_data['health'] = dev_job_data['job_health']
+    ci_data['tests_ok'] = tests_ok
+    ci_data['tests_total'] = tests_total
+    ci_data['tooltip'] = "Last build:\n" \
+      "  Total tests: #{ tests_total }\n" \
+      "  Succeeded: #{ tests_ok }\n" \
+      "  Skipped: #{ tests_skipped }\n" \
+      "  Failed: #{ tests_failed }\n"
+    ci_data['history'] = Array.new
+    if !dev_job_data.key?('history') || dev_job_data['history'].length == 0
+      ci_data['tooltip'] << "\nNo build history available for this repository."
+    else
+      ci_data['tooltip'] << "\nClick to show more build history."
+      dev_job_data['history'].each do |build|
+        build_ = Hash.new
+        build_['id'] = build['build_id']
+        build_['uri'] = build['uri']
+        build_['icon'] = map_build_result_to_icon(build['result'])
+        build_['stamp'] = Time.at(build['stamp'].to_f).strftime('%d-%b-%Y %H:%M')
+        # if there is test data available (not all jobs/builds have tests),
+        # add it to the ci data
+        if build.key?('tests')
+          build_test_data = build['tests']
+          tests_skipped = build_test_data['skipped'].to_i
+          tests_failed = build_test_data['failed'].to_i
+          tests_total = build_test_data['total'].to_i
+          # TODO: this essentially considers skipped tests as failures
+          tests_ok = tests_total - tests_failed - tests_skipped
+          tests_health = (100.0 * tests_ok / [tests_total, 1].max).round
+          build_['health'] = tests_health
+          build_['tests_ok'] = tests_ok
+          build_['tests_total'] = tests_total
+        else
+          build_['health'] = 'n/a'
+          build_['tests_ok'] = '?'
+          build_['tests_total'] = '?'
+        end
+        ci_data['history'] << build_
+      end
+    end
+    return ci_data
+  end
+
   def extract_package(site, distro, repo, snapshot, checkout_path, path, pkg_type, manifest_xml)
 
     data = snapshot.data
@@ -376,6 +457,9 @@ class Indexer < Jekyll::Generator
         docs_uri = "http://docs.ros2.org/#{distro}/api/#{package_name}/"
       end
 
+      # try to acquire information on the CI status of the package
+      ci_data = get_ci_data(distro, package_name)
+
       package_info = {
         'name' => package_name,
         'pkg_type' => pkg_type,
@@ -391,6 +475,7 @@ class Indexer < Jekyll::Generator
         # optional package info
         'authors' => authors,
         'urls' => urls,
+        'ci_data' => ci_data,
         # dependencies
         'pkg_deps' => pkg_deps,
         'system_deps' => system_deps,
