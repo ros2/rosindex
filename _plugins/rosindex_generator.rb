@@ -213,23 +213,37 @@ class Indexer < Jekyll::Generator
 
   def get_ci_data(distro, package_name)
     ci_data = Hash.new
-    # build the parse string
-    results_url = '/'+distro+'/devel_jobs/'+package_name+'/results.yaml'
-    response = Net::HTTP.get_response('docs.ros.org', results_url)
-    if response.code != '200'
-      ci_data['tooltip'] = 'Failed to get test statistics for this package.'
-      ci_data['error'] = true
+    manifest_url = '/'+distro+'/api/'+package_name+'/manifest.yaml'
+    manifest_response = Net::HTTP.get_response('docs.ros.org', manifest_url)
+    if manifest_response.code != '200'
+      ci_data['tooltip'] = 'No CI information available for this package.'
+      ci_data['ci_available'] = false
       return ci_data
     end
-    ci_data['error'] = false
-    yaml_obj = YAML.load(response.body)
-    if !yaml_obj.key?('dev_job_data')
+    manifest_yaml = YAML.load(manifest_response.body)
+    if !manifest_yaml.is_a?(Hash) || !manifest_yaml.key?('devel_jobs') || manifest_yaml['devel_jobs'].length == 0
+      ci_data['tooltip'] = 'No CI information available for this package.'
+      ci_data['ci_available'] = false
+      return ci_data
+    end
+    ci_data['ci_available'] = true
+    ci_data['job_url'] = manifest_yaml['devel_jobs'][0]
+    # get additional test information if available
+    results_url = '/'+distro+'/devel_jobs/'+package_name+'/results.yaml'
+    results_response = Net::HTTP.get_response('docs.ros.org', results_url)
+    if results_response.code != '200'
+      ci_data['tooltip'] = 'No test statistics available for this package.'
+      ci_data['stats_available'] = false
+      return ci_data
+    end
+    results_yaml = YAML.load(results_response.body)
+    if !results_yaml.is_a?(Hash) || !results_yaml.key?('dev_job_data')
       ci_data['tooltip'] = 'No test statistics available for this package.'
       ci_data['stats_available'] = false
       return ci_data
     end
     ci_data['stats_available'] = true
-    dev_job_data = yaml_obj['dev_job_data']
+    dev_job_data = results_yaml['dev_job_data']
     latest_build = dev_job_data['latest_build']
     tests_skipped = latest_build['skipped']
     tests_failed = latest_build['failed']

@@ -85,11 +85,9 @@ Assumes distro and package are defined
               </tr>
               <tr>
                 <td class="text-right"><b>CI status</b></td>
-                <td>
+                <td style="position: absolute;">
                   {% assign ci_data = package.data.ci_data %}
-                  {% if ci_data.error %}
-                    <span class="label label-default" title="{{ ci_data.tooltip }}">No Continuous Integration</span>
-                  {% else %}
+                  {% if ci_data.ci_available %}
                     {% if ci_data.history_available %}
                       <div class="dropdown">
                         <button type="button" data-toggle="dropdown" class="btn label label-primary dropdown-toggle" style="font-size: 75%; padding: .3em .6em .4em;border: 0;" title="{{ ci_data.tooltip }}">
@@ -104,7 +102,7 @@ Assumes distro and package are defined
                           <li class="dropdown-header">Build history (last {{ ci_data.history.size }} of {{ ci_data.total_builds }} builds):</li>
                           {% for build in ci_data.history %}
                             <li>
-                              <a href="{{ build.uri }}" target="_blank">
+                              <a href="http://build.ros.org/{{ build.uri }}" target="_blank">
                                 <span class="glyphicon glyphicon-{{ build.icon }}"></span>
                                 <span style="font-weight: bold; padding-left: 10px;">#{{ build.id }}</span>
                                 <span style="color: #333; padding-left: 10px;">{{ build.stamp }}</span>
@@ -115,14 +113,16 @@ Assumes distro and package are defined
                         </ul>
                       </div>
                     {% else %}
-                      <span class="label label-primary" title="{{ ci_data.tooltip }}">
+                      <a href="{{ ci_data.job_url }}" class="label label-primary" title="{{ ci_data.tooltip }}">
                         <span class="glyphicon glyphicon-check"></span>
                         Continuous Integration
                         {% if ci_data.stats_available %}
                           : {{ ci_data.tests_ok }} / {{ ci_data.tests_total }}
                         {% endif %}
-                      </span>
+                      </a>
                     {% endif %}
+                  {% else %}
+                    <span class="label label-default" title="{{ ci_data.tooltip }}">No Continuous Integration</span>
                   {% endif %}
                 </td>
               </tr>
