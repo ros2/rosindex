@@ -84,13 +84,46 @@ Assumes distro and package are defined
                 </td>
               </tr>
               <tr>
-                <td class="text-right"><b>Continuous Integration</b></td>
+                <td class="text-right"><b>CI status</b></td>
                 <td>
-                  {% if package.data.ci_data.error %}
-                    <span class="label label-default">No Continuous Integration
+                  {% assign ci_data = package.data.ci_data %}
+                  {% if ci_data.error %}
+                    <span class="label label-default" title="{{ ci_data.tooltip }}">No Continuous Integration</span>
                   {% else %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-check"></span>Continuous Integration
-                  {% endif %}</span>
+                    {% if ci_data.history_available %}
+                      <div class="dropdown">
+                        <button type="button" data-toggle="dropdown" class="btn label label-primary dropdown-toggle" style="font-size: 75%; padding: .3em .6em .4em;border: 0;" title="{{ ci_data.tooltip }}">
+                          <span class="glyphicon glyphicon-check"></span>
+                          Continuous Integration
+                          {% if ci_data.stats_available %}
+                            : {{ ci_data.tests_ok }} / {{ ci_data.tests_total }}
+                          {% endif %}
+                          <span class="caret" style="margin: 0 3px 0 5px;"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                          <li class="dropdown-header">Build history (last {{ ci_data.history.size }} of {{ ci_data.total_builds }} builds):</li>
+                          {% for build in ci_data.history %}
+                            <li>
+                              <a href="{{ build.uri }}" target="_blank">
+                                <span class="glyphicon glyphicon-{{ build.icon }}"></span>
+                                <span style="font-weight: bold; padding-left: 10px;">#{{ build.id }}</span>
+                                <span style="color: #333; padding-left: 10px;">{{ build.stamp }}</span>
+                                <span style="color: #333; padding-left: 10px;">{{ build.tests_ok }} / {{ build.tests_total }}</span>
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    {% else %}
+                      <span class="label label-primary" title="{{ ci_data.tooltip }}">
+                        <span class="glyphicon glyphicon-check"></span>
+                        Continuous Integration
+                        {% if ci_data.stats_available %}
+                          : {{ ci_data.tests_ok }} / {{ ci_data.tests_total }}
+                        {% endif %}
+                      </span>
+                    {% endif %}
+                  {% endif %}
                 </td>
               </tr>
               <tr>

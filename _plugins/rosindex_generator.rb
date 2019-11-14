@@ -221,12 +221,14 @@ class Indexer < Jekyll::Generator
       ci_data['error'] = true
       return ci_data
     end
+    ci_data['error'] = false
     yaml_obj = YAML.load(response.body)
     if !yaml_obj.key?('dev_job_data')
       ci_data['tooltip'] = 'No test statistics available for this package.'
-      ci_data['error'] = true
+      ci_data['stats_available'] = false
       return ci_data
     end
+    ci_data['stats_available'] = true
     dev_job_data = yaml_obj['dev_job_data']
     latest_build = dev_job_data['latest_build']
     tests_skipped = latest_build['skipped']
@@ -243,37 +245,39 @@ class Indexer < Jekyll::Generator
       "  Succeeded: #{ tests_ok }\n" \
       "  Skipped: #{ tests_skipped }\n" \
       "  Failed: #{ tests_failed }\n"
-    ci_data['history'] = Array.new
     if !dev_job_data.key?('history') || dev_job_data['history'].length == 0
       ci_data['tooltip'] << "\nNo build history available for this repository."
-    else
-      ci_data['tooltip'] << "\nClick to show more build history."
-      dev_job_data['history'].each do |build|
-        build_ = Hash.new
-        build_['id'] = build['build_id']
-        build_['uri'] = build['uri']
-        build_['icon'] = map_build_result_to_icon(build['result'])
-        build_['stamp'] = Time.at(build['stamp'].to_f).strftime('%d-%b-%Y %H:%M')
-        # if there is test data available (not all jobs/builds have tests),
-        # add it to the ci data
-        if build.key?('tests')
-          build_test_data = build['tests']
-          tests_skipped = build_test_data['skipped'].to_i
-          tests_failed = build_test_data['failed'].to_i
-          tests_total = build_test_data['total'].to_i
-          # TODO: this essentially considers skipped tests as failures
-          tests_ok = tests_total - tests_failed - tests_skipped
-          tests_health = (100.0 * tests_ok / [tests_total, 1].max).round
-          build_['health'] = tests_health
-          build_['tests_ok'] = tests_ok
-          build_['tests_total'] = tests_total
-        else
-          build_['health'] = 'n/a'
-          build_['tests_ok'] = '?'
-          build_['tests_total'] = '?'
-        end
-        ci_data['history'] << build_
+      ci_data['history_available'] = false
+      return vi_data
+    end
+    ci_data['history_available'] = true
+    ci_data['tooltip'] << "\nClick to show more build history."
+    ci_data['history'] = Array.new
+    dev_job_data['history'].each do |build|
+      build_ = Hash.new
+      build_['id'] = build['build_id']
+      build_['uri'] = build['uri']
+      build_['icon'] = map_build_result_to_icon(build['result'])
+      build_['stamp'] = Time.at(build['stamp'].to_f).strftime('%d-%b-%Y %H:%M')
+      # if there is test data available (not all jobs/builds have tests),
+      # add it to the ci data
+      if build.key?('tests')
+        build_test_data = build['tests']
+        tests_skipped = build_test_data['skipped'].to_i
+        tests_failed = build_test_data['failed'].to_i
+        tests_total = build_test_data['total'].to_i
+        # TODO: this essentially considers skipped tests as failures
+        tests_ok = tests_total - tests_failed - tests_skipped
+        tests_health = (100.0 * tests_ok / [tests_total, 1].max).round
+        build_['health'] = tests_health
+        build_['tests_ok'] = tests_ok
+        build_['tests_total'] = tests_total
+      else
+        build_['health'] = 'n/a'
+        build_['tests_ok'] = '?'
+        build_['tests_total'] = '?'
       end
+      ci_data['history'] << build_
     end
     return ci_data
   end
