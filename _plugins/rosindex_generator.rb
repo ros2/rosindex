@@ -227,22 +227,35 @@ class Indexer < Jekyll::Generator
       return ci_data
     end
     ci_data['ci_available'] = true
+    if manifest_response.header.key?('Last-Modified')
+      ci_data['timestamp'] = manifest_response.header['Last-Modified']
+    else
+      ci_data['timestamp'] = 'unknown'
+    end
     ci_data['job_url'] = manifest_yaml['devel_jobs'][0]
     # get additional test information if available
     results_url = '/'+distro+'/devel_jobs/'+package_name+'/results.yaml'
     results_response = Net::HTTP.get_response('docs.ros.org', results_url)
     if results_response.code != '200'
-      ci_data['tooltip'] = 'No test statistics available for this package.'
+      ci_data['tooltip'] = "Latest build information: " + ci_data['timestamp'] + "\n" \
+        'No test statistics available for this package.'
+      ci_data['result'] = 'success'
       ci_data['stats_available'] = false
       return ci_data
     end
     results_yaml = YAML.load(results_response.body)
     if !results_yaml.is_a?(Hash) || !results_yaml.key?('dev_job_data')
-      ci_data['tooltip'] = 'No test statistics available for this package.'
+      ci_data['tooltip'] = "Latest build information: " + ci_data['timestamp'] + "\n" \
+        'No test statistics available for this package.'
+      ci_data['result'] = 'success'
       ci_data['stats_available'] = false
       return ci_data
     end
     ci_data['stats_available'] = true
+    # if we're reporting results.yaml statistics, we should use that timestamp if available
+    if results_response.header.key?('Last-Modified')
+      ci_data['timestamp'] = results_response.header['Last-Modified']
+    end
     dev_job_data = results_yaml['dev_job_data']
     latest_build = dev_job_data['latest_build']
     tests_skipped = latest_build['skipped']
@@ -254,11 +267,18 @@ class Indexer < Jekyll::Generator
     ci_data['health'] = dev_job_data['job_health']
     ci_data['tests_ok'] = tests_ok
     ci_data['tests_total'] = tests_total
-    ci_data['tooltip'] = "Last build:\n" \
+    ci_data['tooltip'] = "Latest build information: " + ci_data['timestamp'] + "\n" \
       "  Total tests: #{ tests_total }\n" \
       "  Succeeded: #{ tests_ok }\n" \
       "  Skipped: #{ tests_skipped }\n" \
-      "  Failed: #{ tests_failed }\n"
+      "  Failed: #{ tests_failed }"
+    if tests_failed > 0
+      ci_data['result'] = 'failure'
+    elsif tests_skipped > 0
+      ci_data['result'] = 'unstable'
+    else
+      ci_data['result'] = 'success'
+    end
     if !dev_job_data.key?('history') || dev_job_data['history'].length == 0
       ci_data['tooltip'] << "\nNo build history available for this repository."
       ci_data['history_available'] = false
@@ -271,8 +291,9 @@ class Indexer < Jekyll::Generator
       build_ = Hash.new
       build_['id'] = build['build_id']
       build_['uri'] = build['uri']
+      build_['result'] = build['result']
       build_['icon'] = map_build_result_to_icon(build['result'])
-      build_['stamp'] = Time.at(build['stamp'].to_f).strftime('%d-%b-%Y %H:%M')
+      build_['timestamp'] = Time.at(build['stamp'].to_f).strftime('%d-%b-%Y %H:%M')
       # if there is test data available (not all jobs/builds have tests),
       # add it to the ci data
       if build.key?('tests')
