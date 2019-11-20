@@ -4,6 +4,8 @@ require 'colorator'
 require 'uri'
 require 'typhoeus'
 require 'open3'
+require 'net/http'
+require 'json'
 
 #require 'git'
 require 'rugged'
@@ -146,6 +148,64 @@ class GIT < VCS
 
   def get_last_commit_time()
     return @r.last_commit.time.strftime('%F')
+  end
+
+  def get_contribution_suggestions()
+    suggestions = Hash.new
+    # Can only query github.com repositories right now
+    if !(@uri.include?("github.com")) then return suggestions end
+    base_url = @uri
+    # "https://github.com/owner/repo.git" => "https://api.github.com/repos/owner/repo"
+    if base_url.end_with?(".git")
+      base_url = base_url[0..-5]
+    end
+    base_url.sub!("github.com","api.github.com/repos")
+    http_response = Net::HTTP.get_response(URI.parse(base_url))
+    if http_response.code != '200' then return suggestions end
+    repo = JSON.parse(http_response.body)
+    # Get open issues
+    http_response = Net::HTTP.get_response(URI.parse(base_url + "/issues"))
+    if http_response.code == '200'
+      issues = JSON.parse(http_response.body)
+      issues.each do |issue|
+        if issue['state'] != 'open' then next end
+        url = issue['html_url'].reverse
+        suggestion = Hash.new
+        suggestion['type'] = 'Issue'
+        suggestion['language'] = repo['language']
+        suggestion['id'] = issue['number']
+        suggestion['url'] = issue['html_url']
+        suggestion['title'] = issue['title']
+        suggestion['date'] = issue['created_at']
+        suggestion['labels'] = Array.new
+        issue['labels'].each do |label|
+          suggestion['labels'] << label['name']
+        end
+        suggestions[url] = suggestion
+      end
+    end
+    # Get open pull requests
+    http_response = Net::HTTP.get_response(URI.parse(base_url + "/pulls"))
+    if http_response.code == '200'
+      pulls = JSON.parse(http_response.body)
+      pulls.each do |pull|
+        if pull['state'] != 'open' then next end
+        url = pull['html_url'].reverse
+        suggestion = Hash.new
+        suggestion['type'] = 'PullRequest'
+        suggestion['language'] = repo['language']
+        suggestion['id'] = pull['number']
+        suggestion['url'] = pull['html_url']
+        suggestion['title'] = pull['title']
+        suggestion['date'] = pull['created_at']
+        suggestion['labels'] = Array.new
+        pull['labels'].each do |label|
+          suggestion['labels'] << label['name']
+        end
+        suggestions[url] = suggestion
+      end
+    end
+    return suggestions
   end
 
   def get_version(distro, explicit_version = nil)
@@ -291,6 +351,12 @@ class HG < VCS
     end
   end
 
+  def get_contribution_suggestions()
+    suggestions = Array.new
+    # No contribution suggestions for Mercurial VCSs
+    return suggestions
+  end
+
   def get_version(distro, explicit_version = nil)
     # get remote head
     if explicit_version == 'REMOTE_HEAD'
@@ -354,6 +420,12 @@ class GITSVN < GIT
     end
 
     super(local_path, uri)
+  end
+
+  def get_contribution_suggestions()
+    suggestions = Array.new
+    # No contribution suggestions for SVN VCSs
+    return suggestions
   end
 
   def get_version(distro, explicit_version = nil)

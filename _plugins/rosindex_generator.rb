@@ -596,6 +596,10 @@ class Indexer < Jekyll::Generator
       repo.errors << (repo.id+': '+msg)
     end
 
+    puts (" --- scraping contribution suggestions for " << repo.name).blue
+    repo_suggestions = vcs.get_contribution_suggestions()
+    if (@contribution_suggestions.nil? || !@contribution_suggestions.is_a?(Hash)) then @contribution_suggestions = Hash.new end
+    @contribution_suggestions.merge!(repo_suggestions)
   end
 
   class SystemDep < Liquid::Drop
@@ -714,6 +718,21 @@ class Indexer < Jekyll::Generator
     return repos_sorted
   end
 
+  def sort_suggestions(site)
+    suggestions_sorted = {'url' => {}, 'type' => {}, 'date' => {}, 'language' => {}}
+    suggestion_urls_sorted = @contribution_suggestions.keys.sort
+    suggestions_sorted_by_url = Array.new
+    suggestion_urls_sorted.each do |url| suggestions_sorted_by_url << @contribution_suggestions[url] end
+
+    $all_distros.each do |distro|
+      suggestions_sorted['url'][distro] = suggestions_sorted_by_url
+      suggestions_sorted['type'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['type'] }
+      suggestions_sorted['date'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['date'] }.reverse
+      suggestions_sorted['language'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['language'] }
+    end
+    return suggestions_sorted
+  end
+
   def sort_packages(site)
     packages_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
 
@@ -822,6 +841,8 @@ class Indexer < Jekyll::Generator
     @package_names = @db.package_names
     # the list of errors encountered
     @errors = @db.errors
+    # the list of contribution suggestions
+    @contribution_suggestions = @db.contribution_suggestions
 
     # a dict of data scraped from the wiki
     # currently the only information is the title-index on the wiki
@@ -1402,6 +1423,11 @@ class Indexer < Jekyll::Generator
     rosdeps_sorted = sort_rosdeps(site)
     generate_sorted_paginated(site, rosdeps_sorted, 'name', @rosdeps.length, site.config['packages_per_page'], DepListPage)
 
+	# create contribution suggestions list pages
+    puts ("Generating contribution suggestions list pages...").blue
+
+    suggestions_sorted = sort_suggestions(site)
+    generate_sorted_paginated(site, suggestions_sorted, 'date', @contribution_suggestions.count, site.config['repos_per_page'], ContributionSuggestionsPage)
 
     # create lunr index data
     unless site.config['skip_search_index']

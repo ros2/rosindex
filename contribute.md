@@ -60,6 +60,13 @@ For packages which are hosted on systems that don't support pull requests, or
 packages which are no longer maintained, feel free to fork those packages on
 GitHub, add documentation, and get them indexed as forks.
 
+You can also contribute by fixing bugs or adding new features to packages
+or by reviewing the contributions proposed or submitted by others as <em>pull requests</em>.
+If you would like some suggestions where your help may be welcomed,
+click the button below.
+
+<a type="button" href={{ "/contribute/suggestions" | prepend: site.baseurl }} class="btn btn-success">Suggestions</a>
+
 ## Opting out of Indexing
 
 If you do not want a branch of your repository to be shown on ROS Index, simply
