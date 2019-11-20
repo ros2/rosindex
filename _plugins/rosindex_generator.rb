@@ -719,7 +719,7 @@ class Indexer < Jekyll::Generator
   end
 
   def sort_suggestions(site)
-    suggestions_sorted = {'url' => {}, 'type' => {}, 'date' => {}, 'language' => {}}
+    suggestions_sorted = {'url' => {}, 'type' => {}, 'date' => {}, 'language' => {}, 'reponame' => {}}
     suggestion_urls_sorted = @contribution_suggestions.keys.sort
     suggestions_sorted_by_url = Array.new
     suggestion_urls_sorted.each do |url| suggestions_sorted_by_url << @contribution_suggestions[url] end
@@ -729,6 +729,7 @@ class Indexer < Jekyll::Generator
       suggestions_sorted['type'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['type'] }
       suggestions_sorted['date'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['date'] }.reverse
       suggestions_sorted['language'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['language'] }
+      suggestions_sorted['reponame'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['reponame'] }
     end
     return suggestions_sorted
   end

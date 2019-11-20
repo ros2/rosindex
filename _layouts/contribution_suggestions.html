@@ -67,14 +67,22 @@ title: "Contribution Suggestions"
                       </a>
                     {% endif %}
                   </th>
-                  <th width="100%" style="text-align: left;">
-                    {% if page.sort_id == '' %}
+                  <th style="text-align: center;">
+                    {% if page.sort_id == 'reponame' %}
                       <span class="selected-sort-label">
-                        <strong>Name</strong>
+                        <strong>Repository</strong>
                       </span>
                     {% else %}
-                      <a class="unselected-sort-label" href="/repos/page/page/1/title">Name</a>
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/reponame"
+                         class="unselected-sort-label">
+                        Repository
+                      </a>
                     {% endif %}
+                  </th>
+                  <th width="100%" style="text-align: left;">
+                    <span class="unselected-sort-label">
+                      Name
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -89,6 +97,9 @@ title: "Contribution Suggestions"
                   </td>
                   <td>
                     {{ suggestion.date | slice: 0, 10 }}
+                  </td>
+                  <td>
+                    {{ suggestion.reponame }}
                   </td>
                   <td>
                     <a href="{{ suggestion.url }}">{{ suggestion.title }}</a>

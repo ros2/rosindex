@@ -169,9 +169,12 @@ class GIT < VCS
       issues = JSON.parse(http_response.body)
       issues.each do |issue|
         if issue['state'] != 'open' then next end
-        url = issue['html_url'].reverse
+        url = issue['html_url'].clone
+        url.sub!(/.*github\.com/,"")
         suggestion = Hash.new
         suggestion['type'] = 'Issue'
+        suggestion['reponame'] = url.clone
+        suggestion['reponame'].sub!(/\/(issues|pull)\/.*/,"")
         suggestion['language'] = repo['language']
         suggestion['id'] = issue['number']
         suggestion['url'] = issue['html_url']
@@ -190,9 +193,12 @@ class GIT < VCS
       pulls = JSON.parse(http_response.body)
       pulls.each do |pull|
         if pull['state'] != 'open' then next end
-        url = pull['html_url'].reverse
+        url = pull['html_url'].clone
+        url.sub!(/.*github\.com/,"")
         suggestion = Hash.new
         suggestion['type'] = 'PullRequest'
+        suggestion['reponame'] = url.clone
+        suggestion['reponame'].sub!(/\/(issues|pull)\/.*/,"")
         suggestion['language'] = repo['language']
         suggestion['id'] = pull['number']
         suggestion['url'] = pull['html_url']
