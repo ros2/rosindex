@@ -64,6 +64,9 @@ class DocPageGenerator < Jekyll::Generator
       documents = {}
       repo_build['documents'].each do |permalink, local_content|
         parent_path, * = permalink.rpartition('/')
+        while not parent_path.empty? and not documents.key? parent_path
+          parent_path, * = parent_path.rpartition('/')
+        end
         parent_page = documents.fetch(parent_path, nil)
 
         content = global_content.clone
@@ -168,7 +171,7 @@ class DocPageGenerator < Jekyll::Generator
     end
 
     Dir.glob(File.join(output_path, "{_images/*.*,_downloads/**/*.*}"),
-             File::FNM_CASEFOLD).each do |static_file_path|
+             File::FNM_PATHNAME).each do |static_file_path|
       static_file_path = Pathname.new(static_file_path)
       static_file_permalink = static_file_path.relative_path_from(output_path)
       repo_build["static_files"][static_file_permalink] = static_file_path
@@ -178,10 +181,10 @@ class DocPageGenerator < Jekyll::Generator
     repo_ignore_pattern = ["**/search.fjson", "**/searchindex.fjson", "**/genindex.fjson"]
     repo_ignore_pattern.push(*repo_data.fetch("ignore_pattern", []))
     Dir.glob(File.join(output_path, '**/*.fjson'),
-             File::FNM_CASEFOLD).each do |json_filepath|
+             File::FNM_PATHNAME).each do |json_filepath|
       json_filepath = Pathname.new(json_filepath)
       next if repo_ignore_pattern.any? do |pattern|
-        File.fnmatch?(pattern, json_filepath)
+        File.fnmatch?(pattern, json_filepath, File::FNM_PATHNAME)
       end
       content = JSON.parse(File.read(json_filepath))
       rel_path = json_filepath.relative_path_from(output_path).sub_ext(".rst")
@@ -192,7 +195,8 @@ class DocPageGenerator < Jekyll::Generator
           repo_data, src_path.relative_path_from(repo_path)
         )
         content["indexed_page"] = repo_index_pattern.any? do |pattern|
-            File.fnmatch?(pattern, src_path.relative_path_from(input_path))
+          File.fnmatch?(pattern, src_path.relative_path_from(input_path),
+                        File::FNM_PATHNAME)
         end
         content["sourcename"] = src_path.relative_path_from(input_path)
       end
@@ -209,11 +213,11 @@ class DocPageGenerator < Jekyll::Generator
       if first_depth == second_depth
         first_sourcename = a[1]['sourcename'] || ''
         first_order = repo_index_pattern.index do |pattern|
-          File.fnmatch?(pattern, first_sourcename)
+          File.fnmatch?(pattern, first_sourcename, File::FNM_PATHNAME)
         end || -1
         second_sourcename = b[1]['sourcename'] || ''
         second_order = repo_index_pattern.index do |pattern|
-          File.fnmatch?(pattern, second_sourcename)
+          File.fnmatch?(pattern, second_sourcename, File::FNM_PATHNAME)
         end || -1
         if first_order == second_order
           first_title = a[1]['title'] || ''
