@@ -63,9 +63,9 @@ class DocPageGenerator < Jekyll::Generator
 
       documents = {}
       repo_build['documents'].each do |permalink, local_content|
-        parent_path, * = permalink.rpartition('/')
+        parent_path = permalink.rpartition('/').first
         while not parent_path.empty? and not documents.key? parent_path
-          parent_path, * = parent_path.rpartition('/')
+          parent_path = parent_path.rpartition('/').first
         end
         parent_page = documents.fetch(parent_path, nil)
 
