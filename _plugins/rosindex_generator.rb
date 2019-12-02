@@ -719,15 +719,23 @@ class Indexer < Jekyll::Generator
   end
 
   def sort_suggestions(site)
-    suggestions_sorted = {'url' => {}, 'type' => {}, 'date' => {}, 'language' => {}, 'reponame' => {}}
+    suggestions_sorted = {
+        'url'      => {},
+        'priority' => {},
+        'type'     => {},
+        'date'     => {},
+        'language' => {},
+        'reponame' => {}
+    }
     suggestion_urls_sorted = @contribution_suggestions.keys.sort
     suggestions_sorted_by_url = Array.new
     suggestion_urls_sorted.each do |url| suggestions_sorted_by_url << @contribution_suggestions[url] end
 
     $all_distros.each do |distro|
       suggestions_sorted['url'][distro] = suggestions_sorted_by_url
-      suggestions_sorted['type'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['type'] }
-      suggestions_sorted['date'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['date'] }.reverse
+      suggestions_sorted['priority'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['priority'] }.reverse
+      suggestions_sorted['type'][distro]     = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['type'] }
+      suggestions_sorted['date'][distro]     = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['date'] }.reverse
       suggestions_sorted['language'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['language'] }
       suggestions_sorted['reponame'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['reponame'] }
     end
@@ -1428,7 +1436,7 @@ class Indexer < Jekyll::Generator
     puts ("Generating contribution suggestions list pages...").blue
 
     suggestions_sorted = sort_suggestions(site)
-    generate_sorted_paginated(site, suggestions_sorted, 'date', @contribution_suggestions.count, site.config['repos_per_page'], ContributionSuggestionsPage)
+    generate_sorted_paginated(site, suggestions_sorted, 'priority', @contribution_suggestions.count, site.config['repos_per_page'], ContributionSuggestionsPage)
 
     # create lunr index data
     unless site.config['skip_search_index']

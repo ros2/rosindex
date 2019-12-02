@@ -32,6 +32,18 @@ title: "Contribution Suggestions"
               <thead>
                 <tr>
                   <th style="text-align: center;">
+                    {% if page.sort_id == 'priority' %}
+                      <span class="selected-sort-label">
+                        <stong>Priority</stong>
+                      </span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/priority"
+                         class="unselected-sort-label">
+                        Priority
+                      </a>
+                    {% endif %}
+                  </th>
+                  <th style="text-align: center;">
                     {% if page.sort_id == 'type' %}
                       <span class="selected-sort-label">
                         <stong>Type</stong>
@@ -89,6 +101,9 @@ title: "Contribution Suggestions"
               <tbody>
               {% for suggestion in page.list[distro] %}
                 <tr>
+                  <td class="text-center">
+                    {{ suggestion.priority }}
+                  </td>
                   <td class="text-center">
                     {{ suggestion.type }}
                   </td>

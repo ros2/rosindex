@@ -150,6 +150,21 @@ class GIT < VCS
     return @r.last_commit.time.strftime('%F')
   end
 
+  CONTRIBUTION_SUGGESTION_PRIORITY_TAGS = {
+    'help wanted'       => 10,
+    'review requested'  => 10,
+    'good first issue'  => 10,
+    'needs discussion'  =>  5,
+    'task'              =>  5,
+    'more work needed'  =>  5,
+    'documentation'     =>  3,
+    'bug'               =>  2,
+    'minor'             =>  2,
+    'major'             =>  1,
+    'enhancement'       =>  1
+  }
+  CONTRIBUTION_SUGGESTION_PRIORITY_THRESHOLD = 5
+
   def get_contribution_suggestions()
     suggestions = Hash.new
     # Can only query github.com repositories right now
@@ -180,11 +195,18 @@ class GIT < VCS
         suggestion['url'] = issue['html_url']
         suggestion['title'] = issue['title']
         suggestion['date'] = issue['created_at']
+        suggestion['priority'] = 0
         suggestion['labels'] = Array.new
         issue['labels'].each do |label|
-          suggestion['labels'] << label['name']
+          l = label['name']
+          if CONTRIBUTION_SUGGESTION_PRIORITY_TAGS.key?(l)
+            suggestion['priority'] += CONTRIBUTION_SUGGESTION_PRIORITY_TAGS[l]
+          end
+          suggestion['labels'] << l
         end
-        suggestions[url] = suggestion
+        if suggestion['priority'] >= CONTRIBUTION_SUGGESTION_PRIORITY_THRESHOLD
+          suggestions[url] = suggestion
+        end
       end
     end
     # Get open pull requests
@@ -204,11 +226,18 @@ class GIT < VCS
         suggestion['url'] = pull['html_url']
         suggestion['title'] = pull['title']
         suggestion['date'] = pull['created_at']
+        suggestion['priority'] = 0
         suggestion['labels'] = Array.new
         pull['labels'].each do |label|
-          suggestion['labels'] << label['name']
+          l = label['name']
+          if CONTRIBUTION_SUGGESTION_PRIORITY_TAGS.key?(l)
+            suggestion['priority'] += CONTRIBUTION_SUGGESTION_PRIORITY_TAGS[l]
+          end
+          suggestion['labels'] << l
         end
-        suggestions[url] = suggestion
+        if suggestion['priority'] >= CONTRIBUTION_SUGGESTION_PRIORITY_THRESHOLD
+          suggestions[url] = suggestion
+        end
       end
     end
     return suggestions
