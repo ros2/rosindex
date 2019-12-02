@@ -63,6 +63,8 @@ class DocPageGenerator < Jekyll::Generator
 
       documents = {}
       repo_build['documents'].each do |permalink, local_content|
+        # A document will be processed _before_ any of its child documents
+        # as DocPageGenerator::build_with_sphinx enforces this ordering.
         parent_path = permalink.rpartition('/').first
         while not parent_path.empty? and not documents.key? parent_path
           parent_path = parent_path.rpartition('/').first
