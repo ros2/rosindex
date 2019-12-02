@@ -400,9 +400,6 @@ th.rotate45 {
   transform: rotate(-45deg);
 }
 
-
-
-
 .list-group-horizontal .list-group-item {
   display: inline-block;
 }
@@ -439,6 +436,9 @@ th.rotate45 {
 }
 .list-group.list-group-root > .list-group > .list-group > .list-group-item {
   padding-left: 45px;
+}
+.list-group.list-group-root > .list-group > .list-group > .list-group > .list-group-item {
+    padding-left: 60px;
 }
 
 .btn-primary.active:hover,
