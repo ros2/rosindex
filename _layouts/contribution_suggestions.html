@@ -34,12 +34,16 @@ title: "Contribution Suggestions"
                   <th style="text-align: center;">
                     {% if page.sort_id == 'priority' %}
                       <span class="selected-sort-label">
-                        <stong>Priority</stong>
+                        <span class="glyphicon glyphicon-star"
+                              title="This rating indicates that the maintainer is hoping for contibutors
+(expressed by attaching labels such as 'help wanted' or 'good first issue')"></span>
                       </span>
                     {% else %}
                       <a href="{{site.baseurl}}/contribute/suggestions/page/1/priority"
                          class="unselected-sort-label">
-                        Priority
+                        <span class="glyphicon glyphicon-star-empty"
+                              title="This rating indicates that the maintainer is hoping for contibutors
+(expressed by attaching labels such as 'help wanted' or 'good first issue')"></span>
                       </a>
                     {% endif %}
                   </th>
