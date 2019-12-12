@@ -150,6 +150,12 @@ class GIT < VCS
     return @r.last_commit.time.strftime('%F')
   end
 
+  CONTRIBUTION_SUGGESTION_CATEGORIES = {
+    'help wanted'       => 'help wanted',
+    'review requested'  => 'review requested',
+    'good first issue'  => 'good first issue'
+  }
+
   CONTRIBUTION_SUGGESTION_PRIORITY_TAGS = {
     'help wanted'       => 10,
     'review requested'  => 10,
@@ -163,10 +169,12 @@ class GIT < VCS
     'major'             =>  1,
     'enhancement'       =>  1
   }
-  CONTRIBUTION_SUGGESTION_PRIORITY_THRESHOLD = 5
 
   def get_contribution_suggestions()
     suggestions = Hash.new
+    CONTRIBUTION_SUGGESTION_CATEGORIES.each do |key, category|
+      suggestions[category] = Hash.new
+    end
     # Can only query github.com repositories right now
     if !(@uri.include?("github.com")) then return suggestions end
     base_url = @uri
@@ -195,17 +203,21 @@ class GIT < VCS
         suggestion['url'] = issue['html_url']
         suggestion['title'] = issue['title']
         suggestion['date'] = issue['created_at']
+        suggestion['category'] = nil
         suggestion['priority'] = 0
         suggestion['labels'] = Array.new
         issue['labels'].each do |label|
           l = label['name']
+          suggestion['labels'] << l
+          if CONTRIBUTION_SUGGESTION_CATEGORIES.key?(l)
+            suggestion['category'] = CONTRIBUTION_SUGGESTION_CATEGORIES[l]
+          end
           if CONTRIBUTION_SUGGESTION_PRIORITY_TAGS.key?(l)
             suggestion['priority'] += CONTRIBUTION_SUGGESTION_PRIORITY_TAGS[l]
           end
-          suggestion['labels'] << l
         end
-        if suggestion['priority'] >= CONTRIBUTION_SUGGESTION_PRIORITY_THRESHOLD
-          suggestions[url] = suggestion
+        if suggestion['category'] != nil
+          suggestions[suggestion['category']][url] = suggestion
         end
       end
     end
@@ -226,17 +238,21 @@ class GIT < VCS
         suggestion['url'] = pull['html_url']
         suggestion['title'] = pull['title']
         suggestion['date'] = pull['created_at']
+        suggestion['category'] = nil
         suggestion['priority'] = 0
         suggestion['labels'] = Array.new
         pull['labels'].each do |label|
           l = label['name']
+          suggestion['labels'] << l
+          if CONTRIBUTION_SUGGESTION_CATEGORIES.key?(l)
+            suggestion['category'] = CONTRIBUTION_SUGGESTION_CATEGORIES[l]
+          end
           if CONTRIBUTION_SUGGESTION_PRIORITY_TAGS.key?(l)
             suggestion['priority'] += CONTRIBUTION_SUGGESTION_PRIORITY_TAGS[l]
           end
-          suggestion['labels'] << l
         end
-        if suggestion['priority'] >= CONTRIBUTION_SUGGESTION_PRIORITY_THRESHOLD
-          suggestions[url] = suggestion
+        if suggestion['category'] != nil
+          suggestions[suggestion['category']][url] = suggestion
         end
       end
     end

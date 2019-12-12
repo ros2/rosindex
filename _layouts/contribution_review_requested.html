@@ -1,0 +1,151 @@
+---
+layout: default
+title: "Contribution Suggestions: Review Requested"
+---
+
+<div class="container-fluid" style="margin-top:20px">
+  <div class="container-fluid">
+    <div class="row">
+      <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li><a href="/contribute">Contribute</a></li>
+        <li class="active">{{ page.title }}</li>
+      </ol>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12"><h2>Issues &amp; Pull Requests marked as "Review Requested"</h2></div>
+  </div>
+    <div class="row">
+      {% include distro_switch.html %}
+    </div>
+    <div class="row">
+      &nbsp;
+    </div>
+    {% for distro in page.all_distros %}
+      <div class="row distro distro-{{distro}}">
+        <div class="panel panel-default">
+          <div class="table-responsive">
+            <table class="table table-condensed table-striped table-hover">
+              <thead>
+                <tr>
+                  <th style="text-align: center;">
+                    {% if page.sort_id == 'priority' %}
+                      <span class="selected-sort-label">
+                        <span class="glyphicon glyphicon-star"
+                              title="This rating indicates that the maintainer is hoping for contibutors
+(expressed by attaching labels such as 'help wanted' or 'good first issue')"></span>
+                      </span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/priority"
+                         class="unselected-sort-label">
+                        <span class="glyphicon glyphicon-star-empty"
+                              title="This rating indicates that the maintainer is hoping for contibutors
+(expressed by attaching labels such as 'help wanted' or 'good first issue')"></span>
+                      </a>
+                    {% endif %}
+                  </th>
+                  <th style="text-align: center;">
+                    {% if page.sort_id == 'type' %}
+                      <span class="selected-sort-label">
+                        <stong>Type</stong>
+                      </span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/type"
+                         class="unselected-sort-label">
+                        Type
+                      </a>
+                    {% endif %}
+                  </th>
+                  <th style="text-align: center;">
+                    {% if page.sort_id == 'language' %}
+                      <span class="selected-sort-label">
+                        <strong>Language</strong>
+                      </span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/language"
+                         class="unselected-sort-label">
+                        Language
+                      </a>
+                    {% endif %}
+                  </th>
+                  <th style="text-align: center;">
+                    {% if page.sort_id == 'date' %}
+                      <span class="selected-sort-label">
+                        <strong>Created</strong>
+                      </span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/date"
+                         class="unselected-sort-label">
+                        Created
+                      </a>
+                    {% endif %}
+                  </th>
+                  <th style="text-align: center;">
+                    {% if page.sort_id == 'reponame' %}
+                      <span class="selected-sort-label">
+                        <strong>Repository</strong>
+                      </span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions/page/1/reponame"
+                         class="unselected-sort-label">
+                        Repository
+                      </a>
+                    {% endif %}
+                  </th>
+                  <th width="100%" style="text-align: left;">
+                    <span class="unselected-sort-label">
+                      Name
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for suggestion in page.list[distro] %}
+                <tr>
+                  <td class="text-center">
+                    {{ suggestion.priority }}
+                  </td>
+                  <td class="text-center">
+                    {{ suggestion.type }}
+                  </td>
+                  <td class="text-center">
+                    {{ suggestion.language }}
+                  </td>
+                  <td>
+                    {{ suggestion.date | slice: 0, 10 }}
+                  </td>
+                  <td>
+                    {{ suggestion.reponame }}
+                  </td>
+                  <td>
+                    <a href="{{ suggestion.url }}">{{ suggestion.title }}</a>
+                    {% for label in suggestion.labels %}
+                      <span class="label label-primary">{{ label }}</span>
+                    {% endfor %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    <div class="row text-center">
+      {% include package_pager.html %}
+    </div>
+  <div class="row">
+    <div class="col-md-12">
+      &nbsp;
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    setupDistroSwitch("{{ site.distros[0] }}");
+  });
+</script>

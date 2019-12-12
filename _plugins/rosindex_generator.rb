@@ -599,7 +599,12 @@ class Indexer < Jekyll::Generator
     puts (" --- scraping contribution suggestions for " << repo.name).blue
     repo_suggestions = vcs.get_contribution_suggestions()
     if (@contribution_suggestions.nil? || !@contribution_suggestions.is_a?(Hash)) then @contribution_suggestions = Hash.new end
-    @contribution_suggestions.merge!(repo_suggestions)
+    if not @contribution_suggestions.key?('help wanted') then @contribution_suggestions['help wanted'] = Hash.new end
+    if not @contribution_suggestions.key?('good first issue') then @contribution_suggestions['good first issue'] = Hash.new end
+    if not @contribution_suggestions.key?('review requested') then @contribution_suggestions['review requested'] = Hash.new end
+    @contribution_suggestions['help wanted'].merge!(repo_suggestions['help wanted'])
+    @contribution_suggestions['good first issue'].merge!(repo_suggestions['good first issue'])
+    @contribution_suggestions['review requested'].merge!(repo_suggestions['review requested'])
   end
 
   class SystemDep < Liquid::Drop
@@ -718,7 +723,7 @@ class Indexer < Jekyll::Generator
     return repos_sorted
   end
 
-  def sort_suggestions(site)
+  def sort_suggestions(site, category)
     suggestions_sorted = {
         'url'      => {},
         'priority' => {},
@@ -727,9 +732,9 @@ class Indexer < Jekyll::Generator
         'language' => {},
         'reponame' => {}
     }
-    suggestion_urls_sorted = @contribution_suggestions.keys.sort
+    suggestion_urls_sorted = @contribution_suggestions[category].keys.sort
     suggestions_sorted_by_url = Array.new
-    suggestion_urls_sorted.each do |url| suggestions_sorted_by_url << @contribution_suggestions[url] end
+    suggestion_urls_sorted.each do |url| suggestions_sorted_by_url << @contribution_suggestions[category][url] end
 
     $all_distros.each do |distro|
       suggestions_sorted['url'][distro] = suggestions_sorted_by_url
@@ -1435,8 +1440,13 @@ class Indexer < Jekyll::Generator
 	# create contribution suggestions list pages
     puts ("Generating contribution suggestions list pages...").blue
 
-    suggestions_sorted = sort_suggestions(site)
-    generate_sorted_paginated(site, suggestions_sorted, 'priority', @contribution_suggestions.count, site.config['repos_per_page'], ContributionSuggestionsPage)
+    suggestions_sorted = Hash.new
+    suggestions_sorted['help wanted'] = sort_suggestions(site, 'help wanted')
+    suggestions_sorted['review requested'] = sort_suggestions(site, 'review requested')
+    suggestions_sorted['good first issue'] = sort_suggestions(site, 'good first issue')
+    generate_sorted_paginated(site, suggestions_sorted['help wanted'], 'priority', @contribution_suggestions['help wanted'].count, site.config['repos_per_page'], ContributionSuggestionsHelpWantedPage)
+    generate_sorted_paginated(site, suggestions_sorted['review requested'], 'priority', @contribution_suggestions['review requested'].count, site.config['repos_per_page'], ContributionSuggestionsReviewRequestedPage)
+    generate_sorted_paginated(site, suggestions_sorted['good first issue'], 'priority', @contribution_suggestions['good first issue'].count, site.config['repos_per_page'], ContributionSuggestionsGoodFirstIssuePage)
 
     # create lunr index data
     unless site.config['skip_search_index']
