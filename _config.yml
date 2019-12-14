@@ -87,6 +87,7 @@ index_old_doc_paths: false
 #
 ros2_distros:
   - 'dashing'
+  - 'eloquent'
 
 ros_distros:
   - 'melodic'
