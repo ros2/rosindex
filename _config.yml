@@ -87,8 +87,6 @@ index_old_doc_paths: false
 #
 ros2_distros:
   - 'dashing'
-  - 'crystal'
-  - 'bouncy'
 
 ros_distros:
   - 'melodic'
@@ -96,6 +94,8 @@ ros_distros:
 
 old_ros2_distros:
   - 'ardent'
+  - 'bouncy'
+  - 'crystal'
 
 old_ros_distros:
   - 'lunar'
