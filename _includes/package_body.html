@@ -462,7 +462,9 @@ Assumes distro and package are defined
         <small class="w-25">{{updated}}</small>
       </a>
       <hr>
-      {{&description}}
+      <div class="question-descrition question-descrition-collapsed" id="question-descrition-{{id}}">
+        {{&description}}
+      </div>
     </div>
     {{/questions}}
   </div>
@@ -493,6 +495,7 @@ jQuery(function() {
               var converter = new showdown.Converter();
               var questions = feed.items.slice(0, 10).map(function(question) {
                   question.description = converter.makeHtml(question.description);
+                  question.id = Math.round(Math.random() * 99999.0);
                   return question;
               });
               var template = jQuery("#{{distro}}-question-list-template").text();
@@ -504,6 +507,11 @@ jQuery(function() {
                 if (jQuery(this).attr("src").startsWith("/upfiles")) {
                    jQuery(this).attr("src", "https://answers.ros.org" + jQuery(this).attr("src"));
                 }
+              });
+              jQuery("#{{distro}}-question-list .question-descrition").each(function() {
+                jQuery(this).click( function() {
+                  jQuery(this).toggleClass( "question-descrition-collapsed", 1000 );
+                })
               });
               jQuery("#{{distro}}-question-list").show();
               PR.prettyPrint();
