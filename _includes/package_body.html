@@ -56,9 +56,9 @@ Assumes distro and package are defined
               <tr>
                 <td style="width:100px;" class="text-right"><strong>Tags</strong></td>
                 <td>
-                  {% assign n_tags = package.repo.tags.size %}
+                  {% assign n_tags = package.data.tags.size %}
                   {% if n_tags > 0 %}
-                    {% for tag in package.repo.tags %}<span class="label label-default">{{ tag }}</span> {% endfor %}
+                    {% for tag in package.data.tags %}<span class="label label-default">{{ tag }}</span> {% endfor %}
                   {% else %}
                     <em>No category tags.</em>
                   {% endif %}
