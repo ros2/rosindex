@@ -462,9 +462,10 @@ Assumes distro and package are defined
         <small class="w-25">{{updated}}</small>
       </a>
       <hr>
-      <div class="question-description question-description-collapsed" id="question-description-{{id}}">
+      <div class="question-description question-description-collapsed" id="question-description-{{id}}" title="{{link}}">
         {{&description}}
       </div>
+      <a class="question-description-link" id="question-description-{{id}}-link">Show more</a>
     </div>
     {{/questions}}
   </div>
@@ -510,7 +511,19 @@ jQuery(function() {
               });
               jQuery("#{{distro}}-question-list .question-description").each(function() {
                 jQuery(this).click( function() {
-                  jQuery(this).toggleClass( "question-description-collapsed", 1000 );
+                  if (jQuery(this).hasClass("question-description-collapsed")) {
+                    window.open(jQuery(this).attr("title"));
+                  }
+                })
+              });
+              jQuery("#{{distro}}-question-list .question-description-link").each(function() {
+                jQuery(this).click( function() {
+                  if (jQuery(this).prev().hasClass("question-description-collapsed")) {
+                    jQuery(this).html("Show less");
+                  } else {
+                    jQuery(this).html("Show more");
+                  }
+                  jQuery(this).prev().toggleClass( "question-description-collapsed", 1000 );
                 })
               });
               jQuery("#{{distro}}-question-list").show();
