@@ -465,7 +465,8 @@ Assumes distro and package are defined
       <div class="question-description question-description-collapsed" id="question-description-{{id}}" title="{{link}}">
         {{&description}}
       </div>
-      <a class="question-description-link" id="question-description-{{id}}-link">Show more</a>
+      <a class="question-description-toggle" id="question-description-{{id}}-toggle">Show more</a>
+      <a class="question-link"  target="_blank" href="{{link}}">View on answers.ros.org</a>
     </div>
     {{/questions}}
   </div>
@@ -516,7 +517,7 @@ jQuery(function() {
                   }
                 })
               });
-              jQuery("#{{distro}}-question-list .question-description-link").each(function() {
+              jQuery("#{{distro}}-question-list .question-description-toggle").each(function() {
                 jQuery(this).click( function() {
                   if (jQuery(this).prev().hasClass("question-description-collapsed")) {
                     jQuery(this).html("Show less");
