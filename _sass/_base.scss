@@ -445,3 +445,15 @@ th.rotate45 {
 .btn-primary.active:focus {
   background-color: #106a8c;
 }
+
+div.question-description-collapsed {
+  height: 70px;
+  overflow: hidden;
+  cursor: pointer;
+}
+a.question-description-toggle {
+  cursor: pointer;
+}
+a.question-link {
+  float: right;
+}
