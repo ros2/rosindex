@@ -462,7 +462,11 @@ Assumes distro and package are defined
         <small class="w-25">{{updated}}</small>
       </a>
       <hr>
-      {{&description}}
+      <div class="question-description question-description-collapsed" id="question-description-{{id}}" title="{{link}}">
+        {{&description}}
+      </div>
+      <a class="question-description-toggle" id="question-description-{{id}}-toggle">Show more</a>
+      <a class="question-link"  target="_blank" href="{{link}}">View on answers.ros.org</a>
     </div>
     {{/questions}}
   </div>
@@ -493,6 +497,7 @@ jQuery(function() {
               var converter = new showdown.Converter();
               var questions = feed.items.slice(0, 10).map(function(question) {
                   question.description = converter.makeHtml(question.description);
+                  question.id = Math.round(Math.random() * 99999.0);
                   return question;
               });
               var template = jQuery("#{{distro}}-question-list-template").text();
@@ -504,6 +509,23 @@ jQuery(function() {
                 if (jQuery(this).attr("src").startsWith("/upfiles")) {
                    jQuery(this).attr("src", "https://answers.ros.org" + jQuery(this).attr("src"));
                 }
+              });
+              jQuery("#{{distro}}-question-list .question-description").each(function() {
+                jQuery(this).click( function() {
+                  if (jQuery(this).hasClass("question-description-collapsed")) {
+                    window.open(jQuery(this).attr("title"));
+                  }
+                })
+              });
+              jQuery("#{{distro}}-question-list .question-description-toggle").each(function() {
+                jQuery(this).click( function() {
+                  if (jQuery(this).prev().hasClass("question-description-collapsed")) {
+                    jQuery(this).html("Show less");
+                  } else {
+                    jQuery(this).html("Show more");
+                  }
+                  jQuery(this).prev().toggleClass( "question-description-collapsed", 1000 );
+                })
               });
               jQuery("#{{distro}}-question-list").show();
               PR.prettyPrint();
