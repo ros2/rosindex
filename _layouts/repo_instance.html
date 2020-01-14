@@ -79,6 +79,17 @@ layout: default
           <div class="panel-body">
             {% if page.repo.snapshots[distro].data.contributing %}
               {{ page.repo.snapshots[distro].data.contributing_rendered }}
+              <hr>
+              <div class="contribute-lists">
+                <h3>HELP WANTED:</h3>
+                <div class="contribute-lists-help-wanted"></div>
+                <br>
+                <h3>GOOD FIRST ISSUE:</h3>
+                <div class="contribute-lists-good-first-issue"></div>
+                <br>
+                <h3>OPEN PULL REQUESTS TO REVIEW:</h3>
+                <div class="contribute-lists-prs"></div>
+              </div>
             {% else %}
               <em>No CONTRIBUTING.md found.</em>
             {% endif %}
@@ -105,8 +116,10 @@ layout: default
   </div>
 {% endfor %}
 
+<script src={{ "/js/contribute_lists.js" | prepend: site.baseurl }}></script>
 <script type="text/javascript">
   $(document).ready(function() {
     setupDistroSwitch("{{ page.default_distro }}");
+    setupContributeLists("{{page.repo.uri}}");
   });
 </script>
