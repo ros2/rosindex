@@ -258,13 +258,13 @@ class Indexer < Jekyll::Generator
     end
     dev_job_data = results_yaml['dev_job_data']
     latest_build = dev_job_data['latest_build']
-    tests_skipped = latest_build['skipped']
-    tests_failed = latest_build['failed']
-    tests_total = latest_build['total']
+    tests_skipped = latest_build ? latest_build['skipped'] : 0
+    tests_failed = latest_build ? latest_build['failed'] : 0
+    tests_total = latest_build ? latest_build['total'] : 0
     # TODO: this essentially considers skipped tests as failures
     tests_ok = tests_total - tests_failed - tests_skipped
-    ci_data['total_builds'] = dev_job_data['total_builds']
-    ci_data['health'] = dev_job_data['job_health']
+    ci_data['total_builds'] = dev_job_data.key?('total_builds') ? dev_job_data['total_builds'] : 0
+    ci_data['health'] = dev_job_data.key?('job_health') ? dev_job_data['job_health'] : 0
     ci_data['tests_ok'] = tests_ok
     ci_data['tests_total'] = tests_total
     ci_data['tooltip'] = "Latest build information: " + ci_data['timestamp'] + "\n" \
@@ -282,7 +282,7 @@ class Indexer < Jekyll::Generator
     if !dev_job_data.key?('history') || dev_job_data['history'].length == 0
       ci_data['tooltip'] << "\nNo build history available for this repository."
       ci_data['history_available'] = false
-      return vi_data
+      return ci_data
     end
     ci_data['history_available'] = true
     ci_data['tooltip'] << "\nClick to show more build history."
