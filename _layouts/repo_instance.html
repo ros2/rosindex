@@ -74,6 +74,17 @@ layout: default
           </div>
         </div>
 
+        <div class="panel panel-default">
+          <div class="panel-heading"><h3 class="panel-title">CONTRIBUTING</h3></div>
+          <div class="panel-body">
+            {% if page.repo.snapshots[distro].data.contributing %}
+              {{ page.repo.snapshots[distro].data.contributing_rendered }}
+            {% else %}
+              <em>No CONTRIBUTING.md found.</em>
+            {% endif %}
+          </div>
+        </div>
+
         {% assign n_errors = page.repo.errors | size %}
         {% if n_errors > 0 %}
           <div class="panel panel-danger">

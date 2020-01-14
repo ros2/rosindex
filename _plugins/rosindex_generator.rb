@@ -39,6 +39,10 @@ def get_readme(site, path, raw_uri, browse_uri)
   return get_md_rst_txt(site, path, "README*", raw_uri, browse_uri)
 end
 
+def get_contributing(site, path, raw_uri, browse_uri)
+  return get_md_rst_txt(site, path, "CONTRIBUTING*", raw_uri, browse_uri)
+end
+
 def get_changelog(site, path, raw_uri, browse_uri)
   return get_md_rst_txt(site, path, "CHANGELOG*", raw_uri, browse_uri)
 end
@@ -605,10 +609,16 @@ class Indexer < Jekyll::Generator
       # get the date of the last modification
       'last_commit_time' => vcs.get_last_commit_time(),
       'readme' => nil,
-      'readme_rendered' => nil}
+      'readme_rendered' => nil,
+      'contributing' => nil,
+      'contributing_rendered' => nil}
 
     # load the repo readme for this branch if it exists
     data['readme_rendered'], data['readme'] = get_readme(
+      site, vcs.local_path, data['raw_uri'], data['browse_uri'])
+
+    # load the repo CONTRIBUTING.md for this branch if it exists
+    data['contributing_rendered'], data['contributing'] = get_contributing(
       site, vcs.local_path, data['raw_uri'], data['browse_uri'])
 
     unless repo.release_manifests[distro].nil?
