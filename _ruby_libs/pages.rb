@@ -194,6 +194,7 @@ class DocPage < Jekyll::Page
     self.data['script_uris'] = data['script_uris']
 
     self.data['child_pages'] = []
+    self.data['indexed_child_pages'] = []
     self.data['ancestor_pages'] = []
     self.data['root_page'] = self
     if not parent_page.nil?
@@ -206,6 +207,9 @@ class DocPage < Jekyll::Page
 
   def add_child_page(page)
     self.data['child_pages'] << page
+    if page.data['indexed']
+      self.data['indexed_child_pages'] << page
+    end
   end
 
 end
