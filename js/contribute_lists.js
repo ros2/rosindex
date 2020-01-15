@@ -1,15 +1,18 @@
 
 
 function populateContributeLists(list, items) {
-  html = "";
+  html = '<table class="table table-condensed table-striped"><tbody>';
   for (var i=0; i < items.length; i++) {
     var item = items[i];
-    html += '<a href="'
-      + item['html_url'] + '">' + item['title'] + '</a><br>';
+    html += '<tr><td><a href="'
+      + item['html_url'] + '">' + item['title'] + '</a></td></tr>';
   }
-  var list_class = ''
+  html += '</tbody>';
   $('.contribute-lists-'+list).each(function() {
     $(this).html(html);
+  });
+  $('.contribute-lists-'+list+'-count').each(function() {
+    $(this).text(items.length);
   });
 }
 
@@ -47,21 +50,3 @@ function setupContributeLists(repo_uri) {
     .catch(error => console.error(error));
 }
 
-// Enable links to contribute list tabs
-$(function() {
-  var url = document.location.toString();
-  if (url.match('#')) {
-      $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
-  }
-
-  // Change hash for page-reload
-  $('.nav-tabs a').on('shown', function (e) {
-      window.location.hash = e.target.hash;
-  });
-
-  $("a[href^=#]").on("click", function(e) {
-     e.preventDefault();
-     history.pushState({}, "", this.href);
-  });
-
-});
