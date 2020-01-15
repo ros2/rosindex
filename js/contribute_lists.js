@@ -21,15 +21,11 @@ function setupContributeLists(repo_uri) {
   // Expected uri pattern:
   // "https://github.com/<owner>/<repo>[.git]"
   if (!repo_uri.includes("github.com")) {
-    $('.contribute-lists').each(function() {
-      $(this).html("NOT A GITHUB REPO");
-    });
     return;
   }
   // Target query pattern:
   // "https://api.github.com/repos/<owner>/<repo>/pulls"
   api_uri = repo_uri.replace(/\.git$/, "").replace("github.com", "api.github.com/repos");
-  console.log(api_uri + "/issues?state=open&per_page=100");
   fetch(api_uri + "/issues?state=open&labels=help%20wanted&per_page=100")
     .then(response => response.json())
     .then(data => {
@@ -50,3 +46,20 @@ function setupContributeLists(repo_uri) {
     .catch(error => console.error(error));
 }
 
+
+// Javascript to enable link to tab
+$(function() {
+  var url = document.location.toString();
+  if (url.match('#')) {
+    $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show');
+  }
+  // Change hash for page-reload
+  $('.nav-tabs a').on('shown', function (e) {
+      window.location.hash = e.target.hash;
+  });
+
+  $("a[href^=#]").on("click", function(e) {
+     e.preventDefault();
+     history.pushState({}, "", this.href);
+  });
+});

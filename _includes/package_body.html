@@ -539,5 +539,34 @@ jQuery(function() {
           jQuery("#{{distro}}-get-question-fail").show();
         }
     });
+    // Update the count on the links to the contribution suggestions
+    repo_uri = '{{package.repo.uri}}';
+    if (repo_uri.includes("github.com")) {
+      api_uri = repo_uri.replace(/\.git$/, "").replace("github.com", "api.github.com/repos");
+      fetch(api_uri + "/issues?state=open&labels=help%20wanted&per_page=100")
+        .then(response => response.json())
+        .then(data => {
+          $('.contribute-lists-help-wanted-count').each(function() {
+            $(this).text(data.length);
+          });
+        })
+        .catch(error => console.error(error));
+      fetch(api_uri + "/issues?state=open&labels=good%20first%20issue&per_page=100")
+        .then(response => response.json())
+        .then(data => {
+          $('.contribute-lists-good-first-issue-count').each(function() {
+            $(this).text(data.length);
+          });
+        })
+        .catch(error => console.error(error));
+      fetch(api_uri + "/pulls?state=open&per_page=100")
+        .then(response => response.json())
+        .then(data => {
+          $('.contribute-lists-pull-requests-count').each(function() {
+            $(this).text(data.length);
+          });
+        })
+        .catch(error => console.error(error));
+      }
 });
 </script>
