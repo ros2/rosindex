@@ -596,15 +596,6 @@ class Indexer < Jekyll::Generator
       repo.errors << (repo.id+': '+msg)
     end
 
-    puts (" --- scraping contribution suggestions for " << repo.name).blue
-    repo_suggestions = vcs.get_contribution_suggestions()
-    if (@contribution_suggestions.nil? || !@contribution_suggestions.is_a?(Hash)) then @contribution_suggestions = Hash.new end
-    if not @contribution_suggestions.key?('help wanted') then @contribution_suggestions['help wanted'] = Hash.new end
-    if not @contribution_suggestions.key?('good first issue') then @contribution_suggestions['good first issue'] = Hash.new end
-    if not @contribution_suggestions.key?('review requested') then @contribution_suggestions['review requested'] = Hash.new end
-    @contribution_suggestions['help wanted'].merge!(repo_suggestions['help wanted'])
-    @contribution_suggestions['good first issue'].merge!(repo_suggestions['good first issue'])
-    @contribution_suggestions['review requested'].merge!(repo_suggestions['review requested'])
   end
 
   class SystemDep < Liquid::Drop
@@ -723,28 +714,39 @@ class Indexer < Jekyll::Generator
     return repos_sorted
   end
 
-  def sort_suggestions(site, category)
-    suggestions_sorted = {
-        'url'      => {},
-        'priority' => {},
-        'type'     => {},
-        'date'     => {},
-        'language' => {},
-        'reponame' => {}
-    }
-    suggestion_urls_sorted = @contribution_suggestions[category].keys.sort
-    suggestions_sorted_by_url = Array.new
-    suggestion_urls_sorted.each do |url| suggestions_sorted_by_url << @contribution_suggestions[category][url] end
+  def sort_repos_filtered(site, filter)
+    repos_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
 
-    $all_distros.each do |distro|
-      suggestions_sorted['url'][distro] = suggestions_sorted_by_url
-      suggestions_sorted['priority'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['priority'] }.reverse
-      suggestions_sorted['type'][distro]     = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['type'] }
-      suggestions_sorted['date'][distro]     = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['date'] }.reverse
-      suggestions_sorted['language'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['language'] }
-      suggestions_sorted['reponame'][distro] = suggestions_sorted_by_url.sort_by!{ |suggestion| suggestion['reponame'] }
+    repos_filtered = @repo_names.select { |key,_| filter.include? key }
+    repos_sorted_by_name = repos_filtered.sort_by { |name, _| name }
+    $all_distros.collect do |distro|
+      repos_sorted['name'][distro] = repos_sorted_by_name
+
+      repos_sorted['time'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.select do |d, s|
+          distro == d and not s.nil?
+        end.map do |d,s|
+          s.data['last_commit_time'].to_s
+        end.max.to_s
+      end.reverse
+
+      repos_sorted['doc'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.count do |d, s|
+          d == distro and not s.nil? and not s.data['readme'].nil?
+        end
+      end.reverse
+
+      repos_sorted['released'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.count do |d, s|
+          d == distro and not s.nil? and s.released
+        end
+      end.reverse
     end
-    return suggestions_sorted
+
+    return repos_sorted
   end
 
   def sort_packages(site)
@@ -855,8 +857,6 @@ class Indexer < Jekyll::Generator
     @package_names = @db.package_names
     # the list of errors encountered
     @errors = @db.errors
-    # the list of contribution suggestions
-    @contribution_suggestions = @db.contribution_suggestions
 
     # a dict of data scraped from the wiki
     # currently the only information is the title-index on the wiki
@@ -1437,16 +1437,16 @@ class Indexer < Jekyll::Generator
     rosdeps_sorted = sort_rosdeps(site)
     generate_sorted_paginated(site, rosdeps_sorted, 'name', @rosdeps.length, site.config['packages_per_page'], DepListPage)
 
-	# create contribution suggestions list pages
+    # create contribution suggestions list pages
     puts ("Generating contribution suggestions list pages...").blue
 
-    suggestions_sorted = Hash.new
-    suggestions_sorted['help wanted'] = sort_suggestions(site, 'help wanted')
-    suggestions_sorted['review requested'] = sort_suggestions(site, 'review requested')
-    suggestions_sorted['good first issue'] = sort_suggestions(site, 'good first issue')
-    generate_sorted_paginated(site, suggestions_sorted['help wanted'], 'priority', @contribution_suggestions['help wanted'].count, site.config['repos_per_page'], ContributionSuggestionsHelpWantedPage)
-    generate_sorted_paginated(site, suggestions_sorted['review requested'], 'priority', @contribution_suggestions['review requested'].count, site.config['repos_per_page'], ContributionSuggestionsReviewRequestedPage)
-    generate_sorted_paginated(site, suggestions_sorted['good first issue'], 'priority', @contribution_suggestions['good first issue'].count, site.config['repos_per_page'], ContributionSuggestionsGoodFirstIssuePage)
+    suggestions = [
+        "moveit",
+        "ros2bag",
+        "catkin_virtualenv",
+    ]
+    suggestions_sorted = sort_repos_filtered(site, suggestions)
+    generate_sorted_paginated(site, suggestions_sorted, 'name', @repo_names.length, site.config['repos_per_page'], ContributionSuggestionsPage)
 
     # create lunr index data
     unless site.config['skip_search_index']

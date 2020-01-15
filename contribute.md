@@ -63,11 +63,9 @@ GitHub, add documentation, and get them indexed as forks.
 You can also contribute by fixing bugs or adding new features to packages
 or by reviewing the contributions proposed or submitted by others as <em>pull requests</em>.
 If you would like some suggestions where your help may be welcomed,
-click one of the buttons below.
+click the button below.
 
-<a type="button" href={{ "/contribute/help_wanted" | prepend: site.baseurl }} class="btn btn-success">Help Wanted</a>
-<a type="button" href={{ "/contribute/good_first_issue" | prepend: site.baseurl }} class="btn btn-success">Good First Issues</a>
-<a type="button" href={{ "/contribute/review_requested" | prepend: site.baseurl }} class="btn btn-success">Review Requested</a>
+<a type="button" href={{ "/contribute/suggestions" | prepend: site.baseurl }} class="btn btn-success">Contribution Suggestions</a>
 
 ## Opting out of Indexing
 

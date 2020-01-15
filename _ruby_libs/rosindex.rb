@@ -131,7 +131,7 @@ class PackageInstances < Liquid::Drop
 end
 
 class RosIndexDB
-  attr_accessor :rosdeps, :all_repos, :repo_names, :package_names, :errors, :contribution_suggestions
+  attr_accessor :rosdeps, :all_repos, :repo_names, :package_names, :errors
   def initialize
     # the rosdep db
     @rosdeps = Hash.new
@@ -143,8 +143,6 @@ class RosIndexDB
     @package_names = Hash.new
     # the errors encountered while processing
     @errors = Hash.new
-    # the list of contribution suggestions
-    @contribution_suggestions = Hash.new
 
     self.add_procs
   end
@@ -232,11 +230,11 @@ class RosIndexDB
   end
 
   def marshal_dump
-    [Hash[@rosdeps], Hash[@all_repos], Hash[@repo_names], Hash[@package_names], Hash[@errors], Array[@contribution_suggestions]]
+    [Hash[@rosdeps], Hash[@all_repos], Hash[@repo_names], Hash[@package_names], Hash[@errors]]
   end
 
   def marshal_load array
-    @rosdeps, @all_repos, @repo_names, @package_names, @errors, @contribution_suggestions = array
+    @rosdeps, @all_repos, @repo_names, @package_names, @errors = array
     self.add_procs
   end
 end

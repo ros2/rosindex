@@ -4,8 +4,6 @@ require 'colorator'
 require 'uri'
 require 'typhoeus'
 require 'open3'
-require 'net/http'
-require 'json'
 
 #require 'git'
 require 'rugged'
@@ -148,115 +146,6 @@ class GIT < VCS
 
   def get_last_commit_time()
     return @r.last_commit.time.strftime('%F')
-  end
-
-  CONTRIBUTION_SUGGESTION_CATEGORIES = {
-    'help wanted'       => 'help wanted',
-    'review requested'  => 'review requested',
-    'good first issue'  => 'good first issue'
-  }
-
-  CONTRIBUTION_SUGGESTION_PRIORITY_TAGS = {
-    'help wanted'       => 10,
-    'review requested'  => 10,
-    'good first issue'  => 10,
-    'needs discussion'  =>  5,
-    'task'              =>  5,
-    'more work needed'  =>  5,
-    'documentation'     =>  3,
-    'bug'               =>  2,
-    'minor'             =>  2,
-    'major'             =>  1,
-    'enhancement'       =>  1
-  }
-
-  def get_contribution_suggestions()
-    suggestions = Hash.new
-    CONTRIBUTION_SUGGESTION_CATEGORIES.each do |key, category|
-      suggestions[category] = Hash.new
-    end
-    # Can only query github.com repositories right now
-    if !(@uri.include?("github.com")) then return suggestions end
-    base_url = @uri
-    # "https://github.com/owner/repo.git" => "https://api.github.com/repos/owner/repo"
-    if base_url.end_with?(".git")
-      base_url = base_url[0..-5]
-    end
-    base_url.sub!("github.com","api.github.com/repos")
-    http_response = Net::HTTP.get_response(URI.parse(base_url))
-    if http_response.code != '200' then return suggestions end
-    repo = JSON.parse(http_response.body)
-    # Get open issues
-    http_response = Net::HTTP.get_response(URI.parse(base_url + "/issues"))
-    if http_response.code == '200'
-      issues = JSON.parse(http_response.body)
-      issues.each do |issue|
-        if issue['state'] != 'open' then next end
-        url = issue['html_url'].clone
-        url.sub!(/.*github\.com/,"")
-        suggestion = Hash.new
-        suggestion['type'] = 'Issue'
-        suggestion['reponame'] = url.clone
-        suggestion['reponame'].sub!(/\/(issues|pull)\/.*/,"")
-        suggestion['language'] = repo['language']
-        suggestion['id'] = issue['number']
-        suggestion['url'] = issue['html_url']
-        suggestion['title'] = issue['title']
-        suggestion['date'] = issue['created_at']
-        suggestion['category'] = nil
-        suggestion['priority'] = 0
-        suggestion['labels'] = Array.new
-        issue['labels'].each do |label|
-          l = label['name']
-          suggestion['labels'] << l
-          if CONTRIBUTION_SUGGESTION_CATEGORIES.key?(l)
-            suggestion['category'] = CONTRIBUTION_SUGGESTION_CATEGORIES[l]
-          end
-          if CONTRIBUTION_SUGGESTION_PRIORITY_TAGS.key?(l)
-            suggestion['priority'] += CONTRIBUTION_SUGGESTION_PRIORITY_TAGS[l]
-          end
-        end
-        if suggestion['category'] != nil
-          suggestions[suggestion['category']][url] = suggestion
-        end
-      end
-    end
-    # Get open pull requests
-    http_response = Net::HTTP.get_response(URI.parse(base_url + "/pulls"))
-    if http_response.code == '200'
-      pulls = JSON.parse(http_response.body)
-      pulls.each do |pull|
-        if pull['state'] != 'open' then next end
-        url = pull['html_url'].clone
-        url.sub!(/.*github\.com/,"")
-        suggestion = Hash.new
-        suggestion['type'] = 'PullRequest'
-        suggestion['reponame'] = url.clone
-        suggestion['reponame'].sub!(/\/(issues|pull)\/.*/,"")
-        suggestion['language'] = repo['language']
-        suggestion['id'] = pull['number']
-        suggestion['url'] = pull['html_url']
-        suggestion['title'] = pull['title']
-        suggestion['date'] = pull['created_at']
-        suggestion['category'] = nil
-        suggestion['priority'] = 0
-        suggestion['labels'] = Array.new
-        pull['labels'].each do |label|
-          l = label['name']
-          suggestion['labels'] << l
-          if CONTRIBUTION_SUGGESTION_CATEGORIES.key?(l)
-            suggestion['category'] = CONTRIBUTION_SUGGESTION_CATEGORIES[l]
-          end
-          if CONTRIBUTION_SUGGESTION_PRIORITY_TAGS.key?(l)
-            suggestion['priority'] += CONTRIBUTION_SUGGESTION_PRIORITY_TAGS[l]
-          end
-        end
-        if suggestion['category'] != nil
-          suggestions[suggestion['category']][url] = suggestion
-        end
-      end
-    end
-    return suggestions
   end
 
   def get_version(distro, explicit_version = nil)
@@ -402,12 +291,6 @@ class HG < VCS
     end
   end
 
-  def get_contribution_suggestions()
-    suggestions = Array.new
-    # No contribution suggestions for Mercurial VCSs
-    return suggestions
-  end
-
   def get_version(distro, explicit_version = nil)
     # get remote head
     if explicit_version == 'REMOTE_HEAD'
@@ -471,12 +354,6 @@ class GITSVN < GIT
     end
 
     super(local_path, uri)
-  end
-
-  def get_contribution_suggestions()
-    suggestions = Array.new
-    # No contribution suggestions for SVN VCSs
-    return suggestions
   end
 
   def get_version(distro, explicit_version = nil)
