@@ -1,48 +1,15 @@
 
-function writeIssuesLists(issues) {
-  help_wanted_list = "";
-  good_first_issues_list = "";
-  console.log(issues.length);
-  for (var i=0; i < issues.length; i++) {
-    var issue = issues[i];
-    if (issue['state'] != "open") {
-      continue;
-    }
-    var labels = issue['labels'];
-    for (var k=0; k < labels.length; k++) {
-      var label = labels[k];
-      // console.log(label);
-      if (label['name'] == 'help wanted') {
-        help_wanted_list += '<a href="'
-          + issue['html_url'] + '">' + issue['title'] + '</a><br>';
-      }
-      if (label['name'] == 'good first issue') {
-        good_first_issues_list += '<a href="'
-          + issue['html_url'] + '">' + issue['title'] + '</a><br>';
-      }
-    }
-  }
-  $('.contribute-lists-help-wanted').each(function() {
-    $(this).html(help_wanted_list);
-  });
-  $('.contribute-lists-good-first-issue').each(function() {
-    $(this).html(good_first_issues_list);
-  });
-}
 
-
-function writePRsLists(prs) {
-  prs_list = "";
-  for (var i=0; i < prs.length; i++) {
-    var pr = prs[i];
-    if (pr['state'] != "open") {
-      continue;
-    }
-    prs_list += '<a href="'
-      + pr['html_url'] + '">' + pr['title'] + '</a><br>';
+function populateContributeLists(list, items) {
+  html = "";
+  for (var i=0; i < items.length; i++) {
+    var item = items[i];
+    html += '<a href="'
+      + item['html_url'] + '">' + item['title'] + '</a><br>';
   }
-  $('.contribute-lists-prs').each(function() {
-    $(this).html(prs_list);
+  var list_class = ''
+  $('.contribute-lists-'+list).each(function() {
+    $(this).html(html);
   });
 }
 
@@ -60,16 +27,41 @@ function setupContributeLists(repo_uri) {
   // "https://api.github.com/repos/<owner>/<repo>/pulls"
   api_uri = repo_uri.replace(/\.git$/, "").replace("github.com", "api.github.com/repos");
   console.log(api_uri + "/issues?state=open&per_page=100");
-  fetch(api_uri + "/issues?state=open&per_page=100")
+  fetch(api_uri + "/issues?state=open&labels=help%20wanted&per_page=100")
     .then(response => response.json())
     .then(data => {
-      writeIssuesLists(data);
+      populateContributeLists('help-wanted', data);
+    })
+    .catch(error => console.error(error));
+  fetch(api_uri + "/issues?state=open&labels=good%20first%20issue&per_page=100")
+    .then(response => response.json())
+    .then(data => {
+      populateContributeLists('good-first-issue', data);
     })
     .catch(error => console.error(error));
   fetch(api_uri + "/pulls?state=open&per_page=100")
     .then(response => response.json())
     .then(data => {
-      writePRsLists(data);
+      populateContributeLists('pull-requests', data);
     })
     .catch(error => console.error(error));
 }
+
+// Enable links to contribute list tabs
+$(function() {
+  var url = document.location.toString();
+  if (url.match('#')) {
+      $('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show') ;
+  }
+
+  // Change hash for page-reload
+  $('.nav-tabs a').on('shown', function (e) {
+      window.location.hash = e.target.hash;
+  });
+
+  $("a[href^=#]").on("click", function(e) {
+     e.preventDefault();
+     history.pushState({}, "", this.href);
+  });
+
+});
