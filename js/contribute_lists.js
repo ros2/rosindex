@@ -4,8 +4,8 @@ function populateContributeLists(list, items) {
   html = '<table class="table table-condensed table-striped"><tbody>';
   for (var i=0; i < items.length; i++) {
     var item = items[i];
-    html += '<tr><td><a href="'
-      + item['html_url'] + '">' + item['title'] + '</a></td></tr>';
+    html += '<tr><td><a href="' + item['html_url'] + '">#';
+    html += item['number'] + '</td><td>' + item['title'] + '</a></td></tr>';
   }
   html += '</tbody>';
   $('.contribute-lists-'+list).each(function() {
