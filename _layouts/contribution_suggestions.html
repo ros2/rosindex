@@ -31,11 +31,25 @@ title: "Contribution Suggestions"
             <table class="table table-condensed table-striped table-hover">
               <thead>
                 <tr>
+                  <th style="text-align: left;">
+                    {% if page.sort_id == 'name' %}
+                      <span class="selected-sort-label">Name</span>
+                    {% else %}
+                      <a class="unselected-sort-label" href="{{site.baseurl}}/contribute/suggestions/page/1/name">Name</a>
+                    {% endif %}
+                  </th>
                   <th style="text-align: center;">
-                    <stong>Project</stong>
+                    {% if page.sort_id == 'time' %}
+                      <span class="glyphicon glyphicon-time selected-sort-label"
+                            title="Sorted by last commit date"></span>
+                    {% else %}
+                      <a href="{{site.baseurl}}/contribute/suggestions//page/1/time"
+                         class="unselected-sort-label glyphicon glyphicon-time"
+                         title="Sort by last commit date"></a>
+                    {% endif %}
                   </th>
                   <th width="100%" style="text-align: left;">
-                    To-Do
+                    To Do
                   </th>
                 </tr>
               </thead>
@@ -45,8 +59,16 @@ title: "Contribution Suggestions"
                 {% assign instance = suggestion[1].default %}
                 {% assign r = instance.snapshots[distro] %}
                 <tr>
-                  <td class="text-center">
-                    {{repo_name}}
+                  <td>
+                    <a href="{{site.baseurl}}/r/{{repo_name}}">{{repo_name}}</a>
+                  </td>
+                  <td>
+                    {% assign date_str = r.data.last_commit_time %}
+                    {% if date_str %}
+                      <span class="label label-default">{{ date_str }}</span>
+                    {% else %}
+                      <span class="label label-default">[unknown]</span>
+                    {% endif %}
                   </td>
                   <td class="contribute-lists-{{repo_name}}">
                     <a class="label label-primary" href="{{site.baseurl}}/r/{{repo_name}}/#{{distro}}-contribute-lists-help-wanted">

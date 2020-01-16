@@ -1572,14 +1572,9 @@ class Indexer < Jekyll::Generator
     generate_sorted_paginated(site, rosdeps_sorted, 'name', @rosdeps.length, site.config['packages_per_page'], DepListPage)
 
     # create contribution suggestions list pages
-    puts ("Generating contribution suggestions list pages...").blue
+    puts ("Generating contribution suggestions list page...").blue
 
-    suggestions = [
-        "moveit",
-        "ros2bag",
-        "catkin_virtualenv",
-    ]
-    suggestions_sorted = sort_repos_filtered(site, suggestions)
+    suggestions_sorted = sort_repos_filtered(site, site.config['contribute_suggested_repos'])
     generate_sorted_paginated(site, suggestions_sorted, 'name', @repo_names.length, site.config['repos_per_page'], ContributionSuggestionsPage)
 
     # create lunr index data
