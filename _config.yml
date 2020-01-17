@@ -105,8 +105,8 @@ old_ros_distros:
   - 'hydro'
 
 # package list page
-packages_per_page: 50
-repos_per_page: 50
+packages_per_page: 200
+repos_per_page: 200
 
 # uncomment the following line for testing (limit the number of indexed repos)
 max_repos: 00
