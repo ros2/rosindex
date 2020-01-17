@@ -128,10 +128,13 @@ layout: default
   </div>
 {% endfor %}
 
-<script src={{ "/js/contribute_lists.js" | prepend: site.baseurl }}></script>
+<script src={{ "/js/contribution_suggestions.js" | prepend: site.baseurl }}></script>
 <script type="text/javascript">
+  $(function() {
+    setupContributeListTabLinks();
+  });
   $(document).ready(function() {
     setupDistroSwitch("{{ page.default_distro }}");
-    setupContributeLists("{{page.repo.uri}}");
+    setupContributeLists("{{ page.repo.uri }}");
   });
 </script>
