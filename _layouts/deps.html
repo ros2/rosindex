@@ -31,13 +31,6 @@ layout: default
                 {% endif %}
               </th>
               <th style="text-align: center;">
-                {% if page.sort_id == 'doc' %}
-                  <span class="glyphicon glyphicon-file selected-sort-label"></span>
-                {% else %}
-                  <a href="{{site.baseurl}}/packages/page/1/doc" class="unselected-sort-label glyphicon glyphicon-file"></a>
-                {% endif %}
-              </th>
-              <th style="text-align: center;">
                 {% if page.sort_id == 'time' %}
                   <span class="glyphicon glyphicon-time selected-sort-label"></span>
                 {% else %}
@@ -72,15 +65,6 @@ layout: default
                     </td>
                   {% else %}
                     <td title="Not released in {{distro}}" data-toggle="tooltip" data-placement="left" class="text-center">
-                      <span class="glyphicon glyphicon-none"></span>
-                    </td>
-                  {% endif %}
-                  {% if p.data.readme %}
-                    <td title="Has README" data-toggle="tooltip" data-placement="left" align="center">
-                      <span class="glyphicon glyphicon-file"></span>
-                    </td>
-                  {% else %}
-                    <td title="No README" data-toggle="tooltip" data-placement="left" align="center">
                       <span class="glyphicon glyphicon-none"></span>
                     </td>
                   {% endif %}

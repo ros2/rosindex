@@ -805,7 +805,7 @@ class Indexer < Jekyll::Generator
   end
 
   def sort_repos(site)
-    repos_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
+    repos_sorted = {'name' => {}, 'time' => {}, 'released' => {}}
 
     repos_sorted_by_name = @repo_names.sort_by { |name, _| name }
     $all_distros.collect do |distro|
@@ -820,13 +820,6 @@ class Indexer < Jekyll::Generator
         end.max.to_s
       end.reverse
 
-      repos_sorted['doc'][distro] = \
-      repos_sorted['name'][distro].sort_by do |_, instances|
-        instances.default.snapshots.count do |d, s|
-          d == distro and not s.nil? and not s.data['readme'].nil?
-        end
-      end.reverse
-
       repos_sorted['released'][distro] = \
       repos_sorted['name'][distro].sort_by do |_, instances|
         instances.default.snapshots.count do |d, s|
@@ -839,7 +832,7 @@ class Indexer < Jekyll::Generator
   end
 
   def sort_packages(site)
-    packages_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
+    packages_sorted = {'name' => {}, 'time' => {}, 'released' => {}}
 
     packages_sorted_by_name = @package_names.sort_by { |name, _| name }
     $all_distros.each do |distro|
@@ -852,13 +845,6 @@ class Indexer < Jekyll::Generator
         end.map do |_, s|
           s.snapshot.data['last_commit_time'].to_s
         end.max.to_s
-      end.reverse
-
-      packages_sorted['doc'][distro] = \
-      packages_sorted['name'][distro].sort_by do |_, instances|
-        instances.snapshots.count do |d, s|
-          distro == d and not s.nil? and s.data['readmes'].count > 0
-        end
       end.reverse
 
       packages_sorted['released'][distro] = \
