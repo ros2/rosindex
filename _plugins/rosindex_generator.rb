@@ -39,6 +39,10 @@ def get_readme(site, path, raw_uri, browse_uri)
   return get_md_rst_txt(site, path, "README*", raw_uri, browse_uri)
 end
 
+def get_contributing(site, path, raw_uri, browse_uri)
+  return get_md_rst_txt(site, path, "CONTRIBUTING*", raw_uri, browse_uri)
+end
+
 def get_changelog(site, path, raw_uri, browse_uri)
   return get_md_rst_txt(site, path, "CHANGELOG*", raw_uri, browse_uri)
 end
@@ -605,10 +609,16 @@ class Indexer < Jekyll::Generator
       # get the date of the last modification
       'last_commit_time' => vcs.get_last_commit_time(),
       'readme' => nil,
-      'readme_rendered' => nil}
+      'readme_rendered' => nil,
+      'contributing' => nil,
+      'contributing_rendered' => nil}
 
     # load the repo readme for this branch if it exists
     data['readme_rendered'], data['readme'] = get_readme(
+      site, vcs.local_path, data['raw_uri'], data['browse_uri'])
+
+    # load the repo CONTRIBUTING.md for this branch if it exists
+    data['contributing_rendered'], data['contributing'] = get_contributing(
       site, vcs.local_path, data['raw_uri'], data['browse_uri'])
 
     unless repo.release_manifests[distro].nil?
@@ -818,6 +828,41 @@ class Indexer < Jekyll::Generator
         end.map do |d,s|
           s.data['last_commit_time'].to_s
         end.max.to_s
+      end.reverse
+
+      repos_sorted['released'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.count do |d, s|
+          d == distro and not s.nil? and s.released
+        end
+      end.reverse
+    end
+
+    return repos_sorted
+  end
+
+  def sort_repos_filtered(site, filter)
+    repos_sorted = {'name' => {}, 'time' => {}, 'doc' => {}, 'released' => {}}
+
+    repos_filtered = @repo_names.select { |key,_| filter.include? key }
+    repos_sorted_by_name = repos_filtered.sort_by { |name, _| name }
+    $all_distros.collect do |distro|
+      repos_sorted['name'][distro] = repos_sorted_by_name
+
+      repos_sorted['time'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.select do |d, s|
+          distro == d and not s.nil?
+        end.map do |d,s|
+          s.data['last_commit_time'].to_s
+        end.max.to_s
+      end.reverse
+
+      repos_sorted['doc'][distro] = \
+      repos_sorted['name'][distro].sort_by do |_, instances|
+        instances.default.snapshots.count do |d, s|
+          d == distro and not s.nil? and not s.data['readme'].nil?
+        end
       end.reverse
 
       repos_sorted['released'][distro] = \
@@ -1512,6 +1557,11 @@ class Indexer < Jekyll::Generator
     rosdeps_sorted = sort_rosdeps(site)
     generate_sorted_paginated(site, rosdeps_sorted, 'name', @rosdeps.length, site.config['packages_per_page'], DepListPage)
 
+    # create contribution suggestions list pages
+    puts ("Generating contribution suggestions list page...").blue
+
+    suggestions_sorted = sort_repos_filtered(site, site.config['contribute_suggested_repos'])
+    generate_sorted_paginated(site, suggestions_sorted, 'name', @repo_names.length, site.config['repos_per_page'], ContributionSuggestionsPage)
 
     # create lunr index data
     unless site.config['skip_search_index']

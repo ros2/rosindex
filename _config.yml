@@ -113,3 +113,13 @@ max_repos: 00
 
 plugins:
   - jekyll-sitemap
+
+# Repos to list as suggestiong on the "contribute" page
+#
+# This must be an array of repository names which acts as a whitelist,
+# filtering all known repositories by name.
+#
+contribute_suggested_repos:
+  - moveit
+  - catkin_virtualenv
+  - tiny_tf

@@ -478,7 +478,7 @@ Assumes distro and package are defined
 <script type="text/javascript" src="{{ '/js/prettify.js' | prepend: site.baseurl }}"></script>
 <script type="text/javascript" src="{{ '/js/mustache.js' | prepend: site.baseurl }}"></script>
 <script type="text/javascript" src="{{ '/js/showdown.min.js' | prepend: site.baseurl }}"></script>
-
+<script src={{ "/js/contribution_suggestions.js" | prepend: site.baseurl }}></script>
 <script type="text/javascript">
 jQuery.browser = {};
 (function () {
@@ -539,5 +539,7 @@ jQuery(function() {
           jQuery("#{{distro}}-get-question-fail").show();
         }
     });
+    // Update the count on the links to the contribution suggestions
+    updateContributionSuggestionsCountOnPackage('{{package.repo.uri}}');
 });
 </script>
