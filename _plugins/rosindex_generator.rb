@@ -1561,7 +1561,7 @@ class Indexer < Jekyll::Generator
     puts ("Generating contribution suggestions list page...").blue
 
     suggestions_sorted = sort_repos_filtered(site, site.config['contribute_suggested_repos'])
-    generate_sorted_paginated(site, suggestions_sorted, 'name', @repo_names.length, site.config['repos_per_page'], ContributionSuggestionsPage)
+    generate_sorted_paginated(site, suggestions_sorted, 'name', suggestions_sorted['name'].length, site.config['repos_per_page'], ContributionSuggestionsPage)
 
     # create lunr index data
     unless site.config['skip_search_index']

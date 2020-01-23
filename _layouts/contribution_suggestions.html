@@ -62,7 +62,7 @@ title: "Contribution Suggestions"
               </thead>
               <tbody>
               {% for suggestion in page.list[distro] %}
-                {% assign repo_name = {{suggestion[0]}} %}
+                {% assign repo_name = suggestion[0] %}
                 {% assign instance = suggestion[1].default %}
                 {% assign r = instance.snapshots[distro] %}
                 <tr>
@@ -115,7 +115,7 @@ title: "Contribution Suggestions"
     // Set links for contribution suggestions
     {% for distro in page.all_distros %}
       {% for suggestion in page.list[distro] %}
-        {% assign repo_name = {{suggestion[0]}} %}
+        {% assign repo_name = suggestion[0] %}
         {% assign instance = suggestion[1].default %}
         {% assign r = instance.snapshots[distro] %}
         updateContributionSuggestionsCount("{{repo_name}}", "{{r.data.browse_uri}}");
