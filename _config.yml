@@ -114,6 +114,7 @@ repos_per_page: 200
 max_repos: 00
 
 plugins:
+  - jekyll-include-cache
   - jekyll-sitemap
 
 # Repos to list as suggestiong on the "contribute" page
