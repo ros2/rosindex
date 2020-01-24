@@ -14,6 +14,8 @@ discover_config=_config/discover.yml
 update_config=_config/update.yml
 scrape_config=_config/scrape.yml
 search_config=_config/search_index.yml
+norender_config=_config/norender.yml
+onlyrender_config=_config/onlyrender.yml
 
 build: prepare-sources
 	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file)
@@ -33,6 +35,13 @@ scrape: prepare-sources
 
 search-index: prepare-sources
 	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(search_config)
+
+norender: prepare-sources
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(norender_config)
+
+# Call norender from a second process so that it's split into a separate ruby process and the memory is cleared between the scraping process and the rendering process.
+render: norender
+	bundle exec jekyll build --verbose --trace -d $(site_path) --config=$(config_file),$(index_file),$(onlyrender_config)
 
 serve:
 	bundle exec jekyll serve --host 0.0.0.0 --no-watch --trace -d $(site_path) --config=$(config_file),$(index_file) --skip-initial-build
