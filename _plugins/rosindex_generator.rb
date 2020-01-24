@@ -959,6 +959,7 @@ class Indexer < Jekyll::Generator
     @skip_discover = site.config['skip_discover']
     @skip_update = site.config['skip_update']
     @skip_scrape = site.config['skip_scrape']
+    @skip_rosindex_generation = site.config['skip_rosindex_generation']
 
     if @use_db_cache
       puts ("Reading cache: " << @db_cache_filename).blue
@@ -1399,6 +1400,10 @@ class Indexer < Jekyll::Generator
       db_cache_dirname = File.dirname(@db_cache_filename)
       Dir.mkdir(db_cache_dirname) unless File.directory?(db_cache_dirname)
       File.open(@db_cache_filename, 'w') {|f| f.write(Marshal.dump(@db)) }
+    end
+
+    if @skip_rosindex_generation
+      return ''
     end
 
     puts "Generating update report...".blue
