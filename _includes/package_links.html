@@ -13,9 +13,52 @@ Assumes the following are defined:
 {% endif %}
 
 <div class="list-group list-group-sm {%if horizontal%}list-group-horizontal list-group-justified{%endif%}">
-  <a class="{{list_group_class}}" target="_blank" href="{{ package.data.docs_uri }}" {% unless package.snapshot.documented %}disabled{% endunless %}><span style="margin-right: 5px;" class="glyphicon glyphicon-file"></span>{%if hide_link_labels%}<br>{%endif%} API Docs</a>
-  <a class="{{list_group_class}}" target="_blank" href="{{ package.data.browse_uri }}"><span class="glyphicon glyphicon-folder-open" style="margin-right:5px;"></span>{%if hide_link_labels%}<br>{%endif%} Browse Code</a>
-  <a class="{{list_group_class}} {% unless package.data.wiki.exists %}inactive{% endunless %}" target="_blank" href="http://wiki.ros.org/{{page.package_name}}?distro={{distro}}"><span style="margin-right: 5px;" class="glyphicon glyphicon-info-sign"></span>{%if hide_link_labels%}<br>{%endif%} Wiki</a>
-  <a class="{{list_group_class}} {% unless package.data.wiki.exists %}inactive{% endunless %}" target="_blank" href="http://http404error.github.io/roseco/graph.html?id=ros.json&focus={{page.package_name}}&height=1&depth=2&tred=standard&metagroup=false&colorby=Health&direction=LR" {% unless package.snapshot.documented %}disabled{% endunless %}><span style="margin-right: 5px;" class="glyphicon glyphicon-tree-deciduous"></span>{%if hide_link_labels%}<br>{%endif%}</a>
+  <a class="{{list_group_class}}"
+     target="_blank"
+     href="{{ package.data.docs_uri }}"
+     title="View API documentation on docs.ros.org"
+     {% unless package.snapshot.documented %}disabled{% endunless %}>
+       <span style="margin-right: 5px;" class="glyphicon glyphicon-file"></span>
+       {%if hide_link_labels%}<br>{%endif%}
+       API Docs
+  </a>
+  <a class="{{list_group_class}}"
+     target="_blank"
+     href="{{ package.data.browse_uri }}"
+     title="View source code on repository">
+       <span class="glyphicon glyphicon-folder-open" style="margin-right:5px;"></span>
+       {%if hide_link_labels%}<br>{%endif%}
+       Browse Code
+  </a>
+  {% assign has_ros1 = false %}
+  {% for ros_distro in site.ros_distros %}
+    {% if page.available_distros[ros_distro] %}
+      {% assign has_ros1 = true %}
+    {% endif %}
+  {% endfor %}
+  {% for old_ros_distro in site.old_ros_distros %}
+    {% if page.available_distros[old_ros_distro] %}
+      {% assign has_ros1 = true %}
+    {% endif %}
+  {% endfor %}
+  {% if has_ros1 %}
+  <a class="{{list_group_class}} {% comment %} TODO: rosindex currently does not detect if a wiki page exists - implement and then re-enable the following: {% unless package.data.wiki.exists %}inactive{% endunless %} {% endcomment %}"
+     target="_blank"
+     href="http://wiki.ros.org/{{page.package_name}}?distro={{distro}}"
+     title="View this package on wiki.ros.org">
+       <span style="margin-right: 5px;" class="glyphicon glyphicon-info-sign"></span>
+       {%if hide_link_labels%}<br>{%endif%}
+       Wiki
+  </a>
+  {%endif%}
+  <a class="{{list_group_class}}"
+     target="_blank" 
+     href="http://http404error.github.io/roseco/graph.html?id=ros.json&focus={{page.package_name}}&height=1&depth=2&tred=standard&metagroup=false&colorby=Health&direction=LR"
+     title="View RosEco package graph"
+     {% unless package.snapshot.documented %}disabled{% endunless %}>
+       <span style="margin-right: 5px;" class="glyphicon glyphicon-tree-deciduous"></span>
+       {%if hide_link_labels%}<br>{%endif%}
+       RosEco
+  </a>
   {% comment %}<a type="button" class="list-group-item {%if horizontal %}text-center{%endif%} inactive" target="_blank" ><span class="glyphicon glyphicon-fire"></span>{%if hide_link_labels%} CI{%endif%}</a>{% endcomment %}
 </div>
