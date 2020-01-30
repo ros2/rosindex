@@ -13,11 +13,10 @@ Assumes the following are defined:
 {% endif %}
 
 <div class="list-group list-group-sm {%if horizontal%}list-group-horizontal list-group-justified{%endif%}">
-  <a class="{{list_group_class}}"
-     target="_blank"
-     href="{{ package.data.docs_uri }}"
-     title="View API documentation on docs.ros.org"
-     {% unless package.snapshot.documented %}disabled{% endunless %}>
+  <a class="{{list_group_class}} {% if package.data.docs_uri == '' %}disabled{% endif %}" target="_blank"
+     {% unless package.data.docs_uri == '' %}href="{{ package.data.docs_uri }}"{% endunless %}
+     {% if package.data.docs_uri == '' %}href="javascript:void(0)"{% endif %}
+     title="View API documentation">
        <span style="margin-right: 5px;" class="glyphicon glyphicon-file"></span>
        {%if hide_link_labels%}<br>{%endif%}
        API Docs
@@ -51,11 +50,13 @@ Assumes the following are defined:
        Wiki
   </a>
   {%endif%}
-  <a class="{{list_group_class}}"
-     target="_blank" 
+  <a class="{{list_group_class}} {% unless package.snapshot.documented %}disabled{% endunless %}"
+     target="_blank"
+     {% if package.snapshot.documented %}
      href="http://http404error.github.io/roseco/graph.html?id=ros.json&focus={{page.package_name}}&height=1&depth=2&tred=standard&metagroup=false&colorby=Health&direction=LR"
-     title="View RosEco package graph"
-     {% unless package.snapshot.documented %}disabled{% endunless %}>
+     {% endif %}
+     {% unless package.snapshot.documented %}href="javascript:void(0);"{% endunless %}
+     title="View RosEco package graph">
        <span style="margin-right: 5px;" class="glyphicon glyphicon-tree-deciduous"></span>
        {%if hide_link_labels%}<br>{%endif%}
        RosEco
