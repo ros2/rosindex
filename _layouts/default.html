@@ -40,7 +40,7 @@
     <script src={{ "/bootstrap/js/bootstrap.min.js" | prepend: site.baseurl }} type="text/javascript"></script>
     <script src={{ "/js/jquery-cookie-1.4.1/jquery.cookie.js" | prepend: site.baseurl }} type="text/javascript"></script>
 
-    <script type="text/javascript" src={{ "/js/ga.js" | prepend: site.baseurl }} async></script>
+    {% include_cached google_analytics.html %}
     <script type="text/javascript" src={{ "/js/toc.js" | prepend: site.baseurl }}></script>
 
     <script src={{ "/js/distro_switch.js" | prepend: site.baseurl }}></script>
