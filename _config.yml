@@ -9,6 +9,8 @@ kramdown:
 
 profile: true
 
+google_analytics_property_id: 'UA-17821189-2'
+
 redcarpet:
   extensions:
     - fenced_code_blocks
