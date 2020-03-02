@@ -15,16 +15,16 @@ RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > \
          /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key add /tmp/ros.asc
 
-RUN echo 'deb http://archive.ubuntu.com/ubuntu/ focal universe\n' >> \
+RUN echo 'deb http://old-releases.ubuntu.com/ubuntu/ cosmic universe\n' >> \
         /etc/apt/sources.list
 RUN echo 'Package: *\n\
-Pin: release n=focal\n\
+Pin: release n=cosmic\n\
 Pin-Priority: -10\n\
 \n\
 Package: pandoc*\n\
-Pin: release n=focal\n\
+Pin: release n=cosmic\n\
 Pin-Priority: 500\n\
-' > /etc/apt/preferences.d/focal.pref
+' > /etc/apt/preferences.d/cosmic.pref
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
