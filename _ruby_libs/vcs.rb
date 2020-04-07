@@ -48,7 +48,7 @@ class VCS
 
     # make sure the uri actually exists
     resp = Typhoeus.get(@uri, followlocation: true, nosignal: true, connecttimeout: 3.0, ssl_verifypeer: false)
-    if resp.code == 404 or resp.code == 403
+    if resp.code >= 400
       raise VCSException.new("Code "+resp.code.to_s+" bad URI: " + @uri)
     elsif resp.timed_out?
       raise VCSException.new("Timed out URI: " + @uri)
