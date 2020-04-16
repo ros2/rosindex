@@ -94,6 +94,7 @@ ros2_distros:
   - 'dashing'
 
 ros_distros:
+  - 'noetic'
   - 'melodic'
   - 'kinetic'
 
