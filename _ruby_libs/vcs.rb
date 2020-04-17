@@ -92,16 +92,14 @@ class GIT < VCS
 
     if @origin.nil?
 
-      # check remote uri
-      begin
-        self.check_uri
-      rescue VCSException => e
-        raise VCSException.new("Could not reach git repository at uri: " + uri + ": " +e.msg)
-      end
-
       # add remote
       dputs " - adding remote for " << @uri << " to " << @local_path
-      @origin = @r.remotes.create('origin', @uri)
+      test_origin = @r.remotes.create('origin', @uri)
+
+      if not test_origin.check_connection(:fetch)
+        raise VCSException.new("Could not fetch from git repository at uri: " + uri)
+      end
+      @origin = test_origin
     end
   end
 
