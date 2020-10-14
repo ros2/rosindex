@@ -239,7 +239,7 @@ class Indexer < Jekyll::Generator
     end
     ci_data['job_url'] = manifest_yaml['devel_jobs'][0]
     # get additional test information if available
-    results_url = '/'+DEFAULT_LANGUAGE_PREFIX+'/'+distro+'/devel_jobs/'+repo_name+'/results.yaml'
+    results_url = "#{DEFAULT_LANGUAGE_PREFIX}/#{distro}/devel_jobs/#{repo_name}/results.yaml"
     results_response = Net::HTTP.get_response('docs.ros.org', results_url)
     if results_response.code != '200'
       ci_data['tooltip'] = "Latest build information: " + ci_data['timestamp'] + "\n" \
