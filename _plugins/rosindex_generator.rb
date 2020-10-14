@@ -218,7 +218,7 @@ class Indexer < Jekyll::Generator
 
   def get_ci_data(distro, package_name, repo_name)
     ci_data = Hash.new
-    manifest_url = '/'+DEFAULT_LANGUAGE_PREFIX+'/'+distro+'/api/'+package_name+'/manifest.yaml'
+    manifest_url = "#{DEFAULT_LANGUAGE_PREFIX}/#{distro}/api/#{package_name}/manifest.yaml"
     manifest_response = Net::HTTP.get_response('docs.ros.org', manifest_url)
     if manifest_response.code != '200'
       ci_data['tooltip'] = 'No CI information available for this package.'
