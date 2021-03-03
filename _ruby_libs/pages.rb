@@ -34,6 +34,7 @@ class DepPage < Jekyll::Page
 
     self.data['dep_name'] = dep_name
     self.data['dep_data'] = dep_data
+    self.data['title'] = 'System Dependency: ' + dep_name
 
     self.data['dep_data_per_platform'] = full_dep_data['data_per_platform']
     self.data['dependants_per_distro'] = full_dep_data['dependants_per_distro']
@@ -163,6 +164,7 @@ class DepListPage < Jekyll::Page
     self.data['n_list_pages'] = n_list_pages
     self.data['page_index'] = page_index
     self.data['list'] = list
+    self.data['title'] = 'System Dependencies'
 
     self.data['prev_page'] = [page_index - 1, 1].max
     self.data['next_page'] = [page_index + 1, n_list_pages].min
@@ -225,6 +227,7 @@ class PackagePage < Jekyll::Page
     self.read_yaml(File.join(@base, '_layouts'),'package.html')
     self.data['package_instances'] = package_instances
     self.data['package_name'] = package_instances.name
+    self.data['title'] = 'Package: ' + package_instances.name
 
     self.data['instances'] = package_instances.instances
 
@@ -253,6 +256,7 @@ class PackageInstancesPage < Jekyll::Page
     self.read_yaml(File.join(@base, '_layouts'),'package_instances.html')
     self.data['package_instances'] = package_instances
     self.data['package_name'] = package_instances.name
+    self.data['title'] = 'Package: ' + package_instances.name
   end
 end
 
@@ -270,6 +274,7 @@ class PackageInstancePage < Jekyll::Page
     self.data['instances'] = package_instances.instances
     self.data['instance'] = instance
     self.data['package_name'] = package_name
+    self.data['title'] = 'Package: ' + package_name
 
     self.data['instance_index_url'] = ['packages',package_instances.name].join('/')
     self.data['instance_base_url'] = ['p',package_name].join('/')
