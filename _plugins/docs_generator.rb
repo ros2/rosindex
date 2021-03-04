@@ -82,13 +82,6 @@ class DocPageGenerator < Jekyll::Generator
           site, parent_page, "doc/#{repo_name}/#{permalink}", content
         )
 
-        documents_index << {
-          'id' => documents_index.length,
-          'url' => document.url,
-          'title' => Nokogiri::HTML(document.data['title']).text,
-          'content' => Nokogiri::HTML(content['body'], &:noent).text
-        } unless site.config['skip_search_index'] if document.data['indexed']
-
         site.pages << document
       end
 
@@ -101,15 +94,6 @@ class DocPageGenerator < Jekyll::Generator
       end
     end
 
-    unless site.config['skip_search_index']
-      puts ("Generating lunr index for documentation pages...").blue
-      reference_field = 'id'
-      indexed_fields = ['title', 'content']
-      site.static_files.push(*precompile_lunr_index(
-        site, documents_index, reference_field, indexed_fields,
-        "search/docs/", site.config['search_index_shards'] || 1
-      ).to_a)
-    end
   end
 
   def generate_edit_url(repo_data, original_filepath)
