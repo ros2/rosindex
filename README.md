@@ -1,8 +1,9 @@
 ROS Index
 =========
 
-A simple static index for known ROS packages. It builds in jekyll with a plugin
-to clone repositories containing ROS packages, scrapes them for information,
+A simple static index for known ROS packages hosted at http://index.ros.org/.
+
+It builds in jekyll with a plugin to clone repositories containing ROS packages, scrapes them for information, 
 and uses client-side javascript for quick searching and visualization.
 
 [ROS Index](http://index.ros.org/)
@@ -11,8 +12,6 @@ and uses client-side javascript for quick searching and visualization.
 * [Design](http://index.ros.org/about/design)
 * [Development](http://index.ros.org/about/development)
 * [Contribute](http://index.ros.org/contribute)
-
-[![Stories in Ready](https://badge.waffle.io/rosindex/rosindex.svg?label=ready&title=Ready)](http://waffle.io/rosindex/rosindex)
 
 ## Building the site
 
