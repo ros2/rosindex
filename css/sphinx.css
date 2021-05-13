@@ -29,34 +29,3 @@ div.admonition p.admonition-title {
     background-color: rgba(132, 172, 255, 0.4);
     display: block;
 }
-
-/* Deal with sphinx-tabs extension CSS */
-
-.docutils.container {
-    margin-left: initial !important;
-    margin-right: initial !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    width: initial !important;
-}
-
-.menu.docutils.container {
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-    line-height: initial !important;
-}
-
-.sphinx-tab .highlight,
-.sphinx-tab pre {
-    margin-top: 5px !important;
-    margin-bottom: 5px !important;
-}
-
-.sphinx-tab.segment {
-    font-size: 1em !important;
-}
-
-.docutils.item {
-    margin-bottom: -2px !important;
-    line-height: initial !important;
-}
