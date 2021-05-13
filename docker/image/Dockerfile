@@ -11,7 +11,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY docker/image/ros.asc /tmp/ros.asc
-RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" > \
+RUN echo "deb http://packages.ros.org/ros/ubuntu bionic main" > \
          /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key add /tmp/ros.asc
 
