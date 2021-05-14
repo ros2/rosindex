@@ -27,6 +27,9 @@ platforms:
       squeeze: ""
       wheezy: ""
       jessie: ""
+      stretch: ""
+      buster: ""
+      bullseye: ""
       sid: "Sid (Unstable)"
   fedora:
     name: 'Fedora'
@@ -83,6 +86,17 @@ platforms:
       wily_python3: "Wily (Python3)"
       xenial: ""
       xenial_python3: "Xenial (Python3)"
+      yakkety: ""
+      zesty: ""
+      artful: ""
+      bionic: ""
+      cosmic: ""
+      disco: ""
+      eoan: ""
+      focal: ""
+      groovy: ""
+      hirsute: ""
+      impish: ""
 
 # These are the names of available package managers across all the
 # platforms
