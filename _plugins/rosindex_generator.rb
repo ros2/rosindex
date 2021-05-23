@@ -58,6 +58,11 @@ def get_raw_uri(uri_s, type, branch)
     path_split = uri_split[1].rpartition('.')
     repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
     return 'https://raw.githubusercontent.com/%s/%s/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
+  when 'gitlab.com'
+    uri_split = File.split(uri.path)
+    path_split = uri_split[1].rpartition('.')
+    repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
+    return 'https://gitlab.com/%s/%s/-/raw/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
   when 'bitbucket.org'
     uri_split = File.split(uri.path)
     return 'https://bitbucket.org/%s/%s/raw/%s' % [uri_split[0], uri_split[1], branch]
@@ -79,6 +84,11 @@ def get_browse_uri(uri_s, type, branch)
     path_split = uri_split[1].rpartition('.')
     repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
     return 'https://github.com/%s/%s/tree/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
+  when 'gitlab.com'
+    uri_split = File.split(uri.path)
+    path_split = uri_split[1].rpartition('.')
+    repo_name = if path_split[1] == '.' then path_split[0] else path_split[-1] end
+    return 'https://gitlab.com/%s/%s/-/tree/%s' % [uri_split[0].sub(/^\//, ''), repo_name, branch]
   when 'bitbucket.org'
     uri_split = File.split(uri.path)
     return 'https://bitbucket.org/%s/%s/src/%s' % [uri_split[0], uri_split[1], branch]
