@@ -92,24 +92,24 @@ index_old_doc_paths: false
 ros2_distros:
   - 'galactic'
   - 'foxy'
-  - 'dashing'
 
 ros_distros:
   - 'noetic'
   - 'melodic'
-  - 'kinetic'
 
 old_ros2_distros:
   - 'ardent'
   - 'bouncy'
   - 'crystal'
   - 'eloquent'
+  - 'dashing'
 
 old_ros_distros:
   - 'lunar'
   - 'jade'
   - 'indigo'
   - 'hydro'
+  - 'kinetic'
 
 # package list page
 packages_per_page: 200
